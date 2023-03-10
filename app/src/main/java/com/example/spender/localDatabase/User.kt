@@ -1,4 +1,4 @@
-package com.example.spender.data
+package com.example.spender.localDatabase
 
 import android.graphics.Bitmap
 import androidx.room.Embedded

@@ -7,7 +7,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,24 +14,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.example.spender.R
-import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
-import com.example.spender.ui.navigation.screens.NavGraphs
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
-import com.example.spender.ui.theme.BackgroundWhite
-import com.ramcosta.composedestinations.DestinationsNavHost
+import com.example.spender.ui.theme.WhiteBackground
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
-
-
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@FirstNavGraph(start = true)
+@Destination
 @Composable
-fun AnimatedSplashScreen(
+fun SplashScreen(
     navigator: DestinationsNavigator
 ){
     var startAnimation by remember { mutableStateOf(false) }
@@ -45,18 +40,22 @@ fun AnimatedSplashScreen(
     LaunchedEffect(key1 = true){
         startAnimation = true
         delay(4000)
+        navigator.popBackStack()
+        navigator.navigate(FirstScreenDestination)
     }
     Splash(alpha = alphaAnim.value)
+
 }
 @Composable
 fun Splash(alpha: Float){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundWhite),
-        verticalArrangement = Arrangement.Center,
+            .background(WhiteBackground),
+        verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
+        Spacer(modifier = Modifier.size(60.dp))
         Box(
             contentAlignment = Alignment.Center
         ) {
@@ -69,23 +68,20 @@ fun Splash(alpha: Float){
                 contentScale = ContentScale.Fit
             )
         }
-        Spacer(modifier = Modifier.size(60.dp))
         Text(
             "Spender",
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.h3
         )
     }
 }
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@FirstNavGraph(start = true)
-@Destination
-@Composable
+/*@Composable
 fun SplashScreen(
     navigator: DestinationsNavigator
 ) {
     // Splash screen layout
+
     // Тут будет выбор запускаемого экрана в зависимости от того вошел юзер или нет
     val user_in = true // взятие user_state откуда-нибудь
     when (user_in) {
@@ -106,4 +102,4 @@ fun SplashScreen(
             navigator.navigate(FirstScreenDestination)
         }
     }
-}
+}*/

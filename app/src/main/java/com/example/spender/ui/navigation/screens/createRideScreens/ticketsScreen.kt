@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.profile_screens
+package com.example.spender.ui.navigation.screens.createRideScreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,14 +7,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.nav_graphs.ProfileNavGraph
+import com.example.spender.ui.navigation.nav_graphs.CreateRideNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@ProfileNavGraph(start = true)
+@CreateRideNavGraph
 @Destination
 @Composable
-fun ProfileScreen(
+fun TicketsScreen(
     navigator: DestinationsNavigator
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -23,7 +23,7 @@ fun ProfileScreen(
                 // navigator.
             }
         ) {
-            Text("Profile screen")
+            Text("Tickets screen")
         }
     }
 }

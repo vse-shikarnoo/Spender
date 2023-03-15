@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.balance_screens
+package com.example.spender.ui.navigation.screens.balanceScreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

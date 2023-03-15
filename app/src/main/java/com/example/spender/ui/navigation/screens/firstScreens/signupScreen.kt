@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.first_screens
+package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
@@ -19,7 +19,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @FirstNavGraph
 @Destination
 @Composable
-fun LogInScreen(
+fun SignUpScreen(
     navigator: DestinationsNavigator
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -31,7 +31,7 @@ fun LogInScreen(
                 confirm.value = true
             }
         ) {
-            Text("Log In")
+            Text("Sign Up")
         }
 
         if (confirm.value) { // user_state изменился

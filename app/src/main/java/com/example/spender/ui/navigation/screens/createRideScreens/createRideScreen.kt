@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.ridemap_screens
+package com.example.spender.ui.navigation.screens.createRideScreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,24 +7,24 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.nav_graphs.RideMapNavGraph
-import com.example.spender.ui.navigation.screens.destinations.ItemScreenDestination
+import com.example.spender.ui.navigation.nav_graphs.CreateRideNavGraph
+import com.example.spender.ui.navigation.screens.destinations.TicketsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@RideMapNavGraph(start = true)
+@CreateRideNavGraph(start = true)
 @Destination
 @Composable
-fun RideMapScreen(
+fun CreateRideScreen(
     navigator: DestinationsNavigator
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
-                navigator.navigate(ItemScreenDestination)
+                navigator.navigate(TicketsScreenDestination)
             }
         ) {
-            Text("Ride map screen")
+            Text("Create ride screen")
         }
     }
 }

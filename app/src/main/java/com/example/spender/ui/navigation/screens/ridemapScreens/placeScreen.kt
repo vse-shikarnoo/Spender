@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.create_ride_screens
+package com.example.spender.ui.navigation.screens.ridemapScreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,14 +7,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.nav_graphs.CreateRideNavGraph
+import com.example.spender.ui.navigation.nav_graphs.RideMapNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@CreateRideNavGraph
+@RideMapNavGraph
 @Destination
 @Composable
-fun TicketsScreen(
+fun ItemScreen(
     navigator: DestinationsNavigator
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -23,7 +23,7 @@ fun TicketsScreen(
                 // navigator.
             }
         ) {
-            Text("Tickets screen")
+            Text("Item screen")
         }
     }
 }

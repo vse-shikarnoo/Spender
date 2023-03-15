@@ -17,12 +17,16 @@ import androidx.navigation.NavController
 import com.example.spender.R
 import com.example.spender.ui.navigation.screens.NavGraphs
 import com.example.spender.ui.navigation.screens.appCurrentDestinationAsState
-import com.example.spender.ui.navigation.screens.destinations.*
+import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.CreateRideScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.ProfileScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.RideMapScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.TypedDestination
 import com.example.spender.ui.navigation.screens.startAppDestination
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
 
-enum class BottomBarDestination(
+enum class BottomBarDestinations(
     val direction: DirectionDestinationSpec,
     val icon: ImageVector,
     @StringRes val label: Int
@@ -41,7 +45,7 @@ fun BottomBar(
         ?: NavGraphs.root.startAppDestination
 
     BottomNavigation {
-        BottomBarDestination.values().forEach { destination ->
+        BottomBarDestinations.values().forEach { destination ->
             BottomNavigationItem(
                 selected = currentDestination == destination.direction,
                 onClick = {

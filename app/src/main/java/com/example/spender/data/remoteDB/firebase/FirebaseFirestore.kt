@@ -54,7 +54,7 @@ class FirebaseFirestoreManager @Inject constructor() {
 
         fun createUser(
             @NotEmpty userID: String, // from Auth
-            onSuccess: (DocumentReference?) -> Unit = {},
+            onSuccess: (DocumentReference) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             db.collection(CollectionNames.USER).document(userID).get()
@@ -64,16 +64,36 @@ class FirebaseFirestoreManager @Inject constructor() {
 
         // Getters
 
+        fun getUserDocRef(
+            @NotEmpty userID: String, // from Auth
+            onSuccess: (DocumentReference) -> Unit = {},
+            onFailure: (Exception) -> Unit = {}
+        ) {
+            db.collection(CollectionNames.USER).document(userID).get()
+                .addOnSuccessListener { userDocSnapshot ->
+                    if (userDocSnapshot.exists()) {
+                        onSuccess(userDocSnapshot.reference)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
+                }
+                .addOnFailureListener { e -> onFailure(e) }
+        }
+
         fun getUserName(
             userDocRef: DocumentReference,
-            onSuccess: (HashMap<String, String>?) -> Unit = {},
+            onSuccess: (HashMap<String, String>) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             userDocRef.get()
                 .addOnSuccessListener { userDoc ->
-                    val name =
-                        userDoc.data?.get(CollectionUserDocumentFieldNames.NAME) as HashMap<String, String>?
-                    onSuccess(name)
+                    val name = userDoc.data?.get(CollectionUserDocumentFieldNames.NAME)
+                        as HashMap<String, String>?
+                    if (name != null) {
+                        onSuccess(name)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e ->
                     onFailure(e)
@@ -82,41 +102,53 @@ class FirebaseFirestoreManager @Inject constructor() {
 
         fun getUserAge(
             userDocRef: DocumentReference,
-            onSuccess: (Int?) -> Unit = {},
+            onSuccess: (Int) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             userDocRef.get()
                 .addOnSuccessListener { userDoc ->
                     val age = userDoc.data?.get(CollectionUserDocumentFieldNames.AGE) as Int?
-                    onSuccess(age)
+                    if (age != null) {
+                        onSuccess(age)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e -> onFailure(e) }
         }
 
         fun getUserNickname(
             userDocRef: DocumentReference,
-            onSuccess: (String?) -> Unit = {},
+            onSuccess: (String) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             userDocRef.get()
                 .addOnSuccessListener { userDoc ->
-                    val nickname =
-                        userDoc.data?.get(CollectionUserDocumentFieldNames.NICKNAME) as String?
-                    onSuccess(nickname)
+                    val nickname = userDoc.data?.get(CollectionUserDocumentFieldNames.NICKNAME)
+                        as String?
+                    if (nickname != null) {
+                        onSuccess(nickname)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e -> onFailure(e) }
         }
 
         fun getUserFriends(
             userDocRef: DocumentReference,
-            onSuccess: (Array<DocumentReference>?) -> Unit = {},
+            onSuccess: (Array<DocumentReference>) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             userDocRef.get()
                 .addOnSuccessListener { userDoc ->
-                    val friends =
-                        userDoc.data?.get(CollectionUserDocumentFieldNames.FRIENDS) as Array<DocumentReference>?
-                    onSuccess(friends)
+                    val friends = userDoc.data?.get(CollectionUserDocumentFieldNames.FRIENDS)
+                        as Array<DocumentReference>?
+                    if (friends != null) {
+                        onSuccess(friends)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e -> onFailure(e) }
         }
@@ -301,7 +333,7 @@ class FirebaseFirestoreManager @Inject constructor() {
             batch.update(
                 tripDocRef,
                 CollectionTripDocumentFieldNames.MEMBERS,
-                FieldValue.arrayUnion(*members.toTypedArray())
+                FieldValue.arrayUnion(members)
             )
 
             members.forEach { member ->
@@ -321,14 +353,17 @@ class FirebaseFirestoreManager @Inject constructor() {
 
         fun getTripName(
             tripDocRef: DocumentReference,
-            onSuccess: (String?) -> Unit = {},
+            onSuccess: (String) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             tripDocRef.get()
                 .addOnSuccessListener { tripDoc ->
-                    val name =
-                        tripDoc.data?.get(CollectionTripDocumentFieldNames.NAME) as String?
-                    onSuccess(name)
+                    val name = tripDoc.data?.get(CollectionTripDocumentFieldNames.NAME) as String?
+                    if (name != null) {
+                        onSuccess(name)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e ->
                     onFailure(e)
@@ -337,14 +372,18 @@ class FirebaseFirestoreManager @Inject constructor() {
 
         fun getTripCreator(
             tripDocRef: DocumentReference,
-            onSuccess: (DocumentReference?) -> Unit = {},
+            onSuccess: (DocumentReference) -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
             tripDocRef.get()
                 .addOnSuccessListener { tripDoc ->
-                    val creator =
-                        tripDoc.data?.get(CollectionTripDocumentFieldNames.NAME) as DocumentReference?
-                    onSuccess(creator)
+                    val creator = tripDoc.data?.get(CollectionTripDocumentFieldNames.NAME)
+                        as DocumentReference?
+                    if (creator != null) {
+                        onSuccess(creator)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e ->
                     onFailure(e)
@@ -353,17 +392,40 @@ class FirebaseFirestoreManager @Inject constructor() {
 
         fun getTripMembers(
             tripDocRef: DocumentReference,
-            onSuccess: (List<DocumentReference>) -> Unit,
-            onFailure: (Exception) -> Unit
+            onSuccess: (List<DocumentReference>) -> Unit = {},
+            onFailure: (Exception) -> Unit = {}
         ) {
             tripDocRef.get()
                 .addOnSuccessListener { tripDoc ->
                     val lst = tripDoc.data?.get(CollectionTripDocumentFieldNames.MEMBERS)
-                    onSuccess(lst as List<DocumentReference>)
+                        as List<DocumentReference>?
+                    if (lst != null) {
+                        onSuccess(lst)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
                 }
                 .addOnFailureListener { e ->
                     onFailure(e)
                 }
+        }
+
+        fun getUserTrips(
+            userDocRef: DocumentReference,
+            onSuccess: (Array<DocumentReference>) -> Unit = {},
+            onFailure: (Exception) -> Unit = {}
+        ) {
+            userDocRef.get()
+                .addOnSuccessListener { userDocSnaphot ->
+                    val trips = userDocSnaphot.data?.get(CollectionUserDocumentFieldNames.TRIPS)
+                        as Array<DocumentReference>?
+                    if (trips != null) {
+                        onSuccess(trips)
+                    } else {
+                        onFailure(NoSuchElementException())
+                    }
+                }
+                .addOnFailureListener { e -> onFailure(e) }
         }
 
         // Updates
@@ -375,6 +437,38 @@ class FirebaseFirestoreManager @Inject constructor() {
             onFailure: (Exception) -> Unit = {}
         ) {
             tripDocRef.update(CollectionTripDocumentFieldNames.NAME, newName)
+                .addOnSuccessListener { onSuccess() }
+                .addOnFailureListener { e -> onFailure(e) }
+        }
+
+        // Deletes
+
+        fun deleteTrip(
+            tripDocRef: DocumentReference,
+            onSuccess: () -> Unit = {},
+            onFailure: (Exception) -> Unit = {}
+        ) {
+            val batch = db.batch()
+
+            getTripMembers(
+                tripDocRef,
+                { members ->
+                    members.forEach { member ->
+                        batch.update(
+                            member,
+                            CollectionUserDocumentFieldNames.TRIPS,
+                            FieldValue.arrayRemove(tripDocRef)
+                        )
+                    }
+                },
+                { e ->
+                    onFailure(e)
+                }
+            )
+
+            batch.delete(tripDocRef)
+
+            batch.commit()
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { e -> onFailure(e) }
         }
@@ -394,25 +488,25 @@ class FirebaseFirestoreManager @Inject constructor() {
         ) {
             val batch = db.batch()
 
-            val categoryDocRef =
+            val spendDocRef =
                 tripDocRef.collection(CollectionTripDocumentFieldNames.SubCollectionSpends)
                     .document()
 
             batch.update(
-                categoryDocRef,
+                spendDocRef,
                 SubCollectionSpendsDocumentFieldNames.NAME,
                 name
             )
 
             batch.update(
-                categoryDocRef,
+                spendDocRef,
                 SubCollectionSpendsDocumentFieldNames.CATEGORY,
                 category
             )
 
             for (payer in payers) {
                 batch.update(
-                    categoryDocRef,
+                    spendDocRef,
                     "${SubCollectionSpendsDocumentFieldNames.MEMBERS_SPEND_CATEGORY}.${payer.key}",
                     (payer.value).toString()
                 )
@@ -426,45 +520,59 @@ class FirebaseFirestoreManager @Inject constructor() {
         // Updates
 
         fun updateName(
-            categoryDocRef: DocumentReference,
+            spendDocRef: DocumentReference,
             @NotEmpty newName: String,
             onSuccess: () -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
-            categoryDocRef.update(SubCollectionSpendsDocumentFieldNames.NAME, newName)
+            spendDocRef.update(SubCollectionSpendsDocumentFieldNames.NAME, newName)
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { e -> onFailure(e) }
         }
 
         fun updateCategory(
-            categoryDocRef: DocumentReference,
+            spendDocRef: DocumentReference,
             @NotEmpty newCategory: String,
             onSuccess: () -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
-            categoryDocRef.update(SubCollectionSpendsDocumentFieldNames.CATEGORY, newCategory)
+            spendDocRef.update(SubCollectionSpendsDocumentFieldNames.CATEGORY, newCategory)
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { e -> onFailure(e) }
         }
 
         fun updateMemberSpend(
-            categoryDocRef: DocumentReference,
+            spendDocRef: DocumentReference,
             newSpend: Pair<String, Double>,
             onSuccess: () -> Unit = {},
             onFailure: (Exception) -> Unit = {}
         ) {
-            categoryDocRef.update(
+            spendDocRef.update(
                 "${SubCollectionSpendsDocumentFieldNames.MEMBERS_SPEND_CATEGORY}.${newSpend.first}",
                 newSpend.second
             )
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { e -> onFailure(e) }
         }
+
+        // Deletes
+
+        fun deleteSpend(
+            spendDocRef: DocumentReference,
+            onSuccess: () -> Unit = {},
+            onFailure: (Exception) -> Unit = {}
+        ) {
+            spendDocRef.delete()
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener { e -> onFailure(e) }
+        }
     }
 
     // Queries
 
-    fun checkIfCurrentUserIsCreatorOfTrip(
+    fun queryCheckIfUserIsCreatorOfTrip(
         tripDocRef: DocumentReference,
         @NotEmpty userID: String,
         onSuccess: () -> Unit = {},

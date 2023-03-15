@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.first_screens
+package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -34,8 +34,8 @@ fun SplashScreen(
         )
     }
     // Тут будет выбор запускаемого экрана в зависимости от того вошел юзер или нет
-    val user_in = true // взятие user_state откуда-нибудь
-    when (user_in) {
+    val userIn = true // взятие user_state откуда-нибудь
+    when (userIn) {
         true -> {
             val navController = rememberNavController()
             Scaffold(

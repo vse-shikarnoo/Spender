@@ -378,7 +378,6 @@ class FirebaseFirestoreManager @Inject constructor() {
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { e -> onFailure(e) }
         }
-
     }
 
     inner class SpendManager {
@@ -461,7 +460,6 @@ class FirebaseFirestoreManager @Inject constructor() {
                 .addOnSuccessListener { onSuccess() }
                 .addOnFailureListener { e -> onFailure(e) }
         }
-
     }
 
     // Queries
@@ -483,5 +481,4 @@ class FirebaseFirestoreManager @Inject constructor() {
             }
             .addOnFailureListener { e -> onFailure(e) }
     }
-
 }

@@ -21,8 +21,8 @@ class FirebaseAuthManager @Inject constructor() {
         onFailure: (Exception) -> Unit
     ) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener{ onSuccess() }
-            .addOnFailureListener{ e -> onFailure(e) }
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
     }
 
     fun signUp(
@@ -32,8 +32,8 @@ class FirebaseAuthManager @Inject constructor() {
         onFailure: (Exception) -> Unit
     ) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener{ onSuccess() }
-            .addOnFailureListener{ e -> onFailure(e) }
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
     }
 
     fun verifyPassword(
@@ -42,8 +42,8 @@ class FirebaseAuthManager @Inject constructor() {
         onFailure: (Exception) -> Unit
     ) {
         user.sendEmailVerification()
-            .addOnSuccessListener{ onSuccess() }
-            .addOnFailureListener{ e -> onFailure(e) }
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
     }
 
     fun signOut() {
@@ -56,8 +56,7 @@ class FirebaseAuthManager @Inject constructor() {
         onFailure: (Exception) -> Unit
     ) {
         firebaseAuth.sendPasswordResetEmail(email)
-            .addOnSuccessListener{ onSuccess() }
-            .addOnFailureListener{ e -> onFailure(e) }
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
     }
-
 }

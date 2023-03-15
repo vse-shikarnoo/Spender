@@ -2,7 +2,6 @@ package com.example.spender.ui.navigation.screens.first_screens
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -26,10 +25,12 @@ fun SignUpScreen(
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         val confirm = remember { mutableStateOf(false) }
 
-        Button(onClick = {
-            // подтверждение регистрации
-            confirm.value = true
-        }) {
+        Button(
+            onClick = {
+                // подтверждение регистрации
+                confirm.value = true
+            }
+        ) {
             Text("Sign Up")
         }
 

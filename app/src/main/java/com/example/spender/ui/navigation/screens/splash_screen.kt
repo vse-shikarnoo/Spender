@@ -44,7 +44,7 @@ fun SplashScreen(
                 }
             ) {
                 DestinationsNavHost(
-                    navController = navController, //!! this is important
+                    navController = navController, // !! this is important
                     navGraph = NavGraphs.bottom
                 )
             }

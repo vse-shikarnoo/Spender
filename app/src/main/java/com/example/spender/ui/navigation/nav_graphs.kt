@@ -37,3 +37,9 @@ annotation class CreateRideNavGraph(
 annotation class ProfileNavGraph(
     val start: Boolean = false
 )
+
+@RootNavGraph
+@com.ramcosta.composedestinations.annotation.NavGraph
+annotation class TestNavGraph(
+    val start: Boolean = false
+)

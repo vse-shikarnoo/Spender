@@ -6,6 +6,8 @@ plugins {
     id 'com.google.devtools.ksp' version '1.8.10-1.0.9'
     // Room database
     id 'kotlin-kapt'
+    // Firebase
+    id 'com.google.gms.google-services' // Add the Google services Gradle plugin
 }
 
 android {
@@ -77,4 +79,16 @@ dependencies {
     implementation "androidx.room:room-runtime:2.5.0"
     kapt "androidx.room:room-compiler:2.5.0"
     implementation "androidx.room:room-ktx:2.5.0"
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:31.2.3') // Import the Firebase BoM
+        // Firebase Analytics
+        implementation 'com.google.firebase:firebase-analytics-ktx'
+        // Firebase Firestore
+        implementation 'com.google.firebase:firebase-firestore-ktx'
+        // Firebase Auth (Email + Password) (Phone)
+        implementation 'com.google.firebase:firebase-auth-ktx'
+
+    // Validation API
+    implementation 'javax.validation:validation-api:2.0.1.Final'
 }

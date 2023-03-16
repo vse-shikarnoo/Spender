@@ -1,6 +1,6 @@
 package com.example.spender.ui.theme
 
-import androidx.compose.material.Typography
+import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -18,26 +18,27 @@ val Roboto = FontFamily(
     Font(R.font.roboto_thin),
 
 )
-val Typography = Typography(
-    h3 = TextStyle(
+val spenderTypography = Typography(
+    headlineLarge = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Light,
         fontSize = 36.sp,
         color = GreenMain,
         letterSpacing = 12.sp
     ),
-    h5 = TextStyle(
+    headlineMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Medium,
         fontSize = 20.sp,
         color = GreenMain,
         letterSpacing = 4.sp
     ),
-    button = TextStyle(
+    labelMedium = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
-        color = WhiteBackground
+        color = WhiteBackground,
+        letterSpacing = 1.sp
     ),/*
     caption = TextStyle(
         fontFamily = FontFamily.Default,

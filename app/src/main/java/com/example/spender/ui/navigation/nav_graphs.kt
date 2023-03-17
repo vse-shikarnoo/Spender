@@ -14,7 +14,7 @@ annotation class BottomNavGraph(
     val start: Boolean = false
 )
 
-@BottomNavGraph(start = true)
+@BottomNavGraph
 @com.ramcosta.composedestinations.annotation.NavGraph
 annotation class BalanceNavGraph(
     val start: Boolean = false

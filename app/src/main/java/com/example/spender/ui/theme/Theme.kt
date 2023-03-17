@@ -18,6 +18,7 @@ private val LightColorPalette = lightColorScheme(
     primary = GreenMain,
     onPrimary = GreenLight,
     secondary = WhiteBackground,
+    onSecondary = GreenMain,
     background = WhiteBackground,
     surface = WhiteBackground,
 

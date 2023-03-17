@@ -18,6 +18,8 @@ private val LightColorPalette = lightColorScheme(
     primary = GreenMain,
     onPrimary = GreenLight,
     secondary = WhiteBackground,
+    background = WhiteBackground,
+    surface = WhiteBackground,
 
 
     /* Other default colors to override
@@ -37,7 +39,6 @@ fun SpenderTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
     } else {
         LightColorPalette
     }
-
     val systemUiController = rememberSystemUiController()
     SideEffect {
         systemUiController.setStatusBarColor(

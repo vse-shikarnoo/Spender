@@ -55,6 +55,8 @@ jobs:
           java-version: '11'
       - name: 🔐 Set up permission
         run: chmod +x gradlew
+      - name: Create local.properties
+        run: touch local.properties
       - name: 🔨 Build internal release
         run: ./gradlew assembleDebug
       - name: 🔄 Upload debug apk

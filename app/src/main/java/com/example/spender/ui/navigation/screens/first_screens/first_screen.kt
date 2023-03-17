@@ -60,7 +60,7 @@ fun ButtonGroup(){
         Button(onClick = {},buttonModifier){
             Image(
                 painterResource(id = R.drawable.google),
-                contentDescription = "gooogle icon",
+                contentDescription = "goooogle icon",
                 modifier = Modifier.size(24.dp)
             )
             Text("Sign in with Google",

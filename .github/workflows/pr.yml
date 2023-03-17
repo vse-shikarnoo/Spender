@@ -17,6 +17,8 @@ jobs:
           java-version: '11'
       - name: 🔐 Set up permission
         run: chmod +x gradlew
+      - name: Create local.properties
+        run: touch local.properties
       - name: 🔨 Build debug
         run: ./gradlew assembleDebug
       - name: 🛠️ Unit-test

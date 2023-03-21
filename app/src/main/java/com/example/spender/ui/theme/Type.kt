@@ -39,7 +39,15 @@ val spenderTypography = Typography(
         fontSize = 16.sp,
         color = WhiteBackground,
         letterSpacing = 1.sp
-    ),/*
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        color = GreenMain,
+        letterSpacing = 1.sp
+    )
+    /*
     caption = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

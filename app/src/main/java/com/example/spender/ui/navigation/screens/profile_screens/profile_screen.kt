@@ -1,16 +1,12 @@
 package com.example.spender.ui.navigation.screens.profile_screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import com.example.spender.R
 import com.example.spender.ui.navigation.nav_graphs.ProfileNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -22,9 +18,11 @@ fun ProfileScreen(
     navigator: DestinationsNavigator
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Button(onClick = {
-            //navigator.
-        }) {
+        Button(
+            onClick = {
+                // navigator.
+            }
+        ) {
             Text("Profile screen")
         }
     }

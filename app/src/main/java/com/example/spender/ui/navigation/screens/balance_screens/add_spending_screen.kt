@@ -1,7 +1,6 @@
 package com.example.spender.ui.navigation.screens.balance_screens
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -19,9 +18,11 @@ fun AddSpendingScreen(
     navigator: DestinationsNavigator
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Button(onClick = {
-            //navigator.
-        }) {
+        Button(
+            onClick = {
+                // navigator.
+            }
+        ) {
             Text("Add screen")
         }
     }

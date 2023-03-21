@@ -134,7 +134,7 @@ fun Content() {
     }
     Divider(color = GreenLight, modifier = Modifier.padding(24.dp))
     Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         OutlinedTextField(
             value = text,

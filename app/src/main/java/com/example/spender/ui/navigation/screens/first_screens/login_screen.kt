@@ -90,14 +90,14 @@ fun LogInScreen(
 }
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LogInContent(){
+fun LogInContent() {
     var text by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     GreetingGroup()
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
+    ) {
         OutlinedTextField(
             value = text,
             label = { Text(text = "Email") },

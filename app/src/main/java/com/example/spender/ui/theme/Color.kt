@@ -8,6 +8,8 @@ val GreenMain = Color(0xFF686C33)
 val GreenLight = Color(0xFFC5BAA9)
 val WhiteBackground = Color(0xFFF6F4F5)
 val GreenLightBackground = Color(0xFFF6F4F5)
+val RedBalance = Color(0xFFA01414)
+val GreenBalance = Color(0xFF12921E)
 @Composable
 fun spenderTextFieldColors(
     primary: Color = GreenMain,

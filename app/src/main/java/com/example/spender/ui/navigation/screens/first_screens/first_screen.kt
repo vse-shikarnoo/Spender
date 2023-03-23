@@ -14,9 +14,7 @@ import com.example.spender.R
 import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.LogInScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.SignUpScreenDestination
-import com.example.spender.ui.theme.GreenLight
-import com.example.spender.ui.theme.GreenMain
-import com.example.spender.ui.theme.WhiteBackground
+import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -103,6 +101,6 @@ fun GreetingGroup() {
             "Travel more, spend less",
             style = MaterialTheme.typography.headlineMedium
         )
-        Divider(color = GreenLight, modifier = Modifier.padding(24.dp))
+        Divider(color = GreenLight, modifier = Modifier.padding(SpenderPadding.medium))
     }
 }

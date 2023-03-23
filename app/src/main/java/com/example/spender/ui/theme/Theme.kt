@@ -3,6 +3,7 @@ package com.example.spender.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -51,10 +52,14 @@ fun SpenderTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
             darkIcons = true
         )
     }
-    MaterialTheme(
-        colorScheme = colors,
-        typography = spenderTypography,
-        shapes = spenderShapes,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalPadding provides Padding(),
+    ) {
+        MaterialTheme(
+            colorScheme = colors,
+            typography = spenderTypography,
+            shapes = spenderShapes,
+            content = content
+        )
+    }
 }

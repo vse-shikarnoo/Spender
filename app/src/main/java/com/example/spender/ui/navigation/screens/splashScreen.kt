@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
 import com.example.spender.R
 import com.example.spender.ui.navigation.BottomBar
-import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
+import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.NavGraphs
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.ramcosta.composedestinations.DestinationsNavHost

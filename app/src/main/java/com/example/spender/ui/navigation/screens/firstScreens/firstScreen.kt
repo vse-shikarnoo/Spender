@@ -7,13 +7,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
+import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.LogInScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.SignUpScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@FirstNavGraph(start = true)
 @Destination
 @Composable
 fun FirstScreen(

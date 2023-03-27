@@ -10,7 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
+import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.SplashScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

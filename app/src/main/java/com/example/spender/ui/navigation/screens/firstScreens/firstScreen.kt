@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.first_screens
+package com.example.spender.ui.navigation.screens.firstScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -11,17 +11,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
+import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.theme.GreenLight
-import com.example.spender.ui.theme.WhiteBackground
 import com.example.spender.ui.theme.GreenMain
+import com.example.spender.ui.theme.WhiteBackground
 import com.ramcosta.composedestinations.annotation.Destination
 
 @FirstNavGraph
 @Destination
 @Composable
 fun FirstScreen(
-    //navigator: DestinationsNavigator
+    // navigator: DestinationsNavigator
 ) {
     Column(
         modifier = Modifier
@@ -33,10 +33,10 @@ fun FirstScreen(
         ButtonGroup()
     }
 }
-//add navigator to ButtonGroup
+// add navigator to ButtonGroup
 @Preview
 @Composable
-fun ButtonGroup(){
+fun ButtonGroup() {
     val buttonModifier = Modifier
         .fillMaxWidth()
         .padding(4.dp)
@@ -45,25 +45,28 @@ fun ButtonGroup(){
             .padding(24.dp),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         Button(
             onClick = {},
             buttonModifier,
-            colors = ButtonDefaults.buttonColors(containerColor = GreenMain,
-                contentColor = WhiteBackground)
-        ){
+            colors = ButtonDefaults.buttonColors(
+                containerColor = GreenMain,
+                contentColor = WhiteBackground
+            )
+        ) {
             Text("Log In", style = MaterialTheme.typography.labelMedium)
         }
-        Button(onClick = {},buttonModifier){
+        Button(onClick = {}, buttonModifier) {
             Text("Sign Up", style = MaterialTheme.typography.labelMedium)
         }
-        Button(onClick = {},buttonModifier){
+        Button(onClick = {}, buttonModifier) {
             Image(
                 painterResource(id = R.drawable.google),
                 contentDescription = "google icon",
                 modifier = Modifier.size(24.dp)
             )
-            Text("Sign in with Google",
+            Text(
+                "Sign in with Google",
                 Modifier.padding(start = 10.dp),
                 style = MaterialTheme.typography.labelMedium,
             )
@@ -73,11 +76,11 @@ fun ButtonGroup(){
 
 @Preview
 @Composable
-fun GreetingGroup(){
+fun GreetingGroup() {
     Column(
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         Box(
             contentAlignment = Alignment.Center
         ) {
@@ -89,7 +92,8 @@ fun GreetingGroup(){
                 contentScale = ContentScale.Fit
             )
         }
-        Text("Travel more, spend less",
+        Text(
+            "Travel more, spend less",
             style = MaterialTheme.typography.headlineMedium
         )
         Divider(color = GreenLight, modifier = Modifier.padding(24.dp))

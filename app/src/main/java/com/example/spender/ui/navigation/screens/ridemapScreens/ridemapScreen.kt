@@ -7,7 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.nav_graphs.RideMapNavGraph
+import com.example.spender.ui.navigation.RideMapNavGraph
 import com.example.spender.ui.navigation.screens.destinations.ItemScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

@@ -16,7 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.ui.navigation.nav_graphs.FirstNavGraph
+import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.theme.WhiteBackground
 import com.ramcosta.composedestinations.annotation.Destination
@@ -29,7 +29,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
     navigator: DestinationsNavigator
-){
+) {
     var startAnimation by remember { mutableStateOf(false) }
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
@@ -37,24 +37,23 @@ fun SplashScreen(
             durationMillis = 3000
         )
     )
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         startAnimation = true
         delay(4000)
         navigator.popBackStack()
         navigator.navigate(FirstScreenDestination)
     }
     Splash(alpha = alphaAnim.value)
-
 }
 @Composable
-fun Splash(alpha: Float){
+fun Splash(alpha: Float) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(WhiteBackground),
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         Spacer(modifier = Modifier.size(60.dp))
         Box(
             contentAlignment = Alignment.Center

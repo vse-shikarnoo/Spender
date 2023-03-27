@@ -1,26 +1,31 @@
 package com.example.spender.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+private val DarkColorPalette = darkColorScheme(
+    primary = GreenMain,
+    onPrimary = GreenLight,
+    secondary = WhiteBackground,
+    background = WhiteBackground,
+    surface = WhiteBackground,
 )
 
-private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+private val LightColorPalette = lightColorScheme(
+    primary = GreenMain,
+    onPrimary = GreenLight,
+    secondary = WhiteBackground,
+    background = WhiteBackground,
+    surface = WhiteBackground,
+
 
     /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
+    background = Color.WhiteBackground,
+    surface = Color.WhiteBackground,
+    onPrimary = Color.WhiteBackground,
     onSecondary = Color.Black,
     onBackground = Color.Black,
     onSurface = Color.Black,
@@ -34,11 +39,21 @@ fun SpenderTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
     } else {
         LightColorPalette
     }
-
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = GreenLightBackground,
+            darkIcons = true
+        )
+        systemUiController.setNavigationBarColor(
+            color = GreenLightBackground,
+            darkIcons = true
+        )
+    }
     MaterialTheme(
-        colors = colors,
-        typography = Typography,
-        shapes = Shapes,
+        colorScheme = colors,
+        typography = spenderTypography,
+        shapes = spenderShapes,
         content = content
     )
 }

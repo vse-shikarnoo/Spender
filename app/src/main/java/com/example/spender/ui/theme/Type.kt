@@ -39,7 +39,7 @@ val spenderTypography = Typography(
         fontSize = 16.sp,
         color = WhiteBackground,
         letterSpacing = 1.sp
-    ),/*
+    ), /*
     caption = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

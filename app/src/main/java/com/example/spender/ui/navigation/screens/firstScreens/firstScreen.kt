@@ -13,6 +13,7 @@ import com.example.spender.ui.navigation.screens.destinations.SignUpScreenDestin
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@FirstNavGraph
 @Destination
 @Composable
 fun FirstScreen(

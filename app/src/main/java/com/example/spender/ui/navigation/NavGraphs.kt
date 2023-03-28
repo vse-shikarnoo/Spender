@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.nav_graphs
+package com.example.spender.ui.navigation
 
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 

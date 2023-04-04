@@ -26,6 +26,7 @@ import com.example.spender.data.firebase.Result
 import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.FirstNavGraph
+import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.theme.WhiteBackground
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -54,17 +55,8 @@ fun SplashScreen(
     currentUserResult.value.let { result ->
         when (result) {
             is Result.Success -> {
-                val navController = rememberNavController()
-                Scaffold(
-                    bottomBar = {
-                        BottomBar(navController)
-                    }
-                ) {
-                    DestinationsNavHost(
-                        navController = navController,
-                        navGraph = NavGraphs.bottom
-                    )
-                }
+                navigator.popBackStack()
+                navigator.navigate(BottomBarScreenDestination)
             }
             is Result.Error -> {
                 Toast.makeText(

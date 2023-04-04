@@ -20,12 +20,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.R
@@ -91,7 +87,7 @@ fun SignUpScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ///
+                // /
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val focusManager = LocalFocusManager.current
                 Row(
@@ -123,7 +119,10 @@ fun SignUpScreen(
                         singleLine = true,
                     )
                 }
-                androidx.compose.material3.Divider(color = GreenLight, modifier = Modifier.padding(24.dp))
+                androidx.compose.material3.Divider(
+                    color = GreenLight,
+                    modifier = Modifier.padding(24.dp)
+                )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -179,7 +178,7 @@ fun SignUpScreen(
 //            singleLine = true,
 //        )
                 }
-                ///
+                // /
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     androidx.compose.material3.Button(
                         onClick = {

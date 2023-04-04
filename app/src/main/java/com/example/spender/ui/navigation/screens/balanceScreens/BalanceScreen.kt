@@ -1,4 +1,4 @@
-package com.example.spender.ui.navigation.screens.balance_screens
+package com.example.spender.ui.navigation.screens.balanceScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,7 +26,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Destination
 @Composable
 fun BalanceScreen(
-    //navigator: DestinationsNavigator
+    // navigator: DestinationsNavigator
 ) {
     Scaffold(
         topBar = {
@@ -59,7 +59,7 @@ fun BalanceScreen(
 }
 @Preview()
 @Composable
-fun BalanceCard(){
+fun BalanceCard() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,7 +68,7 @@ fun BalanceCard(){
                 GreenLightBackground
             )
             .padding(16.dp),
-    ){
+    ) {
         Image(
             painter = painterResource(id = R.drawable.images),
             contentScale = ContentScale.Crop,
@@ -83,7 +83,7 @@ fun BalanceCard(){
                 .weight(3f)
                 .padding(start = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .background(
@@ -92,8 +92,12 @@ fun BalanceCard(){
                         alpha = 0.2f,
                     )
                     .padding(horizontal = 8.dp, vertical = 2.dp)
-            ){
-                Text(text = "You owe "+"1234",color = RedBalance,style = MaterialTheme.typography.labelMedium)
+            ) {
+                Text(
+                    text = "You owe " + "1234",
+                    color = RedBalance,
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
             Box(
                 modifier = Modifier
@@ -108,26 +112,31 @@ fun BalanceCard(){
                         alpha = 0.2f,
                     )
                     .padding(horizontal = 8.dp, vertical = 2.dp)
-            ){
-                Text(text = "You are owed "+"1234",color = GreenBalance, style = MaterialTheme.typography.labelMedium)
+            ) {
+                Text(
+                    text = "You are owed " + "1234",
+                    color = GreenBalance,
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
         }
     }
 }
 @Composable
-fun SearchTrip(){
+fun SearchTrip() {
+    val lol = "df"
 }
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TripsList(){
-    Column(){
+fun TripsList() {
+    Column() {
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
 
         ) {
-            Text("Your Trips",style = MaterialTheme.typography.titleMedium)
+            Text("Your Trips", style = MaterialTheme.typography.titleMedium)
             Image(
                 modifier = Modifier
                     .size(32.dp),
@@ -144,10 +153,10 @@ fun TripsList(){
                     .clip(MaterialTheme.shapes.large)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.Start
-            ){
+            ) {
                 Box(
                     modifier = Modifier.weight(1f)
-                ){
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.trip_image),
                         modifier = Modifier
@@ -159,13 +168,13 @@ fun TripsList(){
                 }
                 Column(
                     modifier = Modifier.weight(4f)
-                ){
+                ) {
                     Text("Moscow Trip")
                     Text("You are owed 1200")
                 }
                 Box(
                     modifier = Modifier.weight(1f)
-                ){
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.baseline_keyboard_arrow_up_24),
                         contentDescription = null,
@@ -176,5 +185,4 @@ fun TripsList(){
             }
         }
     }
-
 }

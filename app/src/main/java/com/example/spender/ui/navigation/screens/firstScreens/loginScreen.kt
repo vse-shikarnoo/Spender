@@ -2,7 +2,6 @@ package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,18 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spender.R
 import com.example.spender.data.firebase.Result
 import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
-import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.theme.spenderTextFieldColors

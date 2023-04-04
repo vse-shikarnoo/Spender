@@ -1,4 +1,4 @@
-package com.example.spender.data.firebase.dataClasses
+package com.example.spender.data.firebase.models
 
 import com.google.firebase.firestore.DocumentReference
 

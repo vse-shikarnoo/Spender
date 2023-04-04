@@ -1,4 +1,4 @@
-package com.example.spender.data.firebase.fieldNames
+package com.example.spender.data.firebase.databaseFieldNames
 
 object CollectionUserDocumentFieldNames {
     const val FIRST_NAME: String = "firstName"

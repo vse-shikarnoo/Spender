@@ -1,4 +1,4 @@
-package com.example.spender.data.firebase.fieldNames
+package com.example.spender.data.firebase.databaseFieldNames
 
 object CollectionTripDocumentFieldNames {
     const val NAME = "Name"

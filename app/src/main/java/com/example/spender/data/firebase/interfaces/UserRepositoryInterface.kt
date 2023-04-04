@@ -1,17 +1,16 @@
 package com.example.spender.data.firebase.interfaces
 
 import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.dataClasses.Friend
-import com.example.spender.data.firebase.dataClasses.Trip
-import com.example.spender.data.firebase.dataClasses.User
-import com.example.spender.data.firebase.fieldNames.CollectionUserDocumentFieldNames
+import com.example.spender.data.firebase.models.Friend
+import com.example.spender.data.firebase.models.User
+import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import kotlinx.coroutines.tasks.await
 
 interface UserRepositoryInterface {
-    suspend fun createUser(userID: String): Result<Boolean>
+    suspend fun createUser(userID: String, nickname: String): Result<Boolean>
     suspend fun getUser(userID: String): Result<User>
     suspend fun getUserName(userID: String): Result<Triple<String, String, String>>
     suspend fun getUserAge(userID: String): Result<Int>

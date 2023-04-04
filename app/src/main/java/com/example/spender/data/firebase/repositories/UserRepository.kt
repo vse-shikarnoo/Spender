@@ -1,12 +1,10 @@
 package com.example.spender.data.firebase.repositories
 
 import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.dataClasses.Friend
-import com.example.spender.data.firebase.dataClasses.Trip
-import com.example.spender.data.firebase.dataClasses.User
-import com.example.spender.data.firebase.fieldNames.CollectionNames
-import com.example.spender.data.firebase.fieldNames.CollectionUserDocumentFieldNames
-import com.example.spender.data.firebase.interfaces.TripRepositoryInterface
+import com.example.spender.data.firebase.models.Friend
+import com.example.spender.data.firebase.models.User
+import com.example.spender.data.firebase.databaseFieldNames.CollectionNames
+import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
 import com.example.spender.data.firebase.interfaces.UserRepositoryInterface
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.DocumentReference
@@ -22,13 +20,14 @@ class UserRepository : UserRepositoryInterface {
 
     override suspend fun createUser(
         userID: String,
+        nickname: String
     ): Result<Boolean> {
         return try {
             userCollection.document(userID).set(
                 User(
                     name = Triple("", "", ""),
                     age = 0,
-                    nickname = "",
+                    nickname = nickname,
                     incomingFriends = emptyList(),
                     outgoingFriends = emptyList(),
                     friends = emptyList(),

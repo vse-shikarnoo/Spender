@@ -1,13 +1,9 @@
 package com.example.spender.data.firebase.interfaces
 
 import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.dataClasses.Friend
-import com.example.spender.data.firebase.dataClasses.Spend
-import com.example.spender.data.firebase.dataClasses.Trip
-import com.example.spender.data.firebase.fieldNames.CollectionUserDocumentFieldNames
-import com.google.firebase.FirebaseNetworkException
+import com.example.spender.data.firebase.models.Friend
+import com.example.spender.data.firebase.models.Trip
 import com.google.firebase.firestore.DocumentReference
-import kotlinx.coroutines.tasks.await
 
 interface TripRepositoryInterface {
     suspend fun createTrip(
@@ -48,7 +44,7 @@ interface TripRepositoryInterface {
 
     suspend fun addTripMembers(
         tripDocRef: DocumentReference,
-        newMember: List<DocumentReference>,
+        newMembers: List<DocumentReference>,
     ): Result<Boolean>
 
     suspend fun deleteTripMember(

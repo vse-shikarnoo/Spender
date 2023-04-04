@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     // в терминале вызываем ./gradlew kspDebugKotlin если не появляется
                     // импорт какого-либо ScreenDestination
                     // navigation module
-                    DestinationsNavHost(navGraph = NavGraphs.first)
+                    DestinationsNavHost(navGraph = NavGraphs.root)
                 }
             }
         }

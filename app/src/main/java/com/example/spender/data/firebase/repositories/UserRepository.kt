@@ -1,11 +1,11 @@
 package com.example.spender.data.firebase.repositories
 
 import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.models.Friend
-import com.example.spender.data.firebase.models.User
 import com.example.spender.data.firebase.databaseFieldNames.CollectionNames
 import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
 import com.example.spender.data.firebase.interfaces.UserRepositoryInterface
+import com.example.spender.data.firebase.models.Friend
+import com.example.spender.data.firebase.models.User
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -98,8 +98,8 @@ class UserRepository : UserRepositoryInterface {
     ): Result<List<Friend>> {
         return try {
             val userDocRef = userCollection.document(userID)
-            val friends = userDocRef.get()
-                .await().data!![CollectionUserDocumentFieldNames.FRIENDS] as Array<DocumentReference>?
+            val friends = userDocRef.get().await()
+                .data!![CollectionUserDocumentFieldNames.FRIENDS] as Array<DocumentReference>?
             if (friends != null) {
                 val lst = mutableListOf<Friend>()
                 for (friend in friends) {

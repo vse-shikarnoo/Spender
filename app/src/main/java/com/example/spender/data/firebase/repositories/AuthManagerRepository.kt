@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 
-class AuthManagerRepository() : AuthManagerInterface {
+class AuthManagerRepository: AuthManagerInterface {
     private val firebaseAuth by lazy { FirebaseAuth.getInstance() }
 
     override suspend fun signIn(email: String, password: String): Result<Boolean> {

@@ -1,9 +1,9 @@
 package com.example.spender.data.firebase.interfaces
 
 import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
 import com.example.spender.data.firebase.models.Friend
 import com.example.spender.data.firebase.models.User
-import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -53,7 +53,8 @@ interface UserRepositoryInterface {
             return try {
                 val userDocRef = userCollection.document(userID)
                 val nickname =
-                    userDocRef.get().await().data!![CollectionUserDocumentFieldNames.NICKNAME] as String
+                    userDocRef.get().await()
+                        .data!![CollectionUserDocumentFieldNames.NICKNAME] as String
                 Result.Success(nickname)
             } catch (e: Exception) {
                 when (e) {

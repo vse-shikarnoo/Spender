@@ -6,8 +6,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.screens.NavGraphs
-import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @BottomNavGraph

@@ -49,7 +49,7 @@ fun BottomBar(
             BottomNavigationItem(
                 selected = currentDestination == destination.direction,
                 onClick = {
-                    //navController.popBackStack()
+                    // navController.popBackStack()
                     navController.navigate(destination.direction)
                 },
                 icon = {

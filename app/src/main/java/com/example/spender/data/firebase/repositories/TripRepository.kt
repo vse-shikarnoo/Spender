@@ -93,17 +93,19 @@ class TripRepository : TripRepositoryInterface {
             val creatorDocRef = tripDocRef.get()
                 .await().data?.get(CollectionTripDocumentFieldNames.CREATOR) as DocumentReference
 
-            when (val nameResult =
-                UserRepositoryInterface.getUserName(
-                    creatorDocRef.id,
-                    db.collection(CollectionNames.USER)
-                )
-            ) {
-                is Result.Success -> {
-                    when (val nicknameResult = UserRepositoryInterface.getUserNickname(
+            when (
+                val nameResult =
+                    UserRepositoryInterface.getUserName(
                         creatorDocRef.id,
                         db.collection(CollectionNames.USER)
                     )
+            ) {
+                is Result.Success -> {
+                    when (
+                        val nicknameResult = UserRepositoryInterface.getUserNickname(
+                            creatorDocRef.id,
+                            db.collection(CollectionNames.USER)
+                        )
                     ) {
                         is Result.Success -> {
                             val creator =
@@ -129,22 +131,24 @@ class TripRepository : TripRepositoryInterface {
 
     override suspend fun getTripMembers(tripDocRef: DocumentReference): Result<List<Friend>> {
         return try {
-            val members = tripDocRef.get()
-                .await().data?.get(CollectionTripDocumentFieldNames.MEMBERS) as List<DocumentReference>
+            val members = tripDocRef.get().await()
+                .data?.get(CollectionTripDocumentFieldNames.MEMBERS) as List<DocumentReference>
 
             val lst: MutableList<Friend> = mutableListOf()
             members.forEach { memberDocRef ->
-                when (val nameResult =
-                    UserRepositoryInterface.getUserName(
-                        memberDocRef.id,
-                        db.collection(CollectionNames.USER)
-                    )
-                ) {
-                    is Result.Success -> {
-                        when (val nicknameResult = UserRepositoryInterface.getUserNickname(
+                when (
+                    val nameResult =
+                        UserRepositoryInterface.getUserName(
                             memberDocRef.id,
                             db.collection(CollectionNames.USER)
                         )
+                ) {
+                    is Result.Success -> {
+                        when (
+                            val nicknameResult = UserRepositoryInterface.getUserNickname(
+                                memberDocRef.id,
+                                db.collection(CollectionNames.USER)
+                            )
                         ) {
                             is Result.Success -> {
                                 val member =
@@ -280,7 +284,6 @@ class TripRepository : TripRepositoryInterface {
                 )
 
                 TODO("Delete and reorganize spends")
-
             }
             Result.Success(true)
         } catch (e: Exception) {
@@ -295,7 +298,7 @@ class TripRepository : TripRepositoryInterface {
         return try {
             val batch = db.batch()
 
-            when(val resultTripMembers = getTripMembers(tripDocRef)) {
+            when (val resultTripMembers = getTripMembers(tripDocRef)) {
                 is Result.Success -> {
                     resultTripMembers.data.forEach() { member ->
                         batch.update(

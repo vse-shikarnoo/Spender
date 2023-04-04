@@ -8,7 +8,7 @@ import com.example.spender.data.firebase.models.Spend
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SpendRepository: SpendRepositoryInterface {
+class SpendRepository : SpendRepositoryInterface {
     private val db by lazy { FirebaseFirestore.getInstance() }
 
     override suspend fun createSpend(
@@ -37,7 +37,9 @@ class SpendRepository: SpendRepositoryInterface {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSpendMembers(spendDocRef: DocumentReference): Result<List<MemberActivity>> {
+    override suspend fun getSpendMembers(
+        spendDocRef: DocumentReference
+    ): Result<List<MemberActivity>> {
         TODO("Not yet implemented")
     }
 
@@ -86,5 +88,4 @@ class SpendRepository: SpendRepositoryInterface {
     override suspend fun deleteSpendSpend(spendDocRef: DocumentReference): Result<Boolean> {
         TODO("Not yet implemented")
     }
-
 }

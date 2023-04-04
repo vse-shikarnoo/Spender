@@ -15,17 +15,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.example.spender.R
 import com.example.spender.data.firebase.Result
 import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
-import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.FirstNavGraph
-import com.example.spender.ui.navigation.screens.NavGraphs
-import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
-import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 

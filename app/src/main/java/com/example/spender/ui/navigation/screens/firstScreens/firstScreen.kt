@@ -12,9 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.R
-import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.LogInScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.SignUpScreenDestination
@@ -56,7 +54,7 @@ fun ButtonGroup(navigator: DestinationsNavigator) {
     ) {
         Button(
             onClick = {
-                //navigator.popBackStack()
+                // navigator.popBackStack()
                 navigator.navigate(LogInScreenDestination)
             },
             buttonModifier,
@@ -67,15 +65,21 @@ fun ButtonGroup(navigator: DestinationsNavigator) {
         ) {
             Text("Log In", style = MaterialTheme.typography.labelMedium)
         }
-        Button(onClick = {
-            //navigator.popBackStack()
-            navigator.navigate(SignUpScreenDestination)
-        }, buttonModifier) {
+        Button(
+            onClick = {
+                // navigator.popBackStack()
+                navigator.navigate(SignUpScreenDestination)
+            },
+            buttonModifier
+        ) {
             Text("Sign Up", style = MaterialTheme.typography.labelMedium)
         }
-        Button(onClick = {
-            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
-        }, buttonModifier) {
+        Button(
+            onClick = {
+                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
+            },
+            buttonModifier
+        ) {
             Image(
                 painterResource(id = R.drawable.google),
                 contentDescription = "google icon",

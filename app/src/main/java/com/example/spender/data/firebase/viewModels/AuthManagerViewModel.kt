@@ -1,27 +1,27 @@
 package com.example.spender.data.firebase.viewModels
 
-//import android.widget.Toast
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.material.Button
-//import androidx.compose.material.OutlinedTextField
-//import androidx.compose.material.Text
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.remember
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.platform.LocalContext
-//import androidx.compose.ui.text.input.PasswordVisualTransformation
-//import androidx.compose.ui.text.input.TextFieldValue
-//import androidx.compose.ui.unit.dp
+// import android.widget.Toast
+// import androidx.compose.foundation.layout.*
+// import androidx.compose.material.Button
+// import androidx.compose.material.OutlinedTextField
+// import androidx.compose.material.Text
+// import androidx.compose.runtime.Composable
+// import androidx.compose.runtime.mutableStateOf
+// import androidx.compose.runtime.remember
+// import androidx.compose.ui.Alignment
+// import androidx.compose.ui.Modifier
+// import androidx.compose.ui.platform.LocalContext
+// import androidx.compose.ui.text.input.PasswordVisualTransformation
+// import androidx.compose.ui.text.input.TextFieldValue
+// import androidx.compose.ui.unit.dp
 import androidx.lifecycle.*
 import com.example.spender.data.firebase.Result
 import com.example.spender.data.firebase.repositories.AuthManagerRepository
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class AuthManagerViewModel @Inject constructor() : ViewModel() {

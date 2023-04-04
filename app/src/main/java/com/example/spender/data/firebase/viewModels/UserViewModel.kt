@@ -1,21 +1,21 @@
 package com.example.spender.data.firebase.viewModels
 
-import com.example.spender.data.firebase.Result
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.spender.data.firebase.Result
 import com.example.spender.data.firebase.models.Friend
 import com.example.spender.data.firebase.models.User
 import com.example.spender.data.firebase.repositories.UserRepository
 import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(): ViewModel() {
+class UserViewModel @Inject constructor() : ViewModel() {
     private val repository = UserRepository()
 
     private val _createUserResult = MutableLiveData<Result<Boolean>>()
@@ -122,13 +122,17 @@ class UserViewModel @Inject constructor(): ViewModel() {
 
     fun addUserOutgoingFriend(userID: String, friendDocRef: DocumentReference) {
         viewModelScope.launch(Dispatchers.IO) {
-            _addUserOutgoingFriendResult.postValue(repository.addUserOutgoingFriend(userID, friendDocRef))
+            _addUserOutgoingFriendResult.postValue(
+                repository.addUserOutgoingFriend(userID, friendDocRef)
+            )
         }
     }
 
     fun addUserIncomingFriend(userID: String, friendDocRef: DocumentReference) {
         viewModelScope.launch(Dispatchers.IO) {
-            _addUserIncomingFriendResult.postValue(repository.addUserIncomingFriend(userID, friendDocRef))
+            _addUserIncomingFriendResult.postValue(
+                repository.addUserIncomingFriend(userID, friendDocRef)
+            )
         }
     }
 
@@ -138,7 +142,6 @@ class UserViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-
     fun removeUserFriends(userID: String, friendDocRefs: List<DocumentReference>) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserFriendsResult.postValue(repository.removeUserFriends(userID, friendDocRefs))
@@ -147,13 +150,17 @@ class UserViewModel @Inject constructor(): ViewModel() {
 
     fun removeUserOutgoingFriend(userID: String, friendDocRef: DocumentReference) {
         viewModelScope.launch(Dispatchers.IO) {
-            _removeUserOutgoingFriendResult.postValue(repository.removeUserOutgoingFriend(userID, friendDocRef))
+            _removeUserOutgoingFriendResult.postValue(
+                repository.removeUserOutgoingFriend(userID, friendDocRef)
+            )
         }
     }
 
     fun removeUserIncomingFriend(userID: String, friendDocRef: DocumentReference) {
         viewModelScope.launch(Dispatchers.IO) {
-            _removeUserIncomingFriendResult.postValue(repository.removeUserIncomingFriend(userID, friendDocRef))
+            _removeUserIncomingFriendResult.postValue(
+                repository.removeUserIncomingFriend(userID, friendDocRef)
+            )
         }
     }
 }

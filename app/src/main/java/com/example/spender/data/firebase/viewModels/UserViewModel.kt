@@ -10,6 +10,7 @@ import com.example.spender.data.firebase.models.User
 import com.example.spender.data.firebase.repositories.UserRepository
 import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -66,93 +67,93 @@ class UserViewModel @Inject constructor(): ViewModel() {
     val removeUserIncomingFriendResult: LiveData<Result<Boolean>> = _removeUserIncomingFriendResult
 
     fun createUser(userID: String, nickname: String) {
-        viewModelScope.launch {
-            _createUserResult.value = repository.createUser(userID, nickname)
+        viewModelScope.launch(Dispatchers.IO) {
+            _createUserResult.postValue(repository.createUser(userID, nickname))
         }
     }
 
     fun getUser(userID: String) {
-        viewModelScope.launch {
-            _getUserResult.value = repository.getUser(userID)
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserResult.postValue(repository.getUser(userID))
         }
     }
 
     fun getUserName(userID: String) {
-        viewModelScope.launch {
-            _getUserName.value = repository.getUserName(userID)
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserName.postValue(repository.getUserName(userID))
         }
     }
 
     fun getUserAge(userID: String) {
-        viewModelScope.launch {
-            _getUserAge.value = repository.getUserAge(userID)
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserAge.postValue(repository.getUserAge(userID))
         }
     }
 
     fun getUserNickname(userID: String) {
-        viewModelScope.launch {
-            _getUserNickname.value = repository.getUserNickname(userID)
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserNickname.postValue(repository.getUserNickname(userID))
         }
     }
 
     fun getUserFriends(userID: String) {
-        viewModelScope.launch {
-            _getUserFriends.value = repository.getUserFriends(userID)
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserFriends.postValue(repository.getUserFriends(userID))
         }
     }
 
     fun updateUserName(userID: String, newName: String) {
-        viewModelScope.launch {
-            _updateUserNameResult.value = repository.updateUserName(userID, newName)
+        viewModelScope.launch(Dispatchers.IO) {
+            _updateUserNameResult.postValue(repository.updateUserName(userID, newName))
         }
     }
 
     fun updateUserAge(userID: String, newAge: Int) {
-        viewModelScope.launch {
-            _updateUserAgeResult.value = repository.updateUserAge(userID, newAge)
+        viewModelScope.launch(Dispatchers.IO) {
+            _updateUserAgeResult.postValue(repository.updateUserAge(userID, newAge))
         }
     }
 
     fun updateUserNickname(userID: String, newNickname: String) {
-        viewModelScope.launch {
-            _updateUserNicknameResult.value = repository.updateUserNickname(userID, newNickname)
+        viewModelScope.launch(Dispatchers.IO) {
+            _updateUserNicknameResult.postValue(repository.updateUserNickname(userID, newNickname))
         }
     }
 
     fun addUserOutgoingFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch {
-            _addUserOutgoingFriendResult.value = repository.addUserOutgoingFriend(userID, friendDocRef)
+        viewModelScope.launch(Dispatchers.IO) {
+            _addUserOutgoingFriendResult.postValue(repository.addUserOutgoingFriend(userID, friendDocRef))
         }
     }
 
     fun addUserIncomingFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch {
-            _addUserIncomingFriendResult.value = repository.addUserIncomingFriend(userID, friendDocRef)
+        viewModelScope.launch(Dispatchers.IO) {
+            _addUserIncomingFriendResult.postValue(repository.addUserIncomingFriend(userID, friendDocRef))
         }
     }
 
     fun removeUserFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch {
-            _removeUserFriendResult.value = repository.removeUserFriend(userID, friendDocRef)
+        viewModelScope.launch(Dispatchers.IO) {
+            _removeUserFriendResult.postValue(repository.removeUserFriend(userID, friendDocRef))
         }
     }
 
 
     fun removeUserFriends(userID: String, friendDocRefs: List<DocumentReference>) {
-        viewModelScope.launch {
-            _removeUserFriendsResult.value = repository.removeUserFriends(userID, friendDocRefs)
+        viewModelScope.launch(Dispatchers.IO) {
+            _removeUserFriendsResult.postValue(repository.removeUserFriends(userID, friendDocRefs))
         }
     }
 
     fun removeUserOutgoingFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch {
-            _removeUserOutgoingFriendResult.value = repository.removeUserOutgoingFriend(userID, friendDocRef)
+        viewModelScope.launch(Dispatchers.IO) {
+            _removeUserOutgoingFriendResult.postValue(repository.removeUserOutgoingFriend(userID, friendDocRef))
         }
     }
 
     fun removeUserIncomingFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch {
-            _removeUserIncomingFriendResult.value = repository.removeUserIncomingFriend(userID, friendDocRef)
+        viewModelScope.launch(Dispatchers.IO) {
+            _removeUserIncomingFriendResult.postValue(repository.removeUserIncomingFriend(userID, friendDocRef))
         }
     }
 }

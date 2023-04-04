@@ -22,6 +22,9 @@ import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.NavGraphs
+import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -82,17 +85,8 @@ fun LogInScreen(
     signInResult.value.let { result ->
         when (result) {
             is Result.Success -> {
-                val navController = rememberNavController()
-                Scaffold(
-                    bottomBar = {
-                        BottomBar(navController)
-                    }
-                ) {
-                    DestinationsNavHost(
-                        navController = navController,
-                        navGraph = NavGraphs.bottom
-                    )
-                }
+                navigator.popBackStack(FirstScreenDestination, true)
+                navigator.navigate(BottomBarScreenDestination)
             }
             is Result.Error -> {
                 if (error != result.exception) {

@@ -3,12 +3,14 @@ package com.example.spender.ui.navigation.screens.balance_screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -16,9 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
 import com.example.spender.ui.navigation.nav_graphs.BalanceNavGraph
-import com.example.spender.ui.theme.GreenBalance
-import com.example.spender.ui.theme.RedBalance
-import com.example.spender.ui.theme.WhiteBackground
+import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +45,7 @@ fun BalanceScreen(
             Column(
                 modifier = Modifier
                     .padding(it)
+                    .padding(horizontal = 16.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -64,17 +65,18 @@ fun BalanceCard(){
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
             .background(
-                WhiteBackground
+                GreenLightBackground
             )
-            .padding(20.dp),
+            .padding(16.dp),
     ){
         Image(
+            painter = painterResource(id = R.drawable.images),
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .weight(1f)
-                .size(80.dp),
-            painter = painterResource(id = R.drawable.profile_icon),
-            contentDescription = "profile_icon",
-            contentScale = ContentScale.Fit
+                .size(80.dp)
+                .clip(CircleShape),
+            contentDescription = null,
         )
         Column(
             modifier = Modifier
@@ -115,6 +117,64 @@ fun BalanceCard(){
 @Composable
 fun SearchTrip(){
 }
+@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripsList(){
+    Column(){
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+
+        ) {
+            Text("Your Trips",style = MaterialTheme.typography.titleMedium)
+            Image(
+                modifier = Modifier
+                    .size(32.dp),
+                painter = painterResource(id = R.drawable.bag_icon),
+                contentDescription = null,
+                contentScale = ContentScale.Fit
+            )
+        }
+        Card(onClick = {}) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(GreenLightBackground)
+                    .clip(MaterialTheme.shapes.large)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.Start
+            ){
+                Box(
+                    modifier = Modifier.weight(1f)
+                ){
+                    Image(
+                        painter = painterResource(id = R.drawable.trip_image),
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(4f)
+                ){
+                    Text("Moscow Trip")
+                    Text("You are owed 1200")
+                }
+                Box(
+                    modifier = Modifier.weight(1f)
+                ){
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_keyboard_arrow_up_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp),
+                        colorFilter = ColorFilter.tint(GreenBalance)
+                    )
+                }
+            }
+        }
+    }
+
 }

@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.ui.navigation.nav_graphs.BalanceNavGraph
+import com.example.spender.ui.navigation.BalanceNavGraph
 import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 

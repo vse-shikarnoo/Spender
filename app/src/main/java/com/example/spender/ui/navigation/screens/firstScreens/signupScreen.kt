@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -15,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -91,15 +93,16 @@ fun SignUpScreen(
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val focusManager = LocalFocusManager.current
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Image(
+                        painter = painterResource(id = R.drawable.images),
                         modifier = Modifier
-                            .size(80.dp),
-                        painter = painterResource(id = com.example.spender.R.drawable.profile_icon),
-                        contentDescription = "profile_icon",
-                        contentScale = ContentScale.Fit
+                            .size(80.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
                     )
                     OutlinedTextField(
                         value = nickname,

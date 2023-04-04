@@ -12,7 +12,7 @@ class AuthManagerRepository() : AuthManagerInterface {
 
     override suspend fun signIn(email: String, password: String): Result<Boolean> {
         return try {
-            firebaseAuth.signInWithEmailAndPassword(email, password)
+            firebaseAuth.signInWithEmailAndPassword(email, password).await()
             Result.Success(true)
         } catch (e: Exception) {
             HandleError.handleFirebaseError(e)

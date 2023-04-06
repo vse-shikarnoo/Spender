@@ -1,9 +1,9 @@
-package com.example.spender.data.firebase.models
+package com.example.spender.data.models.user
 
 import com.google.firebase.firestore.DocumentReference
 
 data class Friend(
-    val name: Triple<String, String, String>,
+    val name: UserName,
     val nickname: String,
     val docRef: DocumentReference
 )

@@ -1,13 +1,18 @@
 package com.example.spender.data.firebase.repositories
 
-import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.FirebaseCallResult
+import com.example.spender.data.firebase.FirebaseInstanceHolder
 import com.example.spender.data.firebase.databaseFieldNames.CollectionNames
 import com.example.spender.data.firebase.databaseFieldNames.CollectionTripDocumentFieldNames
 import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
 import com.example.spender.data.firebase.interfaces.TripRepositoryInterface
 import com.example.spender.data.firebase.interfaces.UserRepositoryInterface
-import com.example.spender.data.firebase.models.Friend
-import com.example.spender.data.firebase.models.Trip
+import com.example.spender.data.firebase.messages.FirebaseErrorHandler
+import com.example.spender.data.firebase.messages.FirebaseSuccessMessages
+import com.example.spender.data.models.user.Friend
+import com.example.spender.data.models.Trip
+import com.example.spender.data.models.spend.Spend
+import com.example.spender.data.models.user.User
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -15,16 +20,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class TripRepository : TripRepositoryInterface {
-    private val db by lazy { FirebaseFirestore.getInstance() }
-    private val tripCollection by lazy { db.collection(CollectionNames.TRIP) }
+    private val tripCollection by lazy { FirebaseInstanceHolder.db.collection(CollectionNames.TRIP) }
 
     override suspend fun createTrip(
         name: String,
-        creatorDocRef: DocumentReference,
+        creator: User,
         members: List<Friend>,
-    ): Result<Boolean> {
+    ): FirebaseCallResult<String> {
         return try {
-            val batch = db.batch()
+            val batch = FirebaseInstanceHolder.db.batch()
             val newTripDocRef = tripCollection.document()
 
             batch.update(
@@ -36,7 +40,7 @@ class TripRepository : TripRepositoryInterface {
             batch.update(
                 newTripDocRef,
                 CollectionTripDocumentFieldNames.CREATOR,
-                creatorDocRef
+                creator.docRef
             )
 
             batch.update(
@@ -53,277 +57,136 @@ class TripRepository : TripRepositoryInterface {
                 )
             }
 
-            batch.commit()
-            Result.Success(true)
+            batch.commit().await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_CREATED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
-        }
-    }
-
-    override suspend fun getTrip(tripDocRef: DocumentReference): Result<Trip> {
-        return try {
-            val trip = tripDocRef.get().await().toObject(Trip::class.java)
-            Result.Success(trip!!)
-        } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
-        }
-    }
-
-    override suspend fun getTripName(tripDocRef: DocumentReference): Result<String> {
-        return try {
-            val name =
-                tripDocRef.get().await().data?.get(CollectionTripDocumentFieldNames.NAME) as String
-            Result.Success(name)
-        } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
-        }
-    }
-
-    override suspend fun getTripCreator(tripDocRef: DocumentReference): Result<Friend> {
-        return try {
-            val creatorDocRef = tripDocRef.get()
-                .await().data?.get(CollectionTripDocumentFieldNames.CREATOR) as DocumentReference
-
-            when (
-                val nameResult =
-                    UserRepositoryInterface.getUserName(
-                        creatorDocRef.id,
-                        db.collection(CollectionNames.USER)
-                    )
-            ) {
-                is Result.Success -> {
-                    when (
-                        val nicknameResult = UserRepositoryInterface.getUserNickname(
-                            creatorDocRef.id,
-                            db.collection(CollectionNames.USER)
-                        )
-                    ) {
-                        is Result.Success -> {
-                            val creator =
-                                Friend(nameResult.data, nicknameResult.data, creatorDocRef)
-                            Result.Success(creator)
-                        }
-                        is Result.Error -> {
-                            Result.Error("Unknown error")
-                        }
-                    }
-                }
-                is Result.Error -> {
-                    Result.Error("Unknown error")
-                }
-            }
-        } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
-        }
-    }
-
-    override suspend fun getTripMembers(tripDocRef: DocumentReference): Result<List<Friend>> {
-        return try {
-            val members = tripDocRef.get().await()
-                .data?.get(CollectionTripDocumentFieldNames.MEMBERS) as List<DocumentReference>
-
-            val lst: MutableList<Friend> = mutableListOf()
-            members.forEach { memberDocRef ->
-                when (
-                    val nameResult =
-                        UserRepositoryInterface.getUserName(
-                            memberDocRef.id,
-                            db.collection(CollectionNames.USER)
-                        )
-                ) {
-                    is Result.Success -> {
-                        when (
-                            val nicknameResult = UserRepositoryInterface.getUserNickname(
-                                memberDocRef.id,
-                                db.collection(CollectionNames.USER)
-                            )
-                        ) {
-                            is Result.Success -> {
-                                val member =
-                                    Friend(nameResult.data, nicknameResult.data, memberDocRef)
-                                lst.add(member)
-                            }
-                            is Result.Error -> {
-                                Result.Error("Unknown error")
-                            }
-                        }
-                    }
-                    is Result.Error -> {
-                        Result.Error("Unknown error")
-                    }
-                }
-            }
-
-            Result.Success(lst)
-        } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
-        }
-    }
-
-    override suspend fun getTripsByUserId(userID: String): Result<List<Trip>> {
-        return try {
-            val tripsQuery = tripCollection.whereEqualTo(
-                CollectionTripDocumentFieldNames.CREATOR,
-                userID
-            )
-            val tripsDocSnapshots = tripsQuery.get().await().documents
-
-            val lst: MutableList<Trip> = mutableListOf()
-            tripsDocSnapshots.forEach { tripDocSnapshot ->
-                val trip = tripDocSnapshot.toObject(Trip::class.java)!!
-                lst.add(trip)
-            }
-
-            Result.Success(lst)
-        } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
+            FirebaseErrorHandler.handle(e)
         }
     }
 
     override suspend fun updateTripName(
-        tripDocRef: DocumentReference,
+        trip: Trip,
         newName: String
-    ): Result<Boolean> {
+    ): FirebaseCallResult<String> {
         return try {
-            tripDocRef.update(CollectionTripDocumentFieldNames.NAME, newName)
-            Result.Success(true)
+            trip.docRef.update(CollectionTripDocumentFieldNames.NAME, newName).await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_NAME_UPDATED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
+            FirebaseErrorHandler.handle(e)
         }
     }
 
     override suspend fun addTripMember(
-        tripDocRef: DocumentReference,
-        newMember: DocumentReference
-    ): Result<Boolean> {
+        trip: Trip,
+        newMember: Friend
+    ): FirebaseCallResult<String> {
         return try {
-            tripDocRef.update(
+            trip.docRef.update(
                 CollectionTripDocumentFieldNames.MEMBERS,
-                FieldValue.arrayUnion(newMember)
-            )
-            Result.Success(true)
+                FieldValue.arrayUnion(newMember.docRef)
+            ).await()
+
+            TODO("reorganize spends")
+
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_MEMBER_ADDED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
+            FirebaseErrorHandler.handle(e)
         }
     }
 
     override suspend fun addTripMembers(
-        tripDocRef: DocumentReference,
-        newMembers: List<DocumentReference>
-    ): Result<Boolean> {
+        trip: Trip,
+        newMembers: List<Friend>
+    ): FirebaseCallResult<String> {
         return try {
             newMembers.forEach { member ->
-                tripDocRef.update(
+                trip.docRef.update(
                     CollectionTripDocumentFieldNames.MEMBERS,
-                    FieldValue.arrayUnion(member)
-                )
+                    FieldValue.arrayUnion(member.docRef)
+                ).await()
+
+                TODO("reorganize spends")
             }
-            Result.Success(true)
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_MEMBERS_ADDED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun deleteTripMember(
-        tripDocRef: DocumentReference,
-        member: DocumentReference
-    ): Result<Boolean> {
+    override suspend fun addTripSpend(trip: Trip, spend: Spend): FirebaseCallResult<String> {
         return try {
-            tripDocRef.update(
-                CollectionTripDocumentFieldNames.MEMBERS,
-                FieldValue.arrayRemove(member)
-            )
-
-            TODO("Delete and reorganize spends")
-
-            Result.Success(true)
+            trip.docRef.collection(CollectionTripDocumentFieldNames.SubCollectionSpends).document()
+                .set(spend).await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_SPEND_ADDED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun deleteTripMembers(
-        tripDocRef: DocumentReference,
-        members: List<DocumentReference>
-    ): Result<Boolean> {
+    override suspend fun removeTripMember(
+        trip: Trip,
+        member: Friend
+    ): FirebaseCallResult<String> {
+        return try {
+            trip.docRef.update(
+                CollectionTripDocumentFieldNames.MEMBERS,
+                FieldValue.arrayRemove(member.docRef)
+            ).await()
+
+            TODO("reorganize spends")
+
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_MEMBER_REMOVED)
+        } catch (e: Exception) {
+            FirebaseErrorHandler.handle(e)
+        }
+    }
+
+    override suspend fun removeTripMembers(
+        trip: Trip,
+        members: List<Friend>
+    ): FirebaseCallResult<String> {
         return try {
             members.forEach { member ->
-                tripDocRef.update(
+                trip.docRef.update(
                     CollectionTripDocumentFieldNames.MEMBERS,
-                    FieldValue.arrayRemove(member)
-                )
+                    FieldValue.arrayRemove(member.docRef)
+                ).await()
 
-                TODO("Delete and reorganize spends")
+                TODO("reorganize spends")
             }
-            Result.Success(true)
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_MEMBERS_REMOVED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
-            }
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun deleteTrip(tripDocRef: DocumentReference): Result<Boolean> {
+    override suspend fun removeTripSpend(spend: Spend): FirebaseCallResult<String> {
         return try {
-            val batch = db.batch()
-
-            when (val resultTripMembers = getTripMembers(tripDocRef)) {
-                is Result.Success -> {
-                    resultTripMembers.data.forEach() { member ->
-                        batch.update(
-                            member.docRef,
-                            CollectionUserDocumentFieldNames.TRIPS,
-                            FieldValue.arrayRemove(tripDocRef)
-                        )
-                    }
-                }
-                is Result.Error -> {
-                    Result.Error(resultTripMembers.exception)
-                }
-            }
-
-            TODO("Delete and reorganize spends")
-
-            batch.delete(tripDocRef)
-
-            batch.commit()
-            Result.Success(true)
+            spend.docRef.delete().await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_SPEND_REMOVED)
         } catch (e: Exception) {
-            when (e) {
-                is FirebaseNetworkException -> Result.Error("Network error")
-                else -> Result.Error("Unknown error")
+            FirebaseErrorHandler.handle(e)
+        }
+    }
+
+    override suspend fun deleteTrip(trip: Trip): FirebaseCallResult<String> {
+        return try {
+            val batch = FirebaseInstanceHolder.db.batch()
+
+            trip.members.forEach { member ->
+                batch.update(
+                    member.docRef,
+                    CollectionUserDocumentFieldNames.TRIPS,
+                    FieldValue.arrayRemove(trip.docRef)
+                )
             }
+
+            batch.delete(trip.docRef)
+
+            batch.commit().await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_DELETED)
+        } catch (e: Exception) {
+            FirebaseErrorHandler.handle(e)
         }
     }
 }

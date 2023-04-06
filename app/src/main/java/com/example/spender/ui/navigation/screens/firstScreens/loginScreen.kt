@@ -21,7 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
@@ -40,7 +40,7 @@ fun LogInScreen(
     authManagerViewModel: AuthManagerViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val signInResult = authManagerViewModel.signInResult.observeAsState()
+    val signInResult = authManagerViewModel.signInFirebaseCallResult.observeAsState()
     var error by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -141,11 +141,11 @@ fun LogInScreen(
 
     signInResult.value.let { result ->
         when (result) {
-            is Result.Success -> {
+            is FirebaseCallResult.Success -> {
                 navigator.popBackStack(FirstScreenDestination, true)
                 navigator.navigate(BottomBarScreenDestination)
             }
-            is Result.Error -> {
+            is FirebaseCallResult.Error -> {
                 if (error != result.exception) {
                     error = result.exception
                     Toast.makeText(

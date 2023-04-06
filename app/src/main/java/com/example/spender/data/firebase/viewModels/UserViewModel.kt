@@ -4,11 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.models.Friend
-import com.example.spender.data.firebase.models.User
-import com.example.spender.data.firebase.repositories.UserRepository
-import com.google.firebase.firestore.DocumentReference
+import com.example.spender.data.firebase.FirebaseCallResult
+import com.example.spender.data.firebase.FirebaseRepositoriesHolder
+import com.example.spender.data.models.user.Friend
+import com.example.spender.data.models.user.User
+import com.example.spender.data.models.Trip
+import com.example.spender.data.models.user.UserName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -16,150 +17,251 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserViewModel @Inject constructor() : ViewModel() {
-    private val repository = UserRepository()
-
-    private val _createUserResult = MutableLiveData<Result<Boolean>>()
-    val createUserResult: LiveData<Result<Boolean>> = _createUserResult
-
-    private val _getUserResult = MutableLiveData<Result<User>>()
-    val getUserResult: LiveData<Result<User>> = _getUserResult
-
-    private val _getUserName = MutableLiveData<Result<Triple<String, String, String>>>()
-    val getUserName: LiveData<Result<Triple<String, String, String>>> = _getUserName
-
-    private val _getUserAge = MutableLiveData<Result<Int>>()
-    val getUserAge: LiveData<Result<Int>> = _getUserAge
-
-    private val _getUserNickname = MutableLiveData<Result<String>>()
-    val getUserNickname: LiveData<Result<String>> = _getUserNickname
-
-    private val _getUserFriends = MutableLiveData<Result<List<Friend>>>()
-    val getUserFriends: LiveData<Result<List<Friend>>> = _getUserFriends
-
-    private val _updateUserNameResult = MutableLiveData<Result<Boolean>>()
-    val updateUserNameResult: LiveData<Result<Boolean>> = _updateUserNameResult
-
-    private val _updateUserAgeResult = MutableLiveData<Result<Boolean>>()
-    val updateUserAgeResult: LiveData<Result<Boolean>> = _updateUserAgeResult
-
-    private val _updateUserNicknameResult = MutableLiveData<Result<Boolean>>()
-    val updateUserNicknameResult: LiveData<Result<Boolean>> = _updateUserNicknameResult
-
-    private val _updateUserFriendsResult = MutableLiveData<Result<Boolean>>()
-    val updateUserFriendsResult: LiveData<Result<Boolean>> = _updateUserFriendsResult
-
-    private val _addUserOutgoingFriendResult = MutableLiveData<Result<Boolean>>()
-    val addUserOutgoingFriendResult: LiveData<Result<Boolean>> = _addUserOutgoingFriendResult
-
-    private val _addUserIncomingFriendResult = MutableLiveData<Result<Boolean>>()
-    val addUserIncomingFriendResult: LiveData<Result<Boolean>> = _addUserIncomingFriendResult
-
-    private val _removeUserFriendResult = MutableLiveData<Result<Boolean>>()
-    val removeUserFriendResult: LiveData<Result<Boolean>> = _removeUserFriendResult
-
-    private val _removeUserFriendsResult = MutableLiveData<Result<Boolean>>()
-    val removeUserFriendsResult: LiveData<Result<Boolean>> = _removeUserFriendsResult
-
-    private val _removeUserOutgoingFriendResult = MutableLiveData<Result<Boolean>>()
-    val removeUserOutgoingFriendResult: LiveData<Result<Boolean>> = _removeUserOutgoingFriendResult
-
-    private val _removeUserIncomingFriendResult = MutableLiveData<Result<Boolean>>()
-    val removeUserIncomingFriendResult: LiveData<Result<Boolean>> = _removeUserIncomingFriendResult
+    private val _createUserFirebaseCallResult = MutableLiveData<FirebaseCallResult<User>>()
+    val createUserFirebaseCallResult: LiveData<FirebaseCallResult<User>> =
+        _createUserFirebaseCallResult
 
     fun createUser(userID: String, nickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _createUserResult.postValue(repository.createUser(userID, nickname))
+            _createUserFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.createUser(userID, nickname)
+            )
         }
     }
+
+    private val _getUserFirebaseCallResult = MutableLiveData<FirebaseCallResult<User>>()
+    val getUserFirebaseCallResult: LiveData<FirebaseCallResult<User>> = _getUserFirebaseCallResult
 
     fun getUser(userID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getUserResult.postValue(repository.getUser(userID))
+            _getUserFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUser(userID)
+            )
         }
     }
+
+    private val _getUserNameFirebaseCallResult = MutableLiveData<FirebaseCallResult<UserName>>()
+    val getUserNameFirebaseCallResult: LiveData<FirebaseCallResult<UserName>> =
+        _getUserNameFirebaseCallResult
 
     fun getUserName(userID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getUserName.postValue(repository.getUserName(userID))
+            _getUserNameFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserName(userID)
+            )
         }
     }
+
+    private val _getUserAgeFirebaseCallResult = MutableLiveData<FirebaseCallResult<Int>>()
+    val getUserAgeFirebaseCallResult: LiveData<FirebaseCallResult<Int>> =
+        _getUserAgeFirebaseCallResult
 
     fun getUserAge(userID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getUserAge.postValue(repository.getUserAge(userID))
+            _getUserAgeFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserAge(userID)
+            )
         }
     }
+
+    private val _getUserNicknameFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
+    val getUserNicknameFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _getUserNicknameFirebaseCallResult
 
     fun getUserNickname(userID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getUserNickname.postValue(repository.getUserNickname(userID))
+            _getUserNicknameFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserNickname(userID)
+            )
         }
     }
+
+    private val _getUserIncomingFriendsFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<List<Friend>>>()
+    val getUserIncomingFriendsFirebaseCallResult: LiveData<FirebaseCallResult<List<Friend>>> =
+        _getUserIncomingFriendsFirebaseCallResult
+
+    fun getUserIncomingFriends(userID: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserIncomingFriendsFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserFriends(userID)
+            )
+        }
+    }
+
+    private val _getUserOutgoingFriendsFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<List<Friend>>>()
+    val getUserOutgoingFriendsFirebaseCallResult: LiveData<FirebaseCallResult<List<Friend>>> =
+        _getUserOutgoingFriendsFirebaseCallResult
+
+    fun getUserOutgoingFriends(userID: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserOutgoingFriendsFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserOutgoingFriends(userID)
+            )
+        }
+    }
+
+    private val _getUserFriendsFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<List<Friend>>>()
+    val getUserFriendsFirebaseCallResult: LiveData<FirebaseCallResult<List<Friend>>> =
+        _getUserFriendsFirebaseCallResult
 
     fun getUserFriends(userID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _getUserFriends.postValue(repository.getUserFriends(userID))
+            _getUserFriendsFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserFriends(userID)
+            )
         }
     }
 
-    fun updateUserName(userID: String, newName: String) {
+    private val _getUserAdminTripsFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<List<Trip>>>()
+    val getUserAdminTripsFirebaseCallResult: LiveData<FirebaseCallResult<List<Trip>>> =
+        _getUserAdminTripsFirebaseCallResult
+
+    fun getUserAdminTrips(userID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _updateUserNameResult.postValue(repository.updateUserName(userID, newName))
+            _getUserAdminTripsFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserAdminTrips(userID)
+            )
         }
     }
+
+    private val _getUserPassengerTripsFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<List<Trip>>>()
+    val getUserPassengerTripsFirebaseCallResult: LiveData<FirebaseCallResult<List<Trip>>> =
+        _getUserPassengerTripsFirebaseCallResult
+
+    fun getUserPassengerTrips(userID: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserPassengerTripsFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.getUserPassengerTrips(userID)
+            )
+        }
+    }
+
+    private val _updateUserFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
+    val updateUserFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _updateUserFirebaseCallResult
+
+    fun updateUser(userID: String, newUser: User) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _updateUserFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.updateUser(userID, newUser)
+            )
+        }
+    }
+
+    private val _updateUserNameFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
+    val updateUserNameFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _updateUserNameFirebaseCallResult
+
+    fun updateUserName(userID: String, newName: UserName) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _updateUserNameFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.updateUserName(userID, newName)
+            )
+        }
+    }
+
+    private val _updateUserAgeFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
+    val updateUserAgeFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _updateUserAgeFirebaseCallResult
 
     fun updateUserAge(userID: String, newAge: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            _updateUserAgeResult.postValue(repository.updateUserAge(userID, newAge))
+            _updateUserAgeFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.updateUserAge(userID, newAge)
+            )
         }
     }
+
+    private val _updateUserNicknameFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<String>>()
+    val updateUserNicknameFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _updateUserNicknameFirebaseCallResult
 
     fun updateUserNickname(userID: String, newNickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            _updateUserNicknameResult.postValue(repository.updateUserNickname(userID, newNickname))
-        }
-    }
-
-    fun addUserOutgoingFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _addUserOutgoingFriendResult.postValue(
-                repository.addUserOutgoingFriend(userID, friendDocRef)
+            _updateUserNicknameFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.updateUserNickname(userID, newNickname)
             )
         }
     }
 
-    fun addUserIncomingFriend(userID: String, friendDocRef: DocumentReference) {
+    private val _addUserOutgoingFriendFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<String>>()
+    val addUserOutgoingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _addUserOutgoingFriendFirebaseCallResult
+
+    fun addUserOutgoingFriend(userID: String, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
-            _addUserIncomingFriendResult.postValue(
-                repository.addUserIncomingFriend(userID, friendDocRef)
+            _addUserOutgoingFriendFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.addUserOutgoingFriend(userID, friend)
             )
         }
     }
 
-    fun removeUserFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _removeUserFriendResult.postValue(repository.removeUserFriend(userID, friendDocRef))
-        }
-    }
+    private val _addUserIncomingFriendFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<String>>()
+    val addUserIncomingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _addUserIncomingFriendFirebaseCallResult
 
-    fun removeUserFriends(userID: String, friendDocRefs: List<DocumentReference>) {
+    fun addUserIncomingFriend(userID: String, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
-            _removeUserFriendsResult.postValue(repository.removeUserFriends(userID, friendDocRefs))
-        }
-    }
-
-    fun removeUserOutgoingFriend(userID: String, friendDocRef: DocumentReference) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _removeUserOutgoingFriendResult.postValue(
-                repository.removeUserOutgoingFriend(userID, friendDocRef)
+            _addUserIncomingFriendFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.addUserIncomingFriend(userID, friend)
             )
         }
     }
 
-    fun removeUserIncomingFriend(userID: String, friendDocRef: DocumentReference) {
+    private val _removeUserFriendFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
+    val removeUserFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _removeUserFriendFirebaseCallResult
+
+    fun removeUserFriend(userID: String, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
-            _removeUserIncomingFriendResult.postValue(
-                repository.removeUserIncomingFriend(userID, friendDocRef)
+            _removeUserFriendFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.removeUserFriend(userID, friend)
+            )
+        }
+    }
+
+    private val _removeUserOutgoingFriendFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<String>>()
+    val removeUserOutgoingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _removeUserOutgoingFriendFirebaseCallResult
+
+    fun removeUserOutgoingFriend(userID: String, friend: Friend) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _removeUserOutgoingFriendFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.removeUserOutgoingFriend(userID, friend)
+            )
+        }
+    }
+
+    private val _removeUserIncomingFriendFirebaseCallResult =
+        MutableLiveData<FirebaseCallResult<String>>()
+    val removeUserIncomingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
+        _removeUserIncomingFriendFirebaseCallResult
+
+    fun removeUserIncomingFriend(userID: String, friend: Friend) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _removeUserIncomingFriendFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.removeUserIncomingFriend(userID, friend)
+            )
+        }
+    }
+
+    private val _checkNicknameFirebaseCallResult = MutableLiveData<FirebaseCallResult<Boolean>>()
+    val checkNicknameFirebaseCallResult: LiveData<FirebaseCallResult<Boolean>> =
+        _checkNicknameFirebaseCallResult
+
+    fun checkNickname(nickname: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _checkNicknameFirebaseCallResult.postValue(
+                FirebaseRepositoriesHolder.userRepository.checkNickname(nickname)
             )
         }
     }

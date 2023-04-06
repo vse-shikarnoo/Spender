@@ -1,9 +1,10 @@
-package com.example.spender.data.firebase.models
+package com.example.spender.data.models.user
 
+import com.example.spender.data.models.Trip
 import com.google.firebase.firestore.DocumentReference
 
 data class User(
-    val name: Triple<String, String, String>,
+    val name: UserName,
     val age: Int,
     val nickname: String,
     val incomingFriends: List<Friend>,

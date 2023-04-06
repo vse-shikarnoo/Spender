@@ -1,63 +1,25 @@
 package com.example.spender.data.firebase.interfaces
 
-import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.models.Friend
-import com.example.spender.data.firebase.models.Trip
+import com.example.spender.data.firebase.FirebaseCallResult
+import com.example.spender.data.models.user.Friend
+import com.example.spender.data.models.Trip
+import com.example.spender.data.models.spend.Spend
+import com.example.spender.data.models.user.User
 import com.google.firebase.firestore.DocumentReference
 
 interface TripRepositoryInterface {
     suspend fun createTrip(
         name: String,
-        creatorDocRef: DocumentReference,
+        creator: User,
         members: List<Friend>,
-    ): Result<Boolean>
+    ): FirebaseCallResult<String>
 
-    suspend fun getTrip(
-        tripDocRef: DocumentReference,
-    ): Result<Trip>
-
-    suspend fun getTripName(
-        tripDocRef: DocumentReference,
-    ): Result<String>
-
-    suspend fun getTripCreator(
-        tripDocRef: DocumentReference,
-    ): Result<Friend>
-
-    suspend fun getTripMembers(
-        tripDocRef: DocumentReference,
-    ): Result<List<Friend>>
-
-    suspend fun getTripsByUserId(
-        userID: String,
-    ): Result<List<Trip>>
-
-    suspend fun updateTripName(
-        tripDocRef: DocumentReference,
-        newName: String,
-    ): Result<Boolean>
-
-    suspend fun addTripMember(
-        tripDocRef: DocumentReference,
-        newMember: DocumentReference,
-    ): Result<Boolean>
-
-    suspend fun addTripMembers(
-        tripDocRef: DocumentReference,
-        newMembers: List<DocumentReference>,
-    ): Result<Boolean>
-
-    suspend fun deleteTripMember(
-        tripDocRef: DocumentReference,
-        member: DocumentReference,
-    ): Result<Boolean>
-
-    suspend fun deleteTripMembers(
-        tripDocRef: DocumentReference,
-        members: List<DocumentReference>,
-    ): Result<Boolean>
-
-    suspend fun deleteTrip(
-        tripDocRef: DocumentReference,
-    ): Result<Boolean>
+    suspend fun updateTripName(trip: Trip, newName: String): FirebaseCallResult<String>
+    suspend fun addTripMember(trip: Trip, newMember: Friend): FirebaseCallResult<String>
+    suspend fun addTripMembers(trip: Trip, newMembers: List<Friend>): FirebaseCallResult<String>
+    suspend fun addTripSpend(trip: Trip, spend: Spend): FirebaseCallResult<String>
+    suspend fun removeTripMember(trip: Trip, member: Friend): FirebaseCallResult<String>
+    suspend fun removeTripMembers(trip: Trip, members: List<Friend>): FirebaseCallResult<String>
+    suspend fun removeTripSpend(spend: Spend): FirebaseCallResult<String>
+    suspend fun deleteTrip(trip: Trip): FirebaseCallResult<String>
 }

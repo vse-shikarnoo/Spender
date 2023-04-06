@@ -1,87 +1,30 @@
 package com.example.spender.data.firebase.interfaces
 
-import com.example.spender.data.firebase.Result
-import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
-import com.example.spender.data.firebase.models.Friend
-import com.example.spender.data.firebase.models.User
-import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import kotlinx.coroutines.tasks.await
+import com.example.spender.data.firebase.FirebaseCallResult
+import com.example.spender.data.models.user.Friend
+import com.example.spender.data.models.Trip
+import com.example.spender.data.models.user.User
+import com.example.spender.data.models.user.UserName
 
 interface UserRepositoryInterface {
-    suspend fun createUser(userID: String, nickname: String): Result<Boolean>
-    suspend fun getUser(userID: String): Result<User>
-    suspend fun getUserName(userID: String): Result<Triple<String, String, String>>
-    suspend fun getUserAge(userID: String): Result<Int>
-    suspend fun getUserNickname(userID: String): Result<String>
-    suspend fun getUserFriends(userID: String): Result<List<Friend>>
-    suspend fun updateUserName(userID: String, newName: String): Result<Boolean>
-    suspend fun updateUserAge(userID: String, age: Int): Result<Boolean>
-    suspend fun updateUserNickname(userID: String, nickname: String): Result<Boolean>
-    suspend fun addUserOutgoingFriend(
-        userID: String,
-        friendDocRef: DocumentReference
-    ): Result<Boolean>
-
-    suspend fun addUserIncomingFriend(
-        userID: String,
-        friendDocRef: DocumentReference
-    ): Result<Boolean>
-
-    suspend fun removeUserFriend(userID: String, friendDocRef: DocumentReference): Result<Boolean>
-    suspend fun removeUserFriends(
-        userID: String,
-        friendDocRefs: List<DocumentReference>
-    ): Result<Boolean>
-
-    suspend fun removeUserOutgoingFriend(
-        userID: String,
-        friendDocRef: DocumentReference
-    ): Result<Boolean>
-
-    suspend fun removeUserIncomingFriend(
-        userID: String,
-        friendDocRef: DocumentReference
-    ): Result<Boolean>
-
-    companion object {
-        suspend fun getUserNickname(
-            userID: String,
-            userCollection: CollectionReference
-        ): Result<String> {
-            return try {
-                val userDocRef = userCollection.document(userID)
-                val nickname =
-                    userDocRef.get().await()
-                        .data!![CollectionUserDocumentFieldNames.NICKNAME] as String
-                Result.Success(nickname)
-            } catch (e: Exception) {
-                when (e) {
-                    is FirebaseNetworkException -> Result.Error("Network error")
-                    else -> Result.Error("Unknown error")
-                }
-            }
-        }
-        suspend fun getUserName(
-            userID: String,
-            userCollection: CollectionReference
-        ): Result<Triple<String, String, String>> {
-            return try {
-                val userDocRef = userCollection.document(userID)
-                val firstName = userDocRef.get()
-                    .await().data!![CollectionUserDocumentFieldNames.FIRST_NAME] as String
-                val middleName = userDocRef.get()
-                    .await().data!![CollectionUserDocumentFieldNames.MIDDLE_NAME] as String
-                val lastName = userDocRef.get()
-                    .await().data!![CollectionUserDocumentFieldNames.LAST_NAME] as String
-                Result.Success(Triple(firstName, middleName, lastName))
-            } catch (e: Exception) {
-                when (e) {
-                    is FirebaseNetworkException -> Result.Error("Network error")
-                    else -> Result.Error("Unknown error")
-                }
-            }
-        }
-    }
+    suspend fun createUser(userID: String, nickname: String): FirebaseCallResult<User>
+    suspend fun getUser(userID: String): FirebaseCallResult<User>
+    suspend fun getUserName(userID: String): FirebaseCallResult<UserName>
+    suspend fun getUserAge(userID: String): FirebaseCallResult<Int>
+    suspend fun getUserNickname(userID: String): FirebaseCallResult<String>
+    suspend fun getUserIncomingFriends(userID: String): FirebaseCallResult<List<Friend>>
+    suspend fun getUserOutgoingFriends(userID: String): FirebaseCallResult<List<Friend>>
+    suspend fun getUserFriends(userID: String): FirebaseCallResult<List<Friend>>
+    suspend fun getUserAdminTrips(userID: String): FirebaseCallResult<List<Trip>>
+    suspend fun getUserPassengerTrips(userID: String): FirebaseCallResult<List<Trip>>
+    suspend fun updateUser(userID: String, newUser: User): FirebaseCallResult<String>
+    suspend fun updateUserName(userID: String, newName: UserName): FirebaseCallResult<String>
+    suspend fun updateUserAge(userID: String, newAge: Int): FirebaseCallResult<String>
+    suspend fun updateUserNickname(userID: String, newNickname: String): FirebaseCallResult<String>
+    suspend fun addUserIncomingFriend(userID: String, friend: Friend): FirebaseCallResult<String>
+    suspend fun addUserOutgoingFriend(userID: String, friend: Friend): FirebaseCallResult<String>
+    suspend fun removeUserFriend(userID: String, friend: Friend): FirebaseCallResult<String>
+    suspend fun removeUserOutgoingFriend(userID: String, friend: Friend): FirebaseCallResult<String>
+    suspend fun removeUserIncomingFriend(userID: String, friend: Friend): FirebaseCallResult<String>
+    suspend fun checkNickname(nickname: String): FirebaseCallResult<Boolean>
 }

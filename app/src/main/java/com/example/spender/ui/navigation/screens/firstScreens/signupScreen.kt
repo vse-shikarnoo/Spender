@@ -24,8 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spender.R
-import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.data.firebase.viewModels.UserViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
@@ -51,8 +50,8 @@ fun SignUpScreen(
     var nickname by remember { mutableStateOf("") }
 
     val context = LocalContext.current
-    val signUpResult = authManagerViewModel.signUpResult.observeAsState()
-    val createUserResult = userViewModel.createUserResult.observeAsState()
+    val signUpResult = authManagerViewModel.signUpFirebaseCallResult.observeAsState()
+    val createUserResult = userViewModel.createUserFirebaseCallResult.observeAsState()
     var error by remember { mutableStateOf("") }
 
     Scaffold(
@@ -198,10 +197,10 @@ fun SignUpScreen(
 
     signUpResult.value.let { result ->
         when (result) {
-            is Result.Success -> {
+            is FirebaseCallResult.Success -> {
                 userViewModel.createUser(result.data.uid, nickname)
             }
-            is Result.Error -> {
+            is FirebaseCallResult.Error -> {
                 if (error != result.exception) {
                     error = result.exception
                     Toast.makeText(
@@ -217,11 +216,11 @@ fun SignUpScreen(
 
     createUserResult.value.let { result ->
         when (result) {
-            is Result.Success -> {
+            is FirebaseCallResult.Success -> {
                 navigator.popBackStack(FirstScreenDestination, true)
                 navigator.navigate(BottomBarScreenDestination)
             }
-            is Result.Error -> {
+            is FirebaseCallResult.Error -> {
                 if (error != result.exception) {
                     error = result.exception
                     Toast.makeText(

@@ -1,10 +1,10 @@
 package com.example.spender.data.firebase.repositories
 
-import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.interfaces.SpendRepositoryInterface
-import com.example.spender.data.firebase.models.Friend
-import com.example.spender.data.firebase.models.MemberActivity
-import com.example.spender.data.firebase.models.Spend
+import com.example.spender.data.models.user.Friend
+import com.example.spender.data.models.MemberActivity
+import com.example.spender.data.models.spend.Spend
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -17,75 +17,75 @@ class SpendRepository : SpendRepositoryInterface {
         category: String,
         amount: Double,
         members: List<MemberActivity>
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSpend(spendDocRef: DocumentReference): Result<Spend> {
+    override suspend fun getSpend(spendDocRef: DocumentReference): FirebaseCallResult<Spend> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSpendName(spendDocRef: DocumentReference): Result<String> {
+    override suspend fun getSpendName(spendDocRef: DocumentReference): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSpendCategory(spendDocRef: DocumentReference): Result<String> {
+    override suspend fun getSpendCategory(spendDocRef: DocumentReference): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSpendAmount(spendDocRef: DocumentReference): Result<Double> {
+    override suspend fun getSpendAmount(spendDocRef: DocumentReference): FirebaseCallResult<Double> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getSpendMembers(
         spendDocRef: DocumentReference
-    ): Result<List<MemberActivity>> {
+    ): FirebaseCallResult<List<MemberActivity>> {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateSpendName(
         spendDocRef: DocumentReference,
         newName: String
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateSpendCategory(
         spendDocRef: DocumentReference,
         newCategory: String
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateSpendAmount(
         spendDocRef: DocumentReference,
         newCategory: String
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
     override suspend fun addSpendMember(
         spendDocRef: DocumentReference,
         newMember: Friend
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
     override suspend fun addSpendMembers(
         spendDocRef: DocumentReference,
         newMembers: List<Friend>
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
     override suspend fun deleteSpendMembers(
         spendDocRef: DocumentReference,
         member: List<Friend>
-    ): Result<Boolean> {
+    ): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteSpendSpend(spendDocRef: DocumentReference): Result<Boolean> {
+    override suspend fun deleteSpendSpend(spendDocRef: DocumentReference): FirebaseCallResult<Boolean> {
         TODO("Not yet implemented")
     }
 }

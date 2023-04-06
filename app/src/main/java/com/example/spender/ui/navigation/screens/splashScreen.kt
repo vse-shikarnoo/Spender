@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.R
-import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
@@ -50,11 +50,11 @@ fun SplashScreen(
 
     currentUserResult.value.let { result ->
         when (result) {
-            is Result.Success -> {
+            is FirebaseCallResult.Success -> {
                 navigator.popBackStack()
                 navigator.navigate(BottomBarScreenDestination)
             }
-            is Result.Error -> {
+            is FirebaseCallResult.Error -> {
                 Toast.makeText(
                     context,
                     result.exception,

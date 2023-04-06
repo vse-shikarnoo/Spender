@@ -4,7 +4,6 @@ object CollectionUserDocumentFieldNames {
     const val FIRST_NAME: String = "firstName"
     const val MIDDLE_NAME: String = "middleName"
     const val LAST_NAME: String = "lastName"
-    const val NAME = "Name"
     const val AGE = "Age"
     const val NICKNAME = "Nickname"
     const val INCOMING_FRIENDS = "IncomingFriends"

@@ -1,81 +1,74 @@
 package com.example.spender.data.firebase.repositories
 
-import com.example.spender.data.firebase.HandleError
-import com.example.spender.data.firebase.Result
+import com.example.spender.data.firebase.*
 import com.example.spender.data.firebase.interfaces.AuthManagerInterface
-import com.google.firebase.auth.FirebaseAuth
+import com.example.spender.data.firebase.messages.FirebaseErrorHandler
+import com.example.spender.data.firebase.messages.FirebaseSuccessMessages
+import com.example.spender.data.firebase.messages.exceptions.FirebaseUndefinedException
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 
 class AuthManagerRepository : AuthManagerInterface {
-    private val firebaseAuth by lazy { FirebaseAuth.getInstance() }
-
-    override suspend fun signIn(email: String, password: String): Result<Boolean> {
+    override suspend fun signIn(email: String, password: String): FirebaseCallResult<String> {
         return try {
-            firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            Result.Success(true)
+            FirebaseInstanceHolder.auth.signInWithEmailAndPassword(email, password).await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.SIGN_IN_SUCCESS)
         } catch (e: Exception) {
-            HandleError.handleFirebaseError(e)
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun signUp(email: String, password: String): Result<FirebaseUser> {
+    override suspend fun signUp(email: String, password: String): FirebaseCallResult<FirebaseUser> {
         return try {
-            val user = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            val user =
+                FirebaseInstanceHolder.auth.createUserWithEmailAndPassword(email, password).await()
             if (user != null)
-                Result.Success(user.user!!)
+                FirebaseCallResult.Success(user.user!!)
             else
-                Result.Error("sdf")
+                FirebaseErrorHandler.handle(FirebaseUndefinedException())
         } catch (e: Exception) {
-            HandleError.handleFirebaseError(e)
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun isEmailVerified(): Result<Boolean> {
+    override suspend fun isEmailVerified(): FirebaseCallResult<Boolean> {
         return try {
-            val bool = firebaseAuth.currentUser!!.isEmailVerified
-            if (bool)
-                Result.Success(true)
-            else
-                Result.Error("Email not verified")
+            val bool = FirebaseInstanceHolder.auth.currentUser!!.isEmailVerified
+            FirebaseCallResult.Success(bool)
         } catch (e: Exception) {
-            HandleError.handleFirebaseError(e)
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun getCurrentUser(): Result<FirebaseUser> {
-        firebaseAuth.signOut()
-        firebaseAuth.currentUser?.let { user ->
-            firebaseAuth.updateCurrentUser(user)
-            return Result.Success(user)
-        }
-        return Result.Error("No user signed in")
-    }
-
-    override suspend fun verifyEmail(): Result<Boolean> {
+    override suspend fun getCurrentUser(): FirebaseCallResult<FirebaseUser> {
         return try {
-            firebaseAuth.currentUser!!.sendEmailVerification().await()
-            Result.Success(true)
+            val user = FirebaseInstanceHolder.auth.currentUser
+            if (user != null) {
+                FirebaseInstanceHolder.auth.updateCurrentUser(user)
+                FirebaseCallResult.Success(user)
+            } else {
+                FirebaseErrorHandler.handle(FirebaseUndefinedException())
+            }
         } catch (e: Exception) {
-            HandleError.handleFirebaseError(e)
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun resetPassword(): Result<Boolean> {
+    override suspend fun verifyEmail(): FirebaseCallResult<String> {
         return try {
-            firebaseAuth.sendPasswordResetEmail(firebaseAuth.currentUser!!.email!!).await()
-            Result.Success(true)
+            FirebaseInstanceHolder.auth.currentUser!!.sendEmailVerification().await()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.VERIFICATION_EMAIL_SENT)
         } catch (e: Exception) {
-            HandleError.handleFirebaseError(e)
+            FirebaseErrorHandler.handle(e)
         }
     }
 
-    override suspend fun signOut(): Result<Boolean> {
+    override suspend fun signOut(): FirebaseCallResult<String> {
         return try {
-            firebaseAuth.signOut()
-            Result.Success(true)
+            FirebaseInstanceHolder.auth.signOut()
+            FirebaseCallResult.Success(FirebaseSuccessMessages.SIGN_OUT_SUCCESS)
         } catch (e: Exception) {
-            HandleError.handleFirebaseError(e)
+            FirebaseErrorHandler.handle(e)
         }
     }
 }

@@ -1,56 +1,35 @@
 package com.example.spender.data.firebase.interfaces
 
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.models.user.Friend
-import com.example.spender.data.models.MemberActivity
 import com.example.spender.data.models.spend.Spend
+import com.example.spender.data.models.user.Friend
+import com.example.spender.data.models.spend.SpendMember
+import com.example.spender.data.models.spend.SplitMode
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.GeoPoint
 
 interface SpendRepositoryInterface {
     suspend fun createSpend(
         tripDocRef: DocumentReference,
         name: String,
         category: String = "No category",
+        splitMode: SplitMode,
         amount: Double,
-        members: List<MemberActivity>,
-    ): FirebaseCallResult<Boolean>
+        geoPoint: GeoPoint,
+        members: List<SpendMember>,
+    ): FirebaseCallResult<String>
 
-    suspend fun getSpend(spendDocRef: DocumentReference): FirebaseCallResult<Spend>
-    suspend fun getSpendName(spendDocRef: DocumentReference): FirebaseCallResult<String>
-    suspend fun getSpendCategory(spendDocRef: DocumentReference): FirebaseCallResult<String>
-    suspend fun getSpendAmount(spendDocRef: DocumentReference): FirebaseCallResult<Double>
-    suspend fun getSpendMembers(spendDocRef: DocumentReference): FirebaseCallResult<List<MemberActivity>>
-    suspend fun updateSpendName(spendDocRef: DocumentReference, newName: String): FirebaseCallResult<Boolean>
-    suspend fun updateSpendCategory(
-        spendDocRef: DocumentReference,
-        newCategory: String,
-    ): FirebaseCallResult<Boolean>
+    suspend fun updateSpendName(spend: Spend, newName: String): FirebaseCallResult<String>
+    suspend fun updateSpendCategory(spend: Spend, newCategory: String): FirebaseCallResult<String>
+    suspend fun updateSpendSplitMode(
+        spend: Spend,
+        newSplitMode: SplitMode
+    ): FirebaseCallResult<String>
 
-    suspend fun updateSpendAmount(
-        // TODO("update all payments and debts - field members")
-        spendDocRef: DocumentReference,
-        newCategory: String,
-    ): FirebaseCallResult<Boolean>
-
-    suspend fun addSpendMember(
-        // TODO("update all payments and debts - field members")
-        spendDocRef: DocumentReference,
-        newMember: Friend,
-    ): FirebaseCallResult<Boolean>
-
-    suspend fun addSpendMembers(
-        // TODO("update all payments and debts - field members")
-        spendDocRef: DocumentReference,
-        newMembers: List<Friend>,
-    ): FirebaseCallResult<Boolean>
-
-    suspend fun deleteSpendMembers(
-        // TODO("update all payments and debts - field members")
-        spendDocRef: DocumentReference,
-        member: List<Friend>,
-    ): FirebaseCallResult<Boolean>
-
-    suspend fun deleteSpendSpend(
-        spendDocRef: DocumentReference,
-    ): FirebaseCallResult<Boolean>
+    suspend fun updateSpendAmount(spend: Spend, newAmount: Double): FirebaseCallResult<String>
+    suspend fun updateSpendGeoPoint(spend: Spend, newGeoPoint: GeoPoint): FirebaseCallResult<String>
+    suspend fun addSpendMember(spend: Spend, newMember: Friend): FirebaseCallResult<String>
+    suspend fun addSpendMembers(spend: Spend, newMembers: List<Friend>): FirebaseCallResult<String>
+    suspend fun deleteSpendMember(spend: Spend, member: List<Friend>): FirebaseCallResult<String>
+    suspend fun deleteSpendSpend(spend: Spend): FirebaseCallResult<String>
 }

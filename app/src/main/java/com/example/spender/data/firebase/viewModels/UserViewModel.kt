@@ -52,8 +52,8 @@ class UserViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private val _getUserAgeFirebaseCallResult = MutableLiveData<FirebaseCallResult<Int>>()
-    val getUserAgeFirebaseCallResult: LiveData<FirebaseCallResult<Int>> =
+    private val _getUserAgeFirebaseCallResult = MutableLiveData<FirebaseCallResult<Long>>()
+    val getUserAgeFirebaseCallResult: LiveData<FirebaseCallResult<Long>> =
         _getUserAgeFirebaseCallResult
 
     fun getUserAge(userID: String) {

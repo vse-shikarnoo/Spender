@@ -7,6 +7,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
 import com.example.spender.ui.navigation.ProfileNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -15,12 +17,13 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun ProfileScreen(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    authManagerViewModel: AuthManagerViewModel = viewModel()
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
-                // navigator.
+                authManagerViewModel.signOut()
             }
         ) {
             Text("Profile screen")

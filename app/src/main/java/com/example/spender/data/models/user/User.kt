@@ -5,11 +5,12 @@ import com.google.firebase.firestore.DocumentReference
 
 data class User(
     val name: UserName,
-    val age: Int,
+    val age: Long,
     val nickname: String,
     val incomingFriends: List<Friend>,
     val outgoingFriends: List<Friend>,
     val friends: List<Friend>,
-    val trips: List<Trip>,
+    val adminTrips: List<Trip>,
+    val passengerTrips: List<Trip>,
     val docRef: DocumentReference,
 )

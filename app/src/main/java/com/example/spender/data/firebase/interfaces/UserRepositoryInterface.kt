@@ -10,7 +10,7 @@ interface UserRepositoryInterface {
     suspend fun createUser(userID: String, nickname: String): FirebaseCallResult<User>
     suspend fun getUser(userID: String): FirebaseCallResult<User>
     suspend fun getUserName(userID: String): FirebaseCallResult<UserName>
-    suspend fun getUserAge(userID: String): FirebaseCallResult<Int>
+    suspend fun getUserAge(userID: String): FirebaseCallResult<Long>
     suspend fun getUserNickname(userID: String): FirebaseCallResult<String>
     suspend fun getUserIncomingFriends(userID: String): FirebaseCallResult<List<Friend>>
     suspend fun getUserOutgoingFriends(userID: String): FirebaseCallResult<List<Friend>>

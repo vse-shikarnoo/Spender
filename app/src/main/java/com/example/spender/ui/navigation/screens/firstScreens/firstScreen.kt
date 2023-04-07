@@ -54,7 +54,6 @@ fun ButtonGroup(navigator: DestinationsNavigator) {
     ) {
         Button(
             onClick = {
-                // navigator.popBackStack()
                 navigator.navigate(LogInScreenDestination)
             },
             buttonModifier,
@@ -67,7 +66,6 @@ fun ButtonGroup(navigator: DestinationsNavigator) {
         }
         Button(
             onClick = {
-                // navigator.popBackStack()
                 navigator.navigate(SignUpScreenDestination)
             },
             buttonModifier

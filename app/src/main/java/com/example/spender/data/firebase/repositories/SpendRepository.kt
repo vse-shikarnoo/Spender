@@ -3,89 +3,82 @@ package com.example.spender.data.firebase.repositories
 import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.interfaces.SpendRepositoryInterface
 import com.example.spender.data.models.user.Friend
-import com.example.spender.data.models.MemberActivity
 import com.example.spender.data.models.spend.Spend
+import com.example.spender.data.models.spend.SpendMember
+import com.example.spender.data.models.spend.SplitMode
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 
 class SpendRepository : SpendRepositoryInterface {
-    private val db by lazy { FirebaseFirestore.getInstance() }
-
     override suspend fun createSpend(
         tripDocRef: DocumentReference,
         name: String,
         category: String,
+        splitMode: SplitMode,
         amount: Double,
-        members: List<MemberActivity>
-    ): FirebaseCallResult<Boolean> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getSpend(spendDocRef: DocumentReference): FirebaseCallResult<Spend> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getSpendName(spendDocRef: DocumentReference): FirebaseCallResult<String> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getSpendCategory(spendDocRef: DocumentReference): FirebaseCallResult<String> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getSpendAmount(spendDocRef: DocumentReference): FirebaseCallResult<Double> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getSpendMembers(
-        spendDocRef: DocumentReference
-    ): FirebaseCallResult<List<MemberActivity>> {
+        geoPoint: GeoPoint,
+        members: List<SpendMember>
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateSpendName(
-        spendDocRef: DocumentReference,
+        spend: Spend,
         newName: String
-    ): FirebaseCallResult<Boolean> {
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateSpendCategory(
-        spendDocRef: DocumentReference,
+        spend: Spend,
         newCategory: String
-    ): FirebaseCallResult<Boolean> {
+    ): FirebaseCallResult<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateSpendSplitMode(
+        spend: Spend,
+        newSplitMode: SplitMode
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
     override suspend fun updateSpendAmount(
-        spendDocRef: DocumentReference,
-        newCategory: String
-    ): FirebaseCallResult<Boolean> {
+        spend: Spend,
+        newAmount: Double
+    ): FirebaseCallResult<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateSpendGeoPoint(
+        spend: Spend,
+        newGeoPoint: GeoPoint
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
     override suspend fun addSpendMember(
-        spendDocRef: DocumentReference,
+        spend: Spend,
         newMember: Friend
-    ): FirebaseCallResult<Boolean> {
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
     override suspend fun addSpendMembers(
-        spendDocRef: DocumentReference,
+        spend: Spend,
         newMembers: List<Friend>
-    ): FirebaseCallResult<Boolean> {
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteSpendMembers(
-        spendDocRef: DocumentReference,
+    override suspend fun deleteSpendMember(
+        spend: Spend,
         member: List<Friend>
-    ): FirebaseCallResult<Boolean> {
+    ): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteSpendSpend(spendDocRef: DocumentReference): FirebaseCallResult<Boolean> {
+    override suspend fun deleteSpendSpend(spend: Spend): FirebaseCallResult<String> {
         TODO("Not yet implemented")
     }
 }

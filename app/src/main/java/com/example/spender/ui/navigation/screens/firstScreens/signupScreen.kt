@@ -48,15 +48,6 @@ fun SignUpScreen(
     authManagerViewModel: AuthManagerViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel()
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var nickname by remember { mutableStateOf("") }
-
-    val context = LocalContext.current
-    val signUpResult = authManagerViewModel.signUpResult.observeAsState()
-    val createUserResult = userViewModel.createUserResult.observeAsState()
-    var error by remember { mutableStateOf("") }
-
     Scaffold(
         topBar = {
             androidx.compose.material3.TopAppBar(
@@ -85,15 +76,17 @@ fun SignUpScreen(
         },
         content = {
             Column(
-                modifier = Modifier.padding(it).fillMaxSize(),
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // /
-                val keyboardController = LocalSoftwareKeyboardController.current
-                val focusManager = LocalFocusManager.current
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Image(
@@ -104,22 +97,11 @@ fun SignUpScreen(
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )
-                    OutlinedTextField(
-                        value = nickname,
+                    SignUpTextField(
+                        text = userViewModel.nickname,
+                        onTextChanged = userViewModel::onNicknameChange,
                         label = { Text(text = "Nickname") },
-                        onValueChange = {
-                            nickname = it
-                        },
-                        textStyle = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                                focusManager.clearFocus()
-                            }
-                        ),
-                        colors = spenderTextFieldColors(),
-                        singleLine = true,
+                        keyboardType = KeyboardType.Text
                     )
                 }
                 androidx.compose.material3.Divider(
@@ -129,80 +111,55 @@ fun SignUpScreen(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    OutlinedTextField(
-                        value = email,
+                    SignUpTextField(
+                        text = userViewModel.email,
+                        onTextChanged = userViewModel::onEmailChange,
                         label = { Text(text = "Email") },
-                        onValueChange = {
-                            email = it
-                        },
-                        textStyle = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                                focusManager.clearFocus()
-                            }
-                        ),
-                        colors = spenderTextFieldColors(),
-                        singleLine = true,
+                        keyboardType = KeyboardType.Email
                     )
-                    OutlinedTextField(
-                        value = password,
+                    SignUpTextField(
+                        text = userViewModel.password,
+                        onTextChanged = userViewModel::onPasswordChange,
                         label = { Text(text = "Password") },
-                        onValueChange = {
-                            password = it
-                        },
-                        textStyle = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboardController?.hide()
-                                focusManager.clearFocus()
-                            }
-                        ),
-                        colors = spenderTextFieldColors(),
-                        singleLine = true,
+                        keyboardType = KeyboardType.Password
                     )
-//        OutlinedTextField(
-//            value = text,
-//            label = { Text(text = "Phone") },
-//            onValueChange = {
-//                text = it
-//            },
-//            textStyle = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-//            colors = spenderTextFieldColors(),
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-//            keyboardActions = KeyboardActions(
-//                onDone = {
-//                    keyboardController?.hide()
-//                    focusManager.clearFocus()
-//                }
-//            ),
-//            singleLine = true,
-//        )
                 }
-                // /
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    androidx.compose.material3.Button(
-                        onClick = {
-                            authManagerViewModel.signUp(email, password)
-                        },
-                        modifier = Modifier.padding(20.dp),
-                    ) {
-                        Text(
-                            text = "Sign Up",
-                            style = androidx.compose.material3.MaterialTheme.typography.labelMedium
-                        )
-                    }
-                }
+                SignUpButton(
+                    userViewModel = userViewModel,
+                    authViewModel = authManagerViewModel,
+                    navigator
+                )
             }
         }
     )
-
+}
+@Composable
+fun SignUpButton(
+    userViewModel: UserViewModel,
+    authViewModel: AuthManagerViewModel,
+    navigator: DestinationsNavigator
+) {
+    val context = LocalContext.current
+    val signUpResult = authViewModel.signUpResult.observeAsState()
+    val createUserResult = userViewModel.createUserResult.observeAsState()
+    var error by remember { mutableStateOf("") }
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        androidx.compose.material3.Button(
+            onClick = {
+                authViewModel.signUp(userViewModel.email, userViewModel.password)
+            },
+            modifier = Modifier.padding(20.dp),
+        ) {
+            Text(
+                text = "Sign Up",
+                style = androidx.compose.material3.MaterialTheme.typography.labelMedium
+            )
+        }
+    }
     signUpResult.value.let { result ->
         when (result) {
             is Result.Success -> {
-                userViewModel.createUser(result.data.uid, nickname)
+                userViewModel.createUser(result.data.uid, userViewModel.nickname)
             }
             is Result.Error -> {
                 if (error != result.exception) {
@@ -237,4 +194,30 @@ fun SignUpScreen(
             else -> {}
         }
     }
+}
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun SignUpTextField(
+    text: String,
+    onTextChanged: (String) -> Unit,
+    label: @Composable () -> Unit,
+    keyboardType: KeyboardType
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    OutlinedTextField(
+        value = text,
+        label = label,
+        onValueChange = onTextChanged,
+        textStyle = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }
+        ),
+        colors = spenderTextFieldColors(),
+        singleLine = true,
+    )
 }

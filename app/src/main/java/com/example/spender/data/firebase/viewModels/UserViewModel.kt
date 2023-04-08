@@ -1,5 +1,8 @@
 package com.example.spender.data.firebase.viewModels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +19,23 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserViewModel @Inject constructor() : ViewModel() {
+
+    var email: String by mutableStateOf("")
+        private set
+    var password: String by mutableStateOf("")
+        private set
+    var nickname: String by mutableStateOf("")
+        private set
+
+    fun onEmailChange(text: String) {
+        email = text
+    }
+    fun onPasswordChange(text: String) {
+        password = text
+    }
+    fun onNicknameChange(text: String) {
+        nickname = text
+    }
     private val repository = UserRepository()
 
     private val _createUserResult = MutableLiveData<Result<Boolean>>()

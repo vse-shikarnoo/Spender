@@ -1,15 +1,23 @@
 package com.example.spender.data.firebase.repositories
 
+import android.app.Application
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.interfaces.SpendRepositoryInterface
+import com.example.spender.data.firebase.repositoryInterfaces.SpendRepositoryInterface
 import com.example.spender.data.models.user.Friend
 import com.example.spender.data.models.spend.Spend
 import com.example.spender.data.models.spend.SpendMember
 import com.example.spender.data.models.spend.SplitMode
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import javax.inject.Inject
 
-class SpendRepository : SpendRepositoryInterface {
+class SpendRepository @Inject constructor(
+    private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
+    private val appContext: Application
+) : SpendRepositoryInterface {
     override suspend fun createSpend(
         tripDocRef: DocumentReference,
         name: String,

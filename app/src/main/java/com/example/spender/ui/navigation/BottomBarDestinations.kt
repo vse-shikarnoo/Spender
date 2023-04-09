@@ -50,11 +50,7 @@ fun BottomBar(
                 selected = currentDestination == destination.direction,
                 onClick = {
                     if (currentDestination != destination.direction) {
-                        val lst = mutableListOf<String?>()
-                        navController.currentBackStack.value.forEach { lst.add(it.destination.route) }
-                        if (lst.contains(destination.direction.route)) {
-                            navController.popBackStack(destination.direction.route, true)
-                        }
+                        navController.popBackStack(destination.direction.route, true)
 
                         navController.navigate(destination.direction)
                     }

@@ -2,7 +2,7 @@ package com.example.spender.data.firebase.viewModels
 
 import androidx.lifecycle.*
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.FirebaseRepositoriesHolder
+import com.example.spender.data.firebase.repositoryInterfaces.AuthRepositoryInterface
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -10,17 +10,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class AuthViewModel @Inject constructor() : ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val repository: dagger.Lazy<AuthRepositoryInterface>
+) : ViewModel() {
     private val _signInFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
     val signInFirebaseCallResult: LiveData<FirebaseCallResult<String>> = _signInFirebaseCallResult
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _signInFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.authManagerRepository.signIn(
-                    email,
-                    password
-                )
+                repository.get().signIn(email, password)
             )
         }
     }
@@ -32,11 +31,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun signUp(email: String, password: String, nickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _signUpFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.authManagerRepository.signUp(
-                    email,
-                    password,
-                    nickname
-                )
+                repository.get().signUp(email, password, nickname)
             )
         }
     }
@@ -48,7 +43,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun isEmailVerified() {
         viewModelScope.launch(Dispatchers.IO) {
             _isEmailVerifiedFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.authManagerRepository.isEmailVerified()
+                repository.get().isEmailVerified()
             )
         }
     }
@@ -59,7 +54,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun getCurrentUser() {
         viewModelScope.launch(Dispatchers.IO) {
             _currentUser.postValue(
-                FirebaseRepositoriesHolder.authManagerRepository.getCurrentUser()
+                repository.get().getCurrentUser()
             )
         }
     }
@@ -71,7 +66,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun verifyEmail() {
         viewModelScope.launch(Dispatchers.IO) {
             _verifyEmailFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.authManagerRepository.verifyEmail()
+                repository.get().verifyEmail()
             )
         }
     }
@@ -83,7 +78,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     fun signOut() {
         viewModelScope.launch(Dispatchers.IO) {
             _signOutFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.authManagerRepository.signOut()
+                repository.get().signOut()
             )
         }
     }

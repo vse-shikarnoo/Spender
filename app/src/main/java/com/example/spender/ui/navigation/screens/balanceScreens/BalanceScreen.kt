@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.swipeable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -21,13 +20,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.spender.R
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.FirebaseInstanceHolder
 import com.example.spender.data.firebase.viewModels.UserViewModel
 import com.example.spender.data.models.user.User
 import com.example.spender.ui.navigation.BalanceNavGraph
+import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -37,9 +37,9 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun BalanceScreen(
     //navigator: DestinationsNavigator,
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     var key by remember { mutableStateOf(0) }
-    val userViewModel: UserViewModel = viewModel()
     val user = userViewModel.getUserFirebaseCallResult.observeAsState()
 
     Log.d("ABOBA", userViewModel.hashCode().toString())
@@ -104,7 +104,7 @@ fun BalanceScreen(
 
     LaunchedEffect(key1 = key) {
         Log.d("ABOBA", "launched effect")
-        userViewModel.getUser(FirebaseInstanceHolder.auth.currentUser!!.uid)
+        userViewModel.getUser(null)
     }
 }
 

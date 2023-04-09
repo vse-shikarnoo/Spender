@@ -1,4 +1,4 @@
-package com.example.spender.data.firebase.interfaces
+package com.example.spender.data.firebase.repositoryInterfaces
 
 import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.models.spend.Spend

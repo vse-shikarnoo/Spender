@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.FirebaseRepositoriesHolder
+import com.example.spender.data.firebase.repositoryInterfaces.UserRepositoryInterface
 import com.example.spender.data.models.user.Friend
 import com.example.spender.data.models.user.User
 import com.example.spender.data.models.Trip
@@ -16,14 +16,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class UserViewModel @Inject constructor() : ViewModel() {
+class UserViewModel @Inject constructor(
+    private val repository: dagger.Lazy<UserRepositoryInterface>
+) : ViewModel() {
     private val _getUserFirebaseCallResult = MutableLiveData<FirebaseCallResult<User>>()
     val getUserFirebaseCallResult: LiveData<FirebaseCallResult<User>> = _getUserFirebaseCallResult
 
-    fun getUser(userID: String) {
+    fun getUser(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUser(userID)
+                repository.get().getUser(userID)
             )
         }
     }
@@ -32,10 +34,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserNameFirebaseCallResult: LiveData<FirebaseCallResult<UserName>> =
         _getUserNameFirebaseCallResult
 
-    fun getUserName(userID: String) {
+    fun getUserName(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNameFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserName(userID)
+                repository.get().getUserName(userID)
             )
         }
     }
@@ -44,10 +46,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserAgeFirebaseCallResult: LiveData<FirebaseCallResult<Long>> =
         _getUserAgeFirebaseCallResult
 
-    fun getUserAge(userID: String) {
+    fun getUserAge(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserAgeFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserAge(userID)
+                repository.get().getUserAge(userID)
             )
         }
     }
@@ -56,10 +58,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserNicknameFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _getUserNicknameFirebaseCallResult
 
-    fun getUserNickname(userID: String) {
+    fun getUserNickname(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNicknameFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserNickname(userID)
+                repository.get().getUserNickname(userID)
             )
         }
     }
@@ -69,10 +71,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserIncomingFriendsFirebaseCallResult: LiveData<FirebaseCallResult<List<Friend>>> =
         _getUserIncomingFriendsFirebaseCallResult
 
-    fun getUserIncomingFriends(userID: String) {
+    fun getUserIncomingFriends(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserIncomingFriendsFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserFriends(userID)
+                repository.get().getUserFriends(userID)
             )
         }
     }
@@ -82,10 +84,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserOutgoingFriendsFirebaseCallResult: LiveData<FirebaseCallResult<List<Friend>>> =
         _getUserOutgoingFriendsFirebaseCallResult
 
-    fun getUserOutgoingFriends(userID: String) {
+    fun getUserOutgoingFriends(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserOutgoingFriendsFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserOutgoingFriends(userID)
+                repository.get().getUserOutgoingFriends(userID)
             )
         }
     }
@@ -95,10 +97,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserFriendsFirebaseCallResult: LiveData<FirebaseCallResult<List<Friend>>> =
         _getUserFriendsFirebaseCallResult
 
-    fun getUserFriends(userID: String) {
+    fun getUserFriends(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserFriendsFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserFriends(userID)
+                repository.get().getUserFriends(userID)
             )
         }
     }
@@ -108,10 +110,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserAdminTripsFirebaseCallResult: LiveData<FirebaseCallResult<List<Trip>>> =
         _getUserAdminTripsFirebaseCallResult
 
-    fun getUserAdminTrips(userID: String) {
+    fun getUserAdminTrips(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserAdminTripsFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserAdminTrips(userID)
+                repository.get().getUserAdminTrips(userID)
             )
         }
     }
@@ -121,10 +123,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val getUserPassengerTripsFirebaseCallResult: LiveData<FirebaseCallResult<List<Trip>>> =
         _getUserPassengerTripsFirebaseCallResult
 
-    fun getUserPassengerTrips(userID: String) {
+    fun getUserPassengerTrips(userID: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserPassengerTripsFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.getUserPassengerTrips(userID)
+                repository.get().getUserPassengerTrips(userID)
             )
         }
     }
@@ -133,10 +135,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val updateUserFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _updateUserFirebaseCallResult
 
-    fun updateUser(userID: String, newUser: User) {
+    fun updateUser(userID: String? = null, newUser: User) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.updateUser(userID, newUser)
+                repository.get().updateUser(userID, newUser)
             )
         }
     }
@@ -145,10 +147,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val updateUserNameFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _updateUserNameFirebaseCallResult
 
-    fun updateUserName(userID: String, newName: UserName) {
+    fun updateUserName(userID: String? = null, newName: UserName) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserNameFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.updateUserName(userID, newName)
+                repository.get().updateUserName(userID, newName)
             )
         }
     }
@@ -157,10 +159,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val updateUserAgeFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _updateUserAgeFirebaseCallResult
 
-    fun updateUserAge(userID: String, newAge: Int) {
+    fun updateUserAge(userID: String? = null, newAge: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserAgeFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.updateUserAge(userID, newAge)
+                repository.get().updateUserAge(userID, newAge)
             )
         }
     }
@@ -170,10 +172,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val updateUserNicknameFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _updateUserNicknameFirebaseCallResult
 
-    fun updateUserNickname(userID: String, newNickname: String) {
+    fun updateUserNickname(userID: String? = null, newNickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserNicknameFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.updateUserNickname(userID, newNickname)
+                repository.get().updateUserNickname(userID, newNickname)
             )
         }
     }
@@ -183,10 +185,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val addUserOutgoingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _addUserOutgoingFriendFirebaseCallResult
 
-    fun addUserOutgoingFriend(userID: String, friend: Friend) {
+    fun addUserOutgoingFriend(userID: String? = null, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _addUserOutgoingFriendFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.addUserOutgoingFriend(userID, friend)
+                repository.get().addUserOutgoingFriend(userID, friend)
             )
         }
     }
@@ -196,10 +198,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val addUserIncomingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _addUserIncomingFriendFirebaseCallResult
 
-    fun addUserIncomingFriend(userID: String, friend: Friend) {
+    fun addUserIncomingFriend(userID: String? = null, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _addUserIncomingFriendFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.addUserIncomingFriend(userID, friend)
+                repository.get().addUserIncomingFriend(userID, friend)
             )
         }
     }
@@ -208,10 +210,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val removeUserFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _removeUserFriendFirebaseCallResult
 
-    fun removeUserFriend(userID: String, friend: Friend) {
+    fun removeUserFriend(userID: String? = null, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserFriendFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.removeUserFriend(userID, friend)
+                repository.get().removeUserFriend(userID, friend)
             )
         }
     }
@@ -221,10 +223,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val removeUserOutgoingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _removeUserOutgoingFriendFirebaseCallResult
 
-    fun removeUserOutgoingFriend(userID: String, friend: Friend) {
+    fun removeUserOutgoingFriend(userID: String? = null, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserOutgoingFriendFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.removeUserOutgoingFriend(userID, friend)
+                repository.get().removeUserOutgoingFriend(userID, friend)
             )
         }
     }
@@ -234,10 +236,10 @@ class UserViewModel @Inject constructor() : ViewModel() {
     val removeUserIncomingFriendFirebaseCallResult: LiveData<FirebaseCallResult<String>> =
         _removeUserIncomingFriendFirebaseCallResult
 
-    fun removeUserIncomingFriend(userID: String, friend: Friend) {
+    fun removeUserIncomingFriend(userID: String? = null, friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserIncomingFriendFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.removeUserIncomingFriend(userID, friend)
+                repository.get().removeUserIncomingFriend(userID, friend)
             )
         }
     }

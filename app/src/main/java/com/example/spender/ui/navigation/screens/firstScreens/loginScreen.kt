@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.viewModels.AuthViewModel
@@ -37,7 +38,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun LogInScreen(
     navigator: DestinationsNavigator,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 

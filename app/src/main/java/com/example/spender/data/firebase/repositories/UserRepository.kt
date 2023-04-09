@@ -1,11 +1,10 @@
 package com.example.spender.data.firebase.repositories
 
+import android.app.Application
 import android.util.Log
+import com.example.spender.R
 import com.example.spender.data.firebase.*
-import com.example.spender.data.firebase.databaseFieldNames.CollectionNames
-import com.example.spender.data.firebase.databaseFieldNames.CollectionTripDocumentFieldNames
-import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
-import com.example.spender.data.firebase.interfaces.UserRepositoryInterface
+import com.example.spender.data.firebase.repositoryInterfaces.UserRepositoryInterface
 import com.example.spender.data.firebase.messages.FirebaseErrorHandler
 import com.example.spender.data.firebase.messages.FirebaseSuccessMessages
 import com.example.spender.data.firebase.messages.exceptions.FirebaseNicknameException
@@ -15,19 +14,26 @@ import com.example.spender.data.models.Trip
 import com.example.spender.data.models.user.Friend
 import com.example.spender.data.models.user.User
 import com.example.spender.data.models.user.UserName
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class UserRepository : UserRepositoryInterface {
-    private val userCollection by lazy { FirebaseInstanceHolder.db.collection(CollectionNames.USER) }
-
+class UserRepository @Inject constructor(
+    private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
+    private val appContext: Application
+) : UserRepositoryInterface {
     override suspend fun getUser(
-        userID: String
+        userId: String?
     ): FirebaseCallResult<User> {
         return try {
-            val userDocumentSnapshot = userCollection.document(userID).get().await()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+
+            val userDocumentSnapshot = db.collection(appContext.getString(R.string.collection_name_users)).document(userID).get().await()
 
             val name = getUserName(userID)
             if (name is FirebaseCallResult.Error) {
@@ -82,17 +88,17 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserName(
-        userID: String,
+        userId: String?
     ): FirebaseCallResult<UserName> {
         return try {
-            val userCollection = FirebaseInstanceHolder.db.collection(CollectionNames.USER)
-            val userDocRef = userCollection.document(userID)
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
             val firstName = userDocRef.get()
-                .await().data!![CollectionUserDocumentFieldNames.FIRST_NAME] as String
+                .await().data!![appContext.getString(R.string.collection_users_document_field_first_name)] as String
             val middleName = userDocRef.get()
-                .await().data!![CollectionUserDocumentFieldNames.MIDDLE_NAME] as String
+                .await().data!![appContext.getString(R.string.collection_users_document_field_middle_name)] as String
             val lastName = userDocRef.get()
-                .await().data!![CollectionUserDocumentFieldNames.LAST_NAME] as String
+                .await().data!![appContext.getString(R.string.collection_users_document_field_last_name)] as String
             FirebaseCallResult.Success(UserName(firstName, middleName, lastName))
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -100,11 +106,12 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserAge(
-        userID: String,
+        userId: String?
     ): FirebaseCallResult<Long> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            val age = userDocRef.get().await().data!![CollectionUserDocumentFieldNames.AGE] as Long
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val age = userDocRef.get().await().data!![appContext.getString(R.string.collection_users_document_field_age)] as Long
             FirebaseCallResult.Success(age)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -112,14 +119,14 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserNickname(
-        userID: String,
+        userId: String?
     ): FirebaseCallResult<String> {
         return try {
-            val userCollection = FirebaseInstanceHolder.db.collection(CollectionNames.USER)
-            val userDocRef = userCollection.document(userID)
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
             val nickname =
                 userDocRef.get().await()
-                    .data!![CollectionUserDocumentFieldNames.NICKNAME] as String
+                    .data!![appContext.getString(R.string.collection_users_document_field_nickname)] as String
             FirebaseCallResult.Success(nickname)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -127,12 +134,13 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserIncomingFriends(
-        userID: String,
+        userId: String?
     ): FirebaseCallResult<List<Friend>> {
         return try {
-            val userDocRef = userCollection.document(userID)
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
             val friends = userDocRef.get().await()
-                .data!![CollectionUserDocumentFieldNames.INCOMING_FRIENDS] as ArrayList<DocumentReference>?
+                .data!![appContext.getString(R.string.collection_users_document_field_incoming_friends)] as ArrayList<DocumentReference>?
 
             val lst = mutableListOf<Friend>()
 
@@ -167,12 +175,13 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserOutgoingFriends(
-        userID: String,
+        userId: String?
     ): FirebaseCallResult<List<Friend>> {
         return try {
-            val userDocRef = userCollection.document(userID)
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
             val friends = userDocRef.get().await()
-                .data!![CollectionUserDocumentFieldNames.OUTGOING_FRIENDS] as ArrayList<DocumentReference>?
+                .data!![appContext.getString(R.string.collection_users_document_field_outgoing_friends)] as ArrayList<DocumentReference>?
 
             val lst = mutableListOf<Friend>()
 
@@ -207,12 +216,13 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserFriends(
-        userID: String,
+        userId: String?
     ): FirebaseCallResult<List<Friend>> {
         return try {
-            val userDocRef = userCollection.document(userID)
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
             val friends = userDocRef.get().await()
-                .data!![CollectionUserDocumentFieldNames.FRIENDS] as ArrayList<DocumentReference>?
+                .data!![appContext.getString(R.string.collection_users_document_field_friends)] as ArrayList<DocumentReference>?
 
             val lst = mutableListOf<Friend>()
 
@@ -247,13 +257,14 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserAdminTrips(
-        userID: String
+        userId: String?
     ): FirebaseCallResult<List<Trip>> {
         return try {
+            val userID = userId ?: auth.currentUser?.uid.toString()
             val tripCollection: CollectionReference =
-                FirebaseInstanceHolder.db.collection(CollectionNames.TRIP)
+                db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuery =
-                tripCollection.whereEqualTo(CollectionTripDocumentFieldNames.CREATOR, userID).get()
+                tripCollection.whereEqualTo(appContext.getString(R.string.collection_trip_document_field_creator), userID).get()
                     .await()
             if (!tripsQuery.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
@@ -270,15 +281,16 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun getUserPassengerTrips(
-        userID: String
+        userId: String?
     ): FirebaseCallResult<List<Trip>> {
         return try {
+            val userID = userId ?: auth.currentUser?.uid.toString()
             val tripCollection: CollectionReference =
-                FirebaseInstanceHolder.db.collection(CollectionNames.TRIP)
+                db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuery =
-                tripCollection.whereNotEqualTo(CollectionTripDocumentFieldNames.CREATOR, userID)
+                tripCollection.whereNotEqualTo(appContext.getString(R.string.collection_trip_document_field_creator), userID)
             val tripsQuerySnapshot =
-                tripsQuery.whereArrayContains(CollectionTripDocumentFieldNames.MEMBERS, userID)
+                tripsQuery.whereArrayContains(appContext.getString(R.string.collection_trip_document_field_members), userID)
                     .get().await()
             if (!tripsQuerySnapshot.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
@@ -295,10 +307,12 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun updateUser(
-        userID: String, newUser: User
+        userId: String?,
+        newUser: User
     ): FirebaseCallResult<String> {
         return try {
-            userCollection.document(userID).set(newUser).await()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            db.collection(appContext.getString(R.string.collection_name_users)).document(userID).set(newUser).await()
             FirebaseCallResult.Success(FirebaseSuccessMessages.USER_UPDATED)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -306,16 +320,17 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun updateUserName(
-        userID: String,
-        newName: UserName,
+        userId: String?,
+        newName: UserName
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            userDocRef.update(CollectionUserDocumentFieldNames.FIRST_NAME, newName.firstName)
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            userDocRef.update(appContext.getString(R.string.collection_users_document_field_first_name), newName.firstName)
                 .await()
-            userDocRef.update(CollectionUserDocumentFieldNames.MIDDLE_NAME, newName.middleName)
+            userDocRef.update(appContext.getString(R.string.collection_users_document_field_middle_name), newName.middleName)
                 .await()
-            userDocRef.update(CollectionUserDocumentFieldNames.LAST_NAME, newName.lastName).await()
+            userDocRef.update(appContext.getString(R.string.collection_users_document_field_last_name), newName.lastName).await()
             FirebaseCallResult.Success(FirebaseSuccessMessages.USER_NAME_UPDATED)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -323,12 +338,13 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun updateUserAge(
-        userID: String,
+        userId: String?,
         newAge: Int,
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            userDocRef.update(CollectionUserDocumentFieldNames.AGE, newAge).await()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            userDocRef.update(appContext.getString(R.string.collection_users_document_field_age), newAge).await()
             FirebaseCallResult.Success(FirebaseSuccessMessages.USER_AGE_UPDATED)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -336,15 +352,16 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun updateUserNickname(
-        userID: String,
+        userId: String?,
         newNickname: String,
     ): FirebaseCallResult<String> {
         return try {
+            val userID = userId ?: auth.currentUser?.uid.toString()
             when (val checkNicknameResult = checkNickname(newNickname)) {
                 is FirebaseCallResult.Success -> {
                     if (checkNicknameResult.data) {
-                        val userDocRef = userCollection.document(userID)
-                        userDocRef.update(CollectionUserDocumentFieldNames.NICKNAME, newNickname)
+                        val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+                        userDocRef.update(appContext.getString(R.string.collection_users_document_field_nickname), newNickname)
                             .await()
                         FirebaseCallResult.Success(FirebaseSuccessMessages.USER_NICKNAME_UPDATED)
                     } else {
@@ -361,32 +378,33 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun addUserIncomingFriend(
-        userID: String,
+        userId: String?,
         friend: Friend,
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            val batch = FirebaseInstanceHolder.db.batch()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val batch = db.batch()
 
             batch.update(
                 userDocRef,
-                CollectionUserDocumentFieldNames.FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_friends),
                 FieldValue.arrayUnion(friend.docRef)
             )
             batch.update(
                 friend.docRef,
-                CollectionUserDocumentFieldNames.FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_friends),
                 FieldValue.arrayUnion(userDocRef)
             )
 
             batch.update(
                 userDocRef,
-                CollectionUserDocumentFieldNames.INCOMING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_incoming_friends),
                 FieldValue.arrayRemove(friend.docRef)
             )
             batch.update(
                 friend.docRef,
-                CollectionUserDocumentFieldNames.OUTGOING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_outgoing_friends),
                 FieldValue.arrayRemove(userDocRef)
             )
 
@@ -399,22 +417,23 @@ class UserRepository : UserRepositoryInterface {
 
 
     override suspend fun addUserOutgoingFriend(
-        userID: String,
+        userId: String?,
         friend: Friend,
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            val batch = FirebaseInstanceHolder.db.batch()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val batch = db.batch()
 
             batch.update(
                 userDocRef,
-                CollectionUserDocumentFieldNames.OUTGOING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_outgoing_friends),
                 FieldValue.arrayUnion(friend.docRef)
             )
 
             batch.update(
                 friend.docRef,
-                CollectionUserDocumentFieldNames.INCOMING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_incoming_friends),
                 FieldValue.arrayUnion(userDocRef)
             )
 
@@ -426,21 +445,22 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun removeUserFriend(
-        userID: String,
+        userId: String?,
         friend: Friend,
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            val batch = FirebaseInstanceHolder.db.batch()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val batch = db.batch()
 
             batch.update(
                 userDocRef,
-                CollectionUserDocumentFieldNames.FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_friends),
                 FieldValue.arrayRemove(friend.docRef)
             )
             batch.update(
                 friend.docRef,
-                CollectionUserDocumentFieldNames.FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_friends),
                 FieldValue.arrayRemove(userDocRef)
             )
 
@@ -452,21 +472,22 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun removeUserOutgoingFriend(
-        userID: String,
+        userId: String?,
         friend: Friend
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            val batch = FirebaseInstanceHolder.db.batch()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val batch = db.batch()
 
             batch.update(
                 userDocRef,
-                CollectionUserDocumentFieldNames.OUTGOING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_outgoing_friends),
                 FieldValue.arrayRemove(friend.docRef)
             )
             batch.update(
                 friend.docRef,
-                CollectionUserDocumentFieldNames.INCOMING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_incoming_friends),
                 FieldValue.arrayRemove(userDocRef)
             )
 
@@ -478,21 +499,22 @@ class UserRepository : UserRepositoryInterface {
     }
 
     override suspend fun removeUserIncomingFriend(
-        userID: String,
+        userId: String?,
         friend: Friend
     ): FirebaseCallResult<String> {
         return try {
-            val userDocRef = userCollection.document(userID)
-            val batch = FirebaseInstanceHolder.db.batch()
+            val userID = userId ?: auth.currentUser?.uid.toString()
+            val userDocRef = db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val batch = db.batch()
 
             batch.update(
                 userDocRef,
-                CollectionUserDocumentFieldNames.INCOMING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_incoming_friends),
                 FieldValue.arrayRemove(friend.docRef)
             )
             batch.update(
                 friend.docRef,
-                CollectionUserDocumentFieldNames.OUTGOING_FRIENDS,
+                appContext.getString(R.string.collection_users_document_field_outgoing_friends),
                 FieldValue.arrayRemove(userDocRef)
             )
 
@@ -511,8 +533,8 @@ class UserRepository : UserRepositoryInterface {
         }
         return try {
             val checkNicknameQuerySnapshot =
-                FirebaseInstanceHolder.db.collection(CollectionNames.USER)
-                    .whereEqualTo(CollectionUserDocumentFieldNames.NICKNAME, nickname)
+                db.collection(appContext.getString(R.string.collection_name_users))
+                    .whereEqualTo(appContext.getString(R.string.collection_users_document_field_nickname), nickname)
                     .get().await()
             FirebaseCallResult.Success(checkNicknameQuerySnapshot.isEmpty)
         } catch (e: Exception) {

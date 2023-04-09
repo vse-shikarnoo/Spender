@@ -1,11 +1,10 @@
-package com.example.spender.data.firebase.interfaces
+package com.example.spender.data.firebase.repositoryInterfaces
 
 import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.models.user.Friend
 import com.example.spender.data.models.Trip
 import com.example.spender.data.models.spend.Spend
 import com.example.spender.data.models.user.User
-import com.google.firebase.firestore.DocumentReference
 
 interface TripRepositoryInterface {
     suspend fun createTrip(

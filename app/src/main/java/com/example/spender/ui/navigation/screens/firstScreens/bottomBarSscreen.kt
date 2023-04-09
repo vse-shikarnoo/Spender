@@ -1,7 +1,11 @@
 package com.example.spender.ui.navigation.screens.firstScreens
 
+import android.annotation.SuppressLint
 import androidx.compose.material.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomNavGraph
@@ -10,6 +14,7 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @BottomNavGraph
 @Destination
 @Composable
@@ -20,12 +25,12 @@ fun BottomBarScreen(
     Scaffold(
         bottomBar = {
             BottomBar(navController)
+        },
+        content = {
+            DestinationsNavHost(
+                navController = navController,
+                navGraph = NavGraphs.bottom
+            )
         }
-    ) {
-        it.calculateBottomPadding()
-        DestinationsNavHost(
-            navController = navController,
-            navGraph = NavGraphs.bottom
-        )
-    }
+    )
 }

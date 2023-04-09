@@ -1,23 +1,30 @@
 package com.example.spender.data.firebase.repositories
 
+import android.app.Application
 import android.util.Log
+import com.example.spender.R
 import com.example.spender.data.firebase.*
-import com.example.spender.data.firebase.databaseFieldNames.CollectionNames
-import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
-import com.example.spender.data.firebase.interfaces.AuthRepositoryInterface
+import com.example.spender.data.firebase.repositoryInterfaces.AuthRepositoryInterface
 import com.example.spender.data.firebase.messages.FirebaseErrorHandler
 import com.example.spender.data.firebase.messages.FirebaseSuccessMessages
 import com.example.spender.data.firebase.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.firebase.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.firebase.messages.exceptions.FirebaseNoUserSignedInException
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class AuthRepository : AuthRepositoryInterface {
+class AuthRepository @Inject constructor(
+    private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
+    private val appContext: Application
+) : AuthRepositoryInterface {
     override suspend fun signIn(email: String, password: String): FirebaseCallResult<String> {
         return try {
-            FirebaseInstanceHolder.auth.signInWithEmailAndPassword(email, password).await()
+            auth.signInWithEmailAndPassword(email, password).await()
             FirebaseCallResult.Success(FirebaseSuccessMessages.SIGN_IN_SUCCESS)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -33,7 +40,7 @@ class AuthRepository : AuthRepositoryInterface {
             is FirebaseCallResult.Success -> {
                 if (checkNickname.data) {
                     val user = try {
-                        FirebaseInstanceHolder.auth.createUserWithEmailAndPassword(
+                        auth.createUserWithEmailAndPassword(
                             email,
                             password
                         ).await()
@@ -43,19 +50,19 @@ class AuthRepository : AuthRepositoryInterface {
                     }
                     return try {
                         user.user!!.let {
-                            FirebaseInstanceHolder.db.collection(CollectionNames.USER)
+                            db.collection(appContext.getString(R.string.collection_name_users))
                                 .document(it.uid)
                                 .set(
                                     mapOf(
-                                        CollectionUserDocumentFieldNames.FIRST_NAME to "",
-                                        CollectionUserDocumentFieldNames.MIDDLE_NAME to "",
-                                        CollectionUserDocumentFieldNames.LAST_NAME to "",
-                                        CollectionUserDocumentFieldNames.AGE to 0,
-                                        CollectionUserDocumentFieldNames.NICKNAME to nickname,
-                                        CollectionUserDocumentFieldNames.INCOMING_FRIENDS to emptyList<DocumentReference>(),
-                                        CollectionUserDocumentFieldNames.OUTGOING_FRIENDS to emptyList<DocumentReference>(),
-                                        CollectionUserDocumentFieldNames.FRIENDS to emptyList<DocumentReference>(),
-                                        CollectionUserDocumentFieldNames.TRIPS to emptyList<DocumentReference>(),
+                                        appContext.getString(R.string.collection_users_document_field_first_name) to "",
+                                        appContext.getString(R.string.collection_users_document_field_middle_name) to "",
+                                        appContext.getString(R.string.collection_users_document_field_last_name) to "",
+                                        appContext.getString(R.string.collection_users_document_field_age) to 0,
+                                        appContext.getString(R.string.collection_users_document_field_nickname) to nickname,
+                                        appContext.getString(R.string.collection_users_document_field_incoming_friends) to emptyList<DocumentReference>(),
+                                        appContext.getString(R.string.collection_users_document_field_outgoing_friends) to emptyList<DocumentReference>(),
+                                        appContext.getString(R.string.collection_users_document_field_friends) to emptyList<DocumentReference>(),
+                                        appContext.getString(R.string.collection_users_document_field_trips) to emptyList<DocumentReference>(),
                                     )
                                 ).await()
                             FirebaseCallResult.Success(it)
@@ -79,7 +86,7 @@ class AuthRepository : AuthRepositoryInterface {
 
     override suspend fun isEmailVerified(): FirebaseCallResult<Boolean> {
         return try {
-            val bool = FirebaseInstanceHolder.auth.currentUser!!.isEmailVerified
+            val bool = auth.currentUser!!.isEmailVerified
             FirebaseCallResult.Success(bool)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -88,9 +95,9 @@ class AuthRepository : AuthRepositoryInterface {
 
     override suspend fun getCurrentUser(): FirebaseCallResult<FirebaseUser> {
         return try {
-            val user = FirebaseInstanceHolder.auth.currentUser
+            val user = auth.currentUser
             if (user != null) {
-                FirebaseInstanceHolder.auth.updateCurrentUser(user)
+                auth.updateCurrentUser(user)
                 FirebaseCallResult.Success(user)
             } else {
                 FirebaseErrorHandler.handle(FirebaseNoUserSignedInException())
@@ -102,7 +109,7 @@ class AuthRepository : AuthRepositoryInterface {
 
     override suspend fun verifyEmail(): FirebaseCallResult<String> {
         return try {
-            FirebaseInstanceHolder.auth.currentUser!!.sendEmailVerification().await()
+            auth.currentUser!!.sendEmailVerification().await()
             FirebaseCallResult.Success(FirebaseSuccessMessages.VERIFICATION_EMAIL_SENT)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -111,7 +118,7 @@ class AuthRepository : AuthRepositoryInterface {
 
     override suspend fun signOut(): FirebaseCallResult<String> {
         return try {
-            FirebaseInstanceHolder.auth.signOut()
+            auth.signOut()
             FirebaseCallResult.Success(FirebaseSuccessMessages.SIGN_OUT_SUCCESS)
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
@@ -126,8 +133,11 @@ class AuthRepository : AuthRepositoryInterface {
         }
         return try {
             val checkNicknameQuerySnapshot =
-                FirebaseInstanceHolder.db.collection(CollectionNames.USER)
-                    .whereEqualTo(CollectionUserDocumentFieldNames.NICKNAME, nickname)
+                db.collection(appContext.getString(R.string.collection_name_users))
+                    .whereEqualTo(
+                        appContext.getString(R.string.collection_users_document_field_nickname),
+                        nickname
+                    )
                     .get().await()
             FirebaseCallResult.Success(checkNicknameQuerySnapshot.isEmpty)
         } catch (e: Exception) {

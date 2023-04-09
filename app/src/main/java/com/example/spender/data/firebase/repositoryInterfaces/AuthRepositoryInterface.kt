@@ -1,11 +1,7 @@
-package com.example.spender.data.firebase.interfaces
+package com.example.spender.data.firebase.repositoryInterfaces
 
-import android.provider.ContactsContract.CommonDataKinds.Nickname
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocumentFieldNames
-import com.example.spender.data.firebase.messages.FirebaseErrorHandler
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.tasks.await
 
 interface AuthRepositoryInterface {
     suspend fun signIn(email: String, password: String): FirebaseCallResult<String>

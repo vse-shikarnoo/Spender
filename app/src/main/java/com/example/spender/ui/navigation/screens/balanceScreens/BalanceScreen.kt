@@ -1,22 +1,32 @@
 package com.example.spender.ui.navigation.screens.balanceScreens
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.swipeable
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.R
+import com.example.spender.data.firebase.FirebaseCallResult
+import com.example.spender.data.firebase.FirebaseInstanceHolder
+import com.example.spender.data.firebase.viewModels.UserViewModel
+import com.example.spender.data.models.user.User
 import com.example.spender.ui.navigation.BalanceNavGraph
 import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
@@ -26,8 +36,14 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Destination
 @Composable
 fun BalanceScreen(
-    // navigator: DestinationsNavigator
+    //navigator: DestinationsNavigator,
 ) {
+    var key by remember { mutableStateOf(0) }
+    val userViewModel: UserViewModel = viewModel()
+    val user = userViewModel.getUserFirebaseCallResult.observeAsState()
+
+    Log.d("ABOBA", userViewModel.hashCode().toString())
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -39,6 +55,20 @@ fun BalanceScreen(
                         style = MaterialTheme.typography.headlineMedium
                     )
                 },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            key += 1
+                            Log.d("ABOBA", "$key")
+                        },
+                        content = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.reload),
+                                contentDescription = "refresh"
+                            )
+                        }
+                    )
+                }
             )
         },
         content = {
@@ -48,18 +78,38 @@ fun BalanceScreen(
                     .padding(horizontal = 16.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                BalanceCard()
+                when (user.value) {
+                    is FirebaseCallResult.Success -> {
+                        BalanceCard((user.value as FirebaseCallResult.Success).data)
+                    }
+                    is FirebaseCallResult.Error -> {
+                        Toast.makeText(
+                            LocalContext.current,
+                            (user.value as FirebaseCallResult.Error).exception,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        BalanceCard(null)
+                    }
+                    else -> {
+                        BalanceCard(null)
+                    }
+                }
                 SearchTrip()
                 TripsList()
             }
         }
     )
+
+    LaunchedEffect(key1 = key) {
+        Log.d("ABOBA", "launched effect")
+        userViewModel.getUser(FirebaseInstanceHolder.auth.currentUser!!.uid)
+    }
 }
-@Preview()
+
 @Composable
-fun BalanceCard() {
+fun BalanceCard(user: User?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,6 +134,21 @@ fun BalanceCard() {
                 .padding(start = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            Box(
+                modifier = Modifier
+                    .background(
+                        brush = Brush.horizontalGradient(colors = listOf(RedBalance, RedBalance)),
+                        shape = MaterialTheme.shapes.medium,
+                        alpha = 0.2f,
+                    )
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = user?.nickname ?: "Loading...",
+                    color = RedBalance,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
             Box(
                 modifier = Modifier
                     .background(
@@ -122,15 +187,17 @@ fun BalanceCard() {
         }
     }
 }
+
 @Composable
 fun SearchTrip() {
     val lol = "df"
 }
+
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripsList() {
-    Column() {
+    Column {
         Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()

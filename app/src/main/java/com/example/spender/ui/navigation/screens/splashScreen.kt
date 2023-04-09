@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.R
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
+import com.example.spender.data.firebase.viewModels.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
@@ -36,10 +36,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
     navigator: DestinationsNavigator,
-    authManagerViewModel: AuthManagerViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val currentUserResult = authManagerViewModel.currentUser.observeAsState()
+    val currentUserResult = authViewModel.currentUser.observeAsState()
     var startAnimation by remember { mutableStateOf(false) }
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
@@ -48,7 +48,7 @@ fun SplashScreen(
         )
     )
 
-    currentUserResult.value.let { result ->
+    currentUserResult.value?.let { result ->
         when (result) {
             is FirebaseCallResult.Success -> {
                 navigator.popBackStack()
@@ -63,14 +63,13 @@ fun SplashScreen(
                 navigator.popBackStack()
                 navigator.navigate(FirstScreenDestination)
             }
-            else -> {}
         }
     }
 
     LaunchedEffect(key1 = true) {
         startAnimation = true
         delay(4000)
-        authManagerViewModel.getCurrentUser()
+        authViewModel.getCurrentUser()
     }
     Splash(alpha = alphaAnim.value)
 }

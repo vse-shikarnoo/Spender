@@ -49,8 +49,15 @@ fun BottomBar(
             BottomNavigationItem(
                 selected = currentDestination == destination.direction,
                 onClick = {
-                    // navController.popBackStack()
-                    navController.navigate(destination.direction)
+                    if (currentDestination != destination.direction) {
+                        val lst = mutableListOf<String?>()
+                        navController.currentBackStack.value.forEach { lst.add(it.destination.route) }
+                        if (lst.contains(destination.direction.route)) {
+                            navController.popBackStack(destination.direction.route, true)
+                        }
+
+                        navController.navigate(destination.direction)
+                    }
                 },
                 icon = {
                     Icon(

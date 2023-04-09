@@ -42,7 +42,6 @@ fun FirstScreen(
 // add navigator to ButtonGroup
 @Composable
 fun ButtonGroup(navigator: DestinationsNavigator) {
-    val context = LocalContext.current
     val buttonModifier = Modifier
         .fillMaxWidth()
         .padding(4.dp)
@@ -72,23 +71,21 @@ fun ButtonGroup(navigator: DestinationsNavigator) {
         ) {
             Text("Sign Up", style = MaterialTheme.typography.labelMedium)
         }
-        Button(
-            onClick = {
-                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
-            },
-            buttonModifier
-        ) {
-            Image(
-                painterResource(id = R.drawable.google),
-                contentDescription = "google icon",
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                "Sign in with Google",
-                Modifier.padding(start = 10.dp),
-                style = MaterialTheme.typography.labelMedium,
-            )
-        }
+//        Button(
+//            onClick = {},
+//            buttonModifier
+//        ) {
+//            Image(
+//                painterResource(id = R.drawable.google),
+//                contentDescription = "google icon",
+//                modifier = Modifier.size(24.dp)
+//            )
+//            Text(
+//                "Sign in with Google",
+//                Modifier.padding(start = 10.dp),
+//                style = MaterialTheme.typography.labelMedium,
+//            )
+//        }
     }
 }
 

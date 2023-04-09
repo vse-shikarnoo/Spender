@@ -17,18 +17,6 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserViewModel @Inject constructor() : ViewModel() {
-    private val _createUserFirebaseCallResult = MutableLiveData<FirebaseCallResult<User>>()
-    val createUserFirebaseCallResult: LiveData<FirebaseCallResult<User>> =
-        _createUserFirebaseCallResult
-
-    fun createUser(userID: String, nickname: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _createUserFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.createUser(userID, nickname)
-            )
-        }
-    }
-
     private val _getUserFirebaseCallResult = MutableLiveData<FirebaseCallResult<User>>()
     val getUserFirebaseCallResult: LiveData<FirebaseCallResult<User>> = _getUserFirebaseCallResult
 
@@ -250,18 +238,6 @@ class UserViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserIncomingFriendFirebaseCallResult.postValue(
                 FirebaseRepositoriesHolder.userRepository.removeUserIncomingFriend(userID, friend)
-            )
-        }
-    }
-
-    private val _checkNicknameFirebaseCallResult = MutableLiveData<FirebaseCallResult<Boolean>>()
-    val checkNicknameFirebaseCallResult: LiveData<FirebaseCallResult<Boolean>> =
-        _checkNicknameFirebaseCallResult
-
-    fun checkNickname(nickname: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _checkNicknameFirebaseCallResult.postValue(
-                FirebaseRepositoriesHolder.userRepository.checkNickname(nickname)
             )
         }
     }

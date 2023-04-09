@@ -10,7 +10,10 @@ import androidx.compose.ui.Modifier
 import com.example.spender.ui.navigation.screens.NavGraphs
 import com.example.spender.ui.theme.SpenderTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.internal.GeneratedComponent
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

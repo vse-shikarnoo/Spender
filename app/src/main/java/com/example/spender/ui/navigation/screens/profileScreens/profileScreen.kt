@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
+import com.example.spender.data.firebase.viewModels.AuthViewModel
 import com.example.spender.ui.navigation.ProfileNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -18,12 +18,12 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun ProfileScreen(
     navigator: DestinationsNavigator,
-    authManagerViewModel: AuthManagerViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel()
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
-                authManagerViewModel.signOut()
+                authViewModel.signOut()
             }
         ) {
             Text("Profile screen")

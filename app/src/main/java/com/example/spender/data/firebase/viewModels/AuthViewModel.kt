@@ -3,7 +3,6 @@ package com.example.spender.data.firebase.viewModels
 import androidx.lifecycle.*
 import com.example.spender.data.firebase.FirebaseCallResult
 import com.example.spender.data.firebase.FirebaseRepositoriesHolder
-import com.example.spender.data.firebase.repositories.AuthManagerRepository
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -11,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class AuthManagerViewModel @Inject constructor() : ViewModel() {
+class AuthViewModel @Inject constructor() : ViewModel() {
     private val _signInFirebaseCallResult = MutableLiveData<FirebaseCallResult<String>>()
     val signInFirebaseCallResult: LiveData<FirebaseCallResult<String>> = _signInFirebaseCallResult
 
@@ -30,12 +29,13 @@ class AuthManagerViewModel @Inject constructor() : ViewModel() {
     val signUpFirebaseCallResult: LiveData<FirebaseCallResult<FirebaseUser>> =
         _signUpFirebaseCallResult
 
-    fun signUp(email: String, password: String) {
+    fun signUp(email: String, password: String, nickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _signUpFirebaseCallResult.postValue(
                 FirebaseRepositoriesHolder.authManagerRepository.signUp(
                     email,
-                    password
+                    password,
+                    nickname
                 )
             )
         }

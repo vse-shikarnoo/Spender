@@ -7,7 +7,6 @@ import com.example.spender.data.models.user.User
 import com.example.spender.data.models.user.UserName
 
 interface UserRepositoryInterface {
-    suspend fun createUser(userID: String, nickname: String): FirebaseCallResult<User>
     suspend fun getUser(userID: String): FirebaseCallResult<User>
     suspend fun getUserName(userID: String): FirebaseCallResult<UserName>
     suspend fun getUserAge(userID: String): FirebaseCallResult<Long>

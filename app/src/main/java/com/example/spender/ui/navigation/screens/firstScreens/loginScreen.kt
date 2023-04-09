@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
+import com.example.spender.data.firebase.viewModels.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
@@ -37,13 +37,14 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun LogInScreen(
     navigator: DestinationsNavigator,
-    authManagerViewModel: AuthManagerViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val signInResult = authManagerViewModel.signInFirebaseCallResult.observeAsState()
-    var error by remember { mutableStateOf("") }
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val signInResult = authViewModel.signInFirebaseCallResult.observeAsState()
 
     Scaffold(
         topBar = {
@@ -125,7 +126,7 @@ fun LogInScreen(
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     androidx.compose.material3.Button(
                         onClick = {
-                            authManagerViewModel.signIn(email, password)
+                            authViewModel.signIn(email, password)
                         },
                         modifier = Modifier.padding(20.dp),
                     ) {
@@ -139,23 +140,19 @@ fun LogInScreen(
         }
     )
 
-    signInResult.value.let { result ->
+    signInResult.value?.let { result ->
         when (result) {
             is FirebaseCallResult.Success -> {
                 navigator.popBackStack(FirstScreenDestination, true)
                 navigator.navigate(BottomBarScreenDestination)
             }
             is FirebaseCallResult.Error -> {
-                if (error != result.exception) {
-                    error = result.exception
-                    Toast.makeText(
-                        context,
-                        result.exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                Toast.makeText(
+                    context,
+                    result.exception,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            else -> {}
         }
     }
 }

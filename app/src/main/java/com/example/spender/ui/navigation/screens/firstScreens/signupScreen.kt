@@ -2,7 +2,6 @@ package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,7 +15,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -25,10 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spender.R
 import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.viewModels.AuthManagerViewModel
+import com.example.spender.data.firebase.viewModels.AuthViewModel
 import com.example.spender.data.firebase.viewModels.UserViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.*
@@ -36,13 +34,6 @@ import com.example.spender.ui.theme.GreenLight
 import com.example.spender.ui.theme.spenderTextFieldColors
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
-
-enum class SignUpStates {
-    INITIAL_STATE,
-    NICKNAME_STATE,
-    EMAIL_PASSWORD_STATE,
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -51,8 +42,7 @@ enum class SignUpStates {
 @Composable
 fun SignUpScreen(
     navigator: DestinationsNavigator,
-    authManagerViewModel: AuthManagerViewModel = viewModel(),
-    userViewModel: UserViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
 ) {
     val context = LocalContext.current
 
@@ -60,11 +50,7 @@ fun SignUpScreen(
     var password by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }
 
-    var signUpStates by remember { mutableStateOf(SignUpStates.INITIAL_STATE) }
-
-    val checkNicknameResult = userViewModel.checkNicknameFirebaseCallResult.observeAsState()
-    val signUpResult = authManagerViewModel.signUpFirebaseCallResult.observeAsState()
-    val createUserResult = userViewModel.createUserFirebaseCallResult.observeAsState()
+    val signUpResult = authViewModel.signUpFirebaseCallResult.observeAsState()
 
     Scaffold(
         topBar = {
@@ -195,8 +181,7 @@ fun SignUpScreen(
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     androidx.compose.material3.Button(
                         onClick = {
-                            userViewModel.checkNickname(nickname)
-                            signUpStates = SignUpStates.NICKNAME_STATE
+                            authViewModel.signUp(email, password, nickname)
                         },
                         modifier = Modifier.padding(20.dp),
                     ) {
@@ -210,74 +195,19 @@ fun SignUpScreen(
         }
     )
 
-    checkNicknameResult.value.let { result ->
-        when (result) {
-            is FirebaseCallResult.Success -> {
-                if (signUpStates == SignUpStates.NICKNAME_STATE) {
-                    if (result.data) {
-                        authManagerViewModel.signUp(email, password)
-                        signUpStates = SignUpStates.EMAIL_PASSWORD_STATE
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Nickname is taken",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-            is FirebaseCallResult.Error -> {
-                if (signUpStates == SignUpStates.NICKNAME_STATE) {
-                    Toast.makeText(
-                        context,
-                        result.exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                signUpStates = SignUpStates.INITIAL_STATE
-            }
-            else -> {}
-        }
-    }
-
-    signUpResult.value.let { result ->
-        when (result) {
-            is FirebaseCallResult.Success -> {
-                if (signUpStates == SignUpStates.EMAIL_PASSWORD_STATE) {
-                    userViewModel.createUser(result.data.uid, nickname)
-                }
-            }
-            is FirebaseCallResult.Error -> {
-                if (signUpStates == SignUpStates.EMAIL_PASSWORD_STATE) {
-                    Toast.makeText(
-                        context,
-                        result.exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                signUpStates = SignUpStates.INITIAL_STATE
-            }
-            else -> {}
-        }
-    }
-
-    createUserResult.value.let { result ->
+    signUpResult.value?.let { result ->
         when (result) {
             is FirebaseCallResult.Success -> {
                 navigator.popBackStack(FirstScreenDestination, true)
                 navigator.navigate(BottomBarScreenDestination)
             }
             is FirebaseCallResult.Error -> {
-                if (signUpStates == SignUpStates.EMAIL_PASSWORD_STATE) {
-                    Toast.makeText(
-                        context,
-                        result.exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                signUpStates = SignUpStates.INITIAL_STATE
+                Toast.makeText(
+                    context,
+                    result.exception,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            else -> {}
         }
     }
 }

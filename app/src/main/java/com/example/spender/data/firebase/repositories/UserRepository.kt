@@ -8,6 +8,8 @@ import com.example.spender.data.firebase.databaseFieldNames.CollectionUserDocume
 import com.example.spender.data.firebase.interfaces.UserRepositoryInterface
 import com.example.spender.data.firebase.messages.FirebaseErrorHandler
 import com.example.spender.data.firebase.messages.FirebaseSuccessMessages
+import com.example.spender.data.firebase.messages.exceptions.FirebaseNicknameException
+import com.example.spender.data.firebase.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.firebase.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.models.Trip
 import com.example.spender.data.models.user.Friend
@@ -21,47 +23,6 @@ import kotlinx.coroutines.tasks.await
 class UserRepository : UserRepositoryInterface {
     private val userCollection by lazy { FirebaseInstanceHolder.db.collection(CollectionNames.USER) }
 
-    override suspend fun createUser(
-        userID: String,
-        nickname: String
-    ): FirebaseCallResult<User> {
-        return try {
-            when (val checkNicknameResult = checkNickname(nickname)) {
-                is FirebaseCallResult.Success -> {
-                    userCollection.document(userID).set(
-                        mapOf(
-                            CollectionUserDocumentFieldNames.FIRST_NAME to "",
-                            CollectionUserDocumentFieldNames.MIDDLE_NAME to "",
-                            CollectionUserDocumentFieldNames.LAST_NAME to "",
-                            CollectionUserDocumentFieldNames.AGE to 0,
-                            CollectionUserDocumentFieldNames.NICKNAME to nickname,
-                            CollectionUserDocumentFieldNames.INCOMING_FRIENDS to emptyList<DocumentReference>(),
-                            CollectionUserDocumentFieldNames.OUTGOING_FRIENDS to emptyList<DocumentReference>(),
-                            CollectionUserDocumentFieldNames.FRIENDS to emptyList<DocumentReference>(),
-                            CollectionUserDocumentFieldNames.TRIPS to emptyList<DocumentReference>(),
-                        )
-                    ).await()
-                    when (val newUserResult = getUser(userID)) {
-                        is FirebaseCallResult.Success -> {
-                            newUserResult
-                        }
-                        is FirebaseCallResult.Error -> {
-                            Log.d("ABOBA", "GetUser error")
-                            newUserResult
-                        }
-                    }
-                }
-                is FirebaseCallResult.Error -> {
-                    checkNicknameResult
-                }
-            }
-        } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
-        }
-    }
-
-    // Getters
-
     override suspend fun getUser(
         userID: String
     ): FirebaseCallResult<User> {
@@ -69,45 +30,52 @@ class UserRepository : UserRepositoryInterface {
             val userDocumentSnapshot = userCollection.document(userID).get().await()
 
             val name = getUserName(userID)
-            val age = userDocumentSnapshot.data!![CollectionUserDocumentFieldNames.AGE] as Long
-            val nickname =
-                userDocumentSnapshot.data!![CollectionUserDocumentFieldNames.NICKNAME] as String
+            if (name is FirebaseCallResult.Error) {
+                return name
+            }
+            val age = getUserAge(userID)
+            if (age is FirebaseCallResult.Error) {
+                return age
+            }
+            val nickname = getUserNickname(userID)
+            if (nickname is FirebaseCallResult.Error) {
+                return nickname
+            }
             val incomingFriends = getUserIncomingFriends(userID)
+            if (incomingFriends is FirebaseCallResult.Error) {
+                return incomingFriends
+            }
             val outgoingFriends = getUserOutgoingFriends(userID)
+            if (outgoingFriends is FirebaseCallResult.Error) {
+                return outgoingFriends
+            }
             val friends = getUserFriends(userID)
+            if (friends is FirebaseCallResult.Error) {
+                return friends
+            }
             val adminTrips = getUserAdminTrips(userID)
+            if (adminTrips is FirebaseCallResult.Error) {
+                return adminTrips
+            }
             val passengerTrips = getUserPassengerTrips(userID)
+            if (passengerTrips is FirebaseCallResult.Error) {
+                return passengerTrips
+            }
             val docRef = userDocumentSnapshot.reference
 
-            if (name is FirebaseCallResult.Success &&
-                incomingFriends is FirebaseCallResult.Success &&
-                outgoingFriends is FirebaseCallResult.Success &&
-                friends is FirebaseCallResult.Success &&
-                adminTrips is FirebaseCallResult.Success &&
-                passengerTrips is FirebaseCallResult.Success
-            ) {
-                FirebaseCallResult.Success(
-                    User(
-                        name = name.data,
-                        age = age,
-                        nickname = nickname,
-                        incomingFriends = incomingFriends.data,
-                        outgoingFriends = outgoingFriends.data,
-                        friends = friends.data,
-                        adminTrips = adminTrips.data,
-                        passengerTrips = passengerTrips.data,
-                        docRef = docRef
-                    )
+            FirebaseCallResult.Success(
+                User(
+                    name = (name as FirebaseCallResult.Success).data,
+                    age = (age as FirebaseCallResult.Success).data,
+                    nickname = (nickname as FirebaseCallResult.Success).data,
+                    incomingFriends = (incomingFriends as FirebaseCallResult.Success).data,
+                    outgoingFriends = (outgoingFriends as FirebaseCallResult.Success).data,
+                    friends = (friends as FirebaseCallResult.Success).data,
+                    adminTrips = (adminTrips as FirebaseCallResult.Success).data,
+                    passengerTrips = (passengerTrips as FirebaseCallResult.Success).data,
+                    docRef = docRef
                 )
-            } else {
-                Log.d("ABOBA", "GetUser name = ${name is FirebaseCallResult.Success}")
-                Log.d("ABOBA", "GetUser incomingFriends = ${(incomingFriends as FirebaseCallResult.Error).exception}")
-                Log.d("ABOBA", "GetUser outgoingFriends = ${outgoingFriends is FirebaseCallResult.Success}")
-                Log.d("ABOBA", "GetUser friends = ${friends is FirebaseCallResult.Success}")
-                Log.d("ABOBA", "GetUser adminTrips = ${adminTrips is FirebaseCallResult.Success}")
-                Log.d("ABOBA", "GetUser passengerTrips = ${passengerTrips is FirebaseCallResult.Success}")
-                FirebaseErrorHandler.handle(FirebaseUndefinedException())
-            }
+            )
         } catch (e: Exception) {
             FirebaseErrorHandler.handle(e)
         }
@@ -285,7 +253,8 @@ class UserRepository : UserRepositoryInterface {
             val tripCollection: CollectionReference =
                 FirebaseInstanceHolder.db.collection(CollectionNames.TRIP)
             val tripsQuery =
-                tripCollection.whereEqualTo(CollectionTripDocumentFieldNames.CREATOR, userID).get().await()
+                tripCollection.whereEqualTo(CollectionTripDocumentFieldNames.CREATOR, userID).get()
+                    .await()
             if (!tripsQuery.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
                 tripsQuery.documents.forEach { tripDocSnapshot ->
@@ -309,7 +278,8 @@ class UserRepository : UserRepositoryInterface {
             val tripsQuery =
                 tripCollection.whereNotEqualTo(CollectionTripDocumentFieldNames.CREATOR, userID)
             val tripsQuerySnapshot =
-                tripsQuery.whereArrayContains(CollectionTripDocumentFieldNames.MEMBERS, userID).get().await()
+                tripsQuery.whereArrayContains(CollectionTripDocumentFieldNames.MEMBERS, userID)
+                    .get().await()
             if (!tripsQuerySnapshot.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
                 tripsQuerySnapshot.documents.forEach { tripDocSnapshot ->
@@ -372,10 +342,14 @@ class UserRepository : UserRepositoryInterface {
         return try {
             when (val checkNicknameResult = checkNickname(newNickname)) {
                 is FirebaseCallResult.Success -> {
-                    val userDocRef = userCollection.document(userID)
-                    userDocRef.update(CollectionUserDocumentFieldNames.NICKNAME, newNickname)
-                        .await()
-                    FirebaseCallResult.Success(FirebaseSuccessMessages.USER_NICKNAME_UPDATED)
+                    if (checkNicknameResult.data) {
+                        val userDocRef = userCollection.document(userID)
+                        userDocRef.update(CollectionUserDocumentFieldNames.NICKNAME, newNickname)
+                            .await()
+                        FirebaseCallResult.Success(FirebaseSuccessMessages.USER_NICKNAME_UPDATED)
+                    } else {
+                        FirebaseErrorHandler.handle(FirebaseNicknameException())
+                    }
                 }
                 is FirebaseCallResult.Error -> {
                     checkNicknameResult
@@ -532,9 +506,13 @@ class UserRepository : UserRepositoryInterface {
     override suspend fun checkNickname(
         nickname: String
     ): FirebaseCallResult<Boolean> {
+        if (nickname.length < 6) {
+            return FirebaseErrorHandler.handle(FirebaseNicknameLengthException())
+        }
         return try {
             val checkNicknameQuerySnapshot =
-                userCollection.whereEqualTo(CollectionUserDocumentFieldNames.NICKNAME, nickname)
+                FirebaseInstanceHolder.db.collection(CollectionNames.USER)
+                    .whereEqualTo(CollectionUserDocumentFieldNames.NICKNAME, nickname)
                     .get().await()
             FirebaseCallResult.Success(checkNicknameQuerySnapshot.isEmpty)
         } catch (e: Exception) {

@@ -24,10 +24,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.viewModels.AuthViewModel
-import com.example.spender.data.firebase.viewModels.UserViewModel
+import com.example.spender.data.DataResult
+import com.example.spender.data.remote.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.*
 import com.example.spender.ui.theme.GreenLight
@@ -50,7 +48,7 @@ fun SignUpScreen(
     var password by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }
 
-    val signUpResult = authViewModel.signUpFirebaseCallResult.observeAsState()
+    val signUpResult = authViewModel.signUpDataResult.observeAsState()
 
     Scaffold(
         topBar = {
@@ -197,11 +195,11 @@ fun SignUpScreen(
 
     signUpResult.value?.let { result ->
         when (result) {
-            is FirebaseCallResult.Success -> {
+            is DataResult.Success -> {
                 navigator.popBackStack(FirstScreenDestination, true)
                 navigator.navigate(BottomBarScreenDestination)
             }
-            is FirebaseCallResult.Error -> {
+            is DataResult.Error -> {
                 Toast.makeText(
                     context,
                     result.exception,

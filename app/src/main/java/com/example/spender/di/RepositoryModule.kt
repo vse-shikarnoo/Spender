@@ -1,13 +1,13 @@
 package com.example.spender.di
 
-import com.example.spender.data.firebase.repositoryInterfaces.AuthRepositoryInterface
-import com.example.spender.data.firebase.repositories.AuthRepository
-import com.example.spender.data.firebase.repositories.SpendRepository
-import com.example.spender.data.firebase.repositories.TripRepository
-import com.example.spender.data.firebase.repositories.UserRepository
-import com.example.spender.data.firebase.repositoryInterfaces.SpendRepositoryInterface
-import com.example.spender.data.firebase.repositoryInterfaces.TripRepositoryInterface
-import com.example.spender.data.firebase.repositoryInterfaces.UserRepositoryInterface
+import com.example.spender.domain.repository.AuthRepository
+import com.example.spender.data.remote.repository.AuthRepositoryImpl
+import com.example.spender.data.remote.repository.SpendRepositoryImpl
+import com.example.spender.data.remote.repository.TripRepositoryImpl
+import com.example.spender.data.remote.repository.UserRepositoryImpl
+import com.example.spender.domain.repository.SpendRepository
+import com.example.spender.domain.repository.TripRepository
+import com.example.spender.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -21,24 +21,24 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepository(
-        authRepository: AuthRepository
-    ): AuthRepositoryInterface
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 
     @Binds
     @Singleton
     abstract fun bindUserRepository(
-        userRepository: UserRepository
-    ): UserRepositoryInterface
+        userRepositoryImpl: UserRepositoryImpl
+    ): UserRepository
 
     @Binds
     @Singleton
     abstract fun bindTripRepository(
-        tripRepository: TripRepository
-    ): TripRepositoryInterface
+        tripRepositoryImpl: TripRepositoryImpl
+    ): TripRepository
     
     @Binds
     @Singleton
     abstract fun bindSpendRepository(
-        spendRepository: SpendRepository
-    ): SpendRepositoryInterface
+        spendRepositoryImpl: SpendRepositoryImpl
+    ): SpendRepository
 }

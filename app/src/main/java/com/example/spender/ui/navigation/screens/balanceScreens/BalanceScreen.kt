@@ -21,13 +21,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.example.spender.R
-import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.viewModels.UserViewModel
-import com.example.spender.data.models.user.User
+import com.example.spender.data.DataResult
+import com.example.spender.data.remote.viewmodel.UserViewModel
+import com.example.spender.domain.domainmodel.user.User
 import com.example.spender.ui.navigation.BalanceNavGraph
-import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -40,7 +38,7 @@ fun BalanceScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     var key by remember { mutableStateOf(0) }
-    val user = userViewModel.getUserFirebaseCallResult.observeAsState()
+    val user = userViewModel.getUserDataResult.observeAsState()
 
     Log.d("ABOBA", userViewModel.hashCode().toString())
 
@@ -81,13 +79,13 @@ fun BalanceScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 when (user.value) {
-                    is FirebaseCallResult.Success -> {
-                        BalanceCard((user.value as FirebaseCallResult.Success).data)
+                    is DataResult.Success -> {
+                        BalanceCard((user.value as DataResult.Success).data)
                     }
-                    is FirebaseCallResult.Error -> {
+                    is DataResult.Error -> {
                         Toast.makeText(
                             LocalContext.current,
-                            (user.value as FirebaseCallResult.Error).exception,
+                            (user.value as DataResult.Error).exception,
                             Toast.LENGTH_SHORT
                         ).show()
                         BalanceCard(null)

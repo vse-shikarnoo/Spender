@@ -3,8 +3,6 @@ package com.example.spender.ui.navigation.screens.profileScreens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.Intent.getIntent
-import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
@@ -16,9 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.spender.data.firebase.viewModels.AuthViewModel
+import com.example.spender.data.remote.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.ProfileNavGraph
-import com.example.spender.ui.navigation.screens.NavGraphs
 import com.example.spender.ui.navigation.screens.destinations.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

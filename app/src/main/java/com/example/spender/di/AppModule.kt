@@ -1,5 +1,7 @@
 package com.example.spender.di
 
+import com.example.spender.data.remote.RemoteDataSourceImpl
+import com.example.spender.domain.RemoteDataSource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -14,13 +16,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseFirestore(): FirebaseFirestore {
-        return FirebaseFirestore.getInstance()
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth {
-        return FirebaseAuth.getInstance()
+    fun provideFirebaseDataSource(): RemoteDataSource<FirebaseFirestore, FirebaseAuth> {
+        return RemoteDataSourceImpl.getInstance()
     }
 }

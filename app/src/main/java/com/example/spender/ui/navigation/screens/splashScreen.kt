@@ -7,9 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -22,8 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.R
-import com.example.spender.data.firebase.FirebaseCallResult
-import com.example.spender.data.firebase.viewModels.AuthViewModel
+import com.example.spender.data.DataResult
+import com.example.spender.data.remote.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
@@ -52,11 +50,11 @@ fun SplashScreen(
 
     currentUserResult.value?.let { result ->
         when (result) {
-            is FirebaseCallResult.Success -> {
+            is DataResult.Success -> {
                 navigator.popBackStack()
                 navigator.navigate(BottomBarScreenDestination)
             }
-            is FirebaseCallResult.Error -> {
+            is DataResult.Error -> {
                 Toast.makeText(
                     context,
                     result.exception,

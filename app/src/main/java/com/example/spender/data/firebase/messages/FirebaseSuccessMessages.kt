@@ -22,4 +22,11 @@ object FirebaseSuccessMessages {
     const val TRIP_MEMBERS_REMOVED = "Trip members removed"
     const val TRIP_SPEND_REMOVED = "Trip spend removed"
     const val TRIP_DELETED = "Trip deleted"
+    const val SPEND_CREATED = "Spend created"
+    const val SPEND_NAME_UPDATED = "Spend name updated"
+    const val SPEND_CATEGORY_UPDATED = "Spend category updated"
+    const val SPEND_AMOUNT_UPDATED = "Spend amount updated"
+    const val SPEND_MEMBER_ADDED = "Spend member added"
+    const val SPEND_MEMBERS_ADDED = "Spend members added"
+    const val SPEND_DELETED = "Spend deleted"
 }

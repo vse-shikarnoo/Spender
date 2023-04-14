@@ -174,7 +174,7 @@ class SpendViewModel @Inject constructor(
     suspend fun deleteSpendSpend(spend: Spend) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateSpendNameFirebaseCallResult.postValue(
-                repository.get().deleteSpendSpend(spend)
+                repository.get().deleteSpendSpend(spend )
             )
         }
     }

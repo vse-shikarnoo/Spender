@@ -30,6 +30,6 @@ interface SpendRepositoryInterface {
     suspend fun updateSpendGeoPoint(spend: Spend, newGeoPoint: GeoPoint): FirebaseCallResult<String>
     suspend fun addSpendMember(spend: Spend, newMember: Friend): FirebaseCallResult<String>
     suspend fun addSpendMembers(spend: Spend, newMembers: List<Friend>): FirebaseCallResult<String>
-    suspend fun deleteSpendMember(spend: Spend, member: List<Friend>): FirebaseCallResult<String>
+    suspend fun deleteSpendMembers(spend: Spend, member: List<Friend>): FirebaseCallResult<String>
     suspend fun deleteSpendSpend(spend: Spend): FirebaseCallResult<String>
 }

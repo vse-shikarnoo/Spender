@@ -20,22 +20,29 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class UserViewModel @Inject constructor() : ViewModel() {
 
-    var email: String by mutableStateOf("")
-        private set
-    var password: String by mutableStateOf("")
-        private set
-    var nickname: String by mutableStateOf("")
-        private set
 
-    fun onEmailChange(text: String) {
-        email = text
+    private val _email = MutableLiveData<String>()
+    val email: LiveData<String> = _email
+
+    private val _password = MutableLiveData<String>()
+    val password: LiveData<String> = _password
+
+    private val _nickname = MutableLiveData<String>()
+    val nickname: LiveData<String> = _nickname
+
+    fun updateEmail(newEmail: String){
+        _email.value = newEmail
     }
-    fun onPasswordChange(text: String) {
-        password = text
+
+    fun updatePassword(newPassword: String){
+        _password.value = newPassword
     }
-    fun onNicknameChange(text: String) {
-        nickname = text
+
+    fun updateNickname(newNickname: String){
+        _nickname.value = newNickname
     }
+
+
     private val repository = UserRepository()
 
     private val _createUserResult = MutableLiveData<Result<Boolean>>()

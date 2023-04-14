@@ -48,6 +48,10 @@ fun SignUpScreen(
     authManagerViewModel: AuthManagerViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel()
 ) {
+    val email by userViewModel.email.observeAsState("")
+    val password by userViewModel.password.observeAsState("")
+    val nickname by userViewModel.nickname.observeAsState("")
+
     Scaffold(
         topBar = {
             androidx.compose.material3.TopAppBar(
@@ -98,8 +102,8 @@ fun SignUpScreen(
                         contentDescription = null,
                     )
                     SignUpTextField(
-                        text = userViewModel.nickname,
-                        onTextChanged = userViewModel::onNicknameChange,
+                        text = nickname,
+                        onTextChanged = {userViewModel.updateNickname(it)},
                         label = { Text(text = "Nickname") },
                         keyboardType = KeyboardType.Text
                     )
@@ -112,14 +116,14 @@ fun SignUpScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     SignUpTextField(
-                        text = userViewModel.email,
-                        onTextChanged = userViewModel::onEmailChange,
+                        text = email,
+                        onTextChanged = {userViewModel.updateEmail(it)},
                         label = { Text(text = "Email") },
                         keyboardType = KeyboardType.Email
                     )
                     SignUpTextField(
-                        text = userViewModel.password,
-                        onTextChanged = userViewModel::onPasswordChange,
+                        text = password,
+                        onTextChanged = {userViewModel.updatePassword(it)},
                         label = { Text(text = "Password") },
                         keyboardType = KeyboardType.Password
                     )
@@ -142,11 +146,15 @@ fun SignUpButton(
     val context = LocalContext.current
     val signUpResult = authViewModel.signUpResult.observeAsState()
     val createUserResult = userViewModel.createUserResult.observeAsState()
+    val email by userViewModel.email.observeAsState("")
+    val password by userViewModel.password.observeAsState("")
+    val nickname by userViewModel.nickname.observeAsState("")
     var error by remember { mutableStateOf("") }
+
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         androidx.compose.material3.Button(
             onClick = {
-                authViewModel.signUp(userViewModel.email, userViewModel.password)
+                authViewModel.signUp(email, password)
             },
             modifier = Modifier.padding(20.dp),
         ) {
@@ -159,7 +167,7 @@ fun SignUpButton(
     signUpResult.value.let { result ->
         when (result) {
             is Result.Success -> {
-                userViewModel.createUser(result.data.uid, userViewModel.nickname)
+                userViewModel.createUser(result.data.uid, nickname)
             }
             is Result.Error -> {
                 if (error != result.exception) {

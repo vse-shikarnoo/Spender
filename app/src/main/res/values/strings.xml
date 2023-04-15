@@ -4,6 +4,7 @@
 
     <string name="collection_name_users">Users</string>
     <string name="collection_name_trips">Trips</string>
+    <string name="collection_name_spends">Spends</string>
 
     <string name="collection_users_document_field_first_name">firstName</string>
     <string name="collection_users_document_field_middle_name">middleName</string>

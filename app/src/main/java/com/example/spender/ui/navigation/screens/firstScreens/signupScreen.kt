@@ -101,9 +101,9 @@ fun SignUpScreen(
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )
-                    SignUpTextField(
+                    EditTextField(
                         text = nickname,
-                        onTextChanged = {userViewModel.updateNickname(it)},
+                        onTextChanged = { userViewModel.updateNickname(it) },
                         label = { Text(text = "Nickname") },
                         keyboardType = KeyboardType.Text
                     )
@@ -115,15 +115,15 @@ fun SignUpScreen(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    SignUpTextField(
+                    EditTextField(
                         text = email,
-                        onTextChanged = {userViewModel.updateEmail(it)},
+                        onTextChanged = { userViewModel.updateEmail(it) },
                         label = { Text(text = "Email") },
                         keyboardType = KeyboardType.Email
                     )
-                    SignUpTextField(
+                    EditTextField(
                         text = password,
-                        onTextChanged = {userViewModel.updatePassword(it)},
+                        onTextChanged = { userViewModel.updatePassword(it) },
                         label = { Text(text = "Password") },
                         keyboardType = KeyboardType.Password
                     )
@@ -205,7 +205,7 @@ fun SignUpButton(
 }
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SignUpTextField(
+fun EditTextField(
     text: String,
     onTextChanged: (String) -> Unit,
     label: @Composable () -> Unit,

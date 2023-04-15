@@ -1,8 +1,5 @@
 package com.example.spender.data.firebase.viewModels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,7 +17,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class UserViewModel @Inject constructor() : ViewModel() {
 
-
     private val _email = MutableLiveData<String>()
     val email: LiveData<String> = _email
 
@@ -30,18 +26,17 @@ class UserViewModel @Inject constructor() : ViewModel() {
     private val _nickname = MutableLiveData<String>()
     val nickname: LiveData<String> = _nickname
 
-    fun updateEmail(newEmail: String){
+    fun updateEmail(newEmail: String) {
         _email.value = newEmail
     }
 
-    fun updatePassword(newPassword: String){
+    fun updatePassword(newPassword: String) {
         _password.value = newPassword
     }
 
-    fun updateNickname(newNickname: String){
+    fun updateNickname(newNickname: String) {
         _nickname.value = newNickname
     }
-
 
     private val repository = UserRepository()
 

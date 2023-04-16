@@ -26,7 +26,10 @@ object FirebaseSuccessMessages {
     const val SPEND_NAME_UPDATED = "Spend name updated"
     const val SPEND_CATEGORY_UPDATED = "Spend category updated"
     const val SPEND_AMOUNT_UPDATED = "Spend amount updated"
-    const val SPEND_MEMBER_ADDED = "Spend member added"
     const val SPEND_MEMBERS_ADDED = "Spend members added"
     const val SPEND_DELETED = "Spend deleted"
+    const val SPEND_GEO_UPDATED = "Spend geo updated"
+    const val SPEND_MEMBERS_REMOVED = "Spend members removed"
+    const val SPEND_UPDATED = "Spend updated"
+    const val SPEND_SPLIT_MODE_UPDATED = "Spend split mode updated"
 }

@@ -5,6 +5,7 @@
     <string name="collection_name_users">Users</string>
     <string name="collection_name_trips">Trips</string>
     <string name="collection_name_spends">Spends</string>
+    <string name="collection_name_spend_member">SpendMember</string>
 
     <string name="collection_users_document_field_first_name">firstName</string>
     <string name="collection_users_document_field_middle_name">middleName</string>
@@ -21,8 +22,13 @@
     <string name="collection_trip_document_field_members">Members</string>
     <string name="collection_trip_document_field_spends">Spends</string>
 
-    <string name="subcollection_spends_document_field_name">Name</string>
-    <string name="subcollection_spends_document_field_category">Category</string>
-    <string name="subcollection_spends_document_field_amount">Amount</string>
-    <string name="subcollection_spends_document_field_members">Members</string>
+    <string name="collection_spends_document_field_name">Name</string>
+    <string name="collection_spends_document_field_category">Category</string>
+    <string name="collection_spends_document_field_split_mode">SplitMode</string>
+    <string name="collection_spends_document_field_amount">SpendAmount</string>
+    <string name="collection_spends_document_field_geo">SpendGeo</string>
+
+    <string name="collection_spend_member_document_field_member">Member</string>
+    <string name="collection_spend_member_document_field_payment">Payment</string>
+    <string name="collection_spend_member_document_field_debt">Debt</string>
 </resources>

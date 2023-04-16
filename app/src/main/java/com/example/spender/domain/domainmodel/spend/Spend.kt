@@ -6,7 +6,7 @@ import com.google.firebase.firestore.GeoPoint
 data class Spend(
     val name: String,
     val category: String,
-    val splitMode: SplitMode,
+    val splitMode: Int,
     val amount: Double,
     val geoPoint: GeoPoint,
     val members: List<SpendMember>,

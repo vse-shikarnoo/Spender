@@ -4,5 +4,6 @@ import com.example.spender.domain.domainmodel.user.Friend
 
 data class SpendMember(
     val friend: Friend,
-    val memberActivity: SpendMemberActivity
+    val payment: Double,
+    val debt: List<DebtToUser>
 )

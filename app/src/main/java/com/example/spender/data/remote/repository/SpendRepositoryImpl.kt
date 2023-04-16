@@ -1,18 +1,17 @@
-package com.example.spender.data.firebase.repositories
+package com.example.spender.data.remote.repository
 
 import android.app.Application
 import com.example.spender.R
+import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
+import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.repository.SpendRepository
-import com.example.spender.domain.domainmodel.user.Friend
-import com.example.spender.domain.domainmodel.spend.Spend
+import com.example.spender.domain.domainmodel.Trip
 import com.example.spender.domain.domainmodel.spend.SpendMember
-import com.example.spender.domain.domainmodel.spend.SplitMode
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class SpendRepositoryImpl @Inject constructor(
@@ -20,147 +19,191 @@ class SpendRepositoryImpl @Inject constructor(
     private val appContext: Application
 ) : SpendRepository {
     override suspend fun createSpend(
-        tripDocRef: DocumentReference,
+        trip: Trip,
         name: String,
         category: String,
-        splitMode: SplitMode,
+        splitMode: Int,
         amount: Double,
         geoPoint: GeoPoint,
         members: List<SpendMember>
     ): DataResult<String> {
-        TODO("Not yet implemented")
+        return try {
+            val batch = remoteDataSource.db.batch()
+            val newSpendDocRef =
+                trip.docRef.collection(appContext.getString(R.string.collection_name_spends))
+                    .document()
+            batch.set(
+                newSpendDocRef,
+                mapOf(
+                    appContext.getString(R.string.collection_spends_document_field_name) to name,
+                    appContext.getString(R.string.collection_spends_document_field_category) to category,
+                    appContext.getString(R.string.collection_spends_document_field_split_mode) to splitMode,
+                    appContext.getString(R.string.collection_spends_document_field_amount) to amount,
+                    appContext.getString(R.string.collection_spends_document_field_geo) to geoPoint,
+                )
+            )
+            when (val addSpendMembersResult = addSpendMembers(newSpendDocRef, members)) {
+                is DataResult.Success -> {
+                    batch.commit().await()
+                    DataResult.Success(FirebaseSuccessMessages.SPEND_CREATED)
+                }
+
+                is DataResult.Error -> {
+                    addSpendMembersResult
+                }
+            }
+        } catch (e: Exception) {
+            DataErrorHandler.handle(e)
+        }
     }
 
     override suspend fun updateSpendName(
-        spend: Spend,
+        spendDocRef: DocumentReference,
         newName: String
     ): DataResult<String> {
         return try {
-            spend.docRef.update(
-                appContext.getString(R.string.subcollection_spends_document_field_name),
+            spendDocRef.update(
+                appContext.getString(R.string.collection_spends_document_field_name),
                 newName
             ).await()
-            FirebaseCallResult.Success(FirebaseSuccessMessages.SPEND_NAME_UPDATED)
+            DataResult.Success(FirebaseSuccessMessages.SPEND_NAME_UPDATED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 
     override suspend fun updateSpendCategory(
-        spend: Spend,
+        spendDocRef: DocumentReference,
         newCategory: String
     ): DataResult<String> {
         return try {
-            spend.docRef.update(
-                appContext.getString(R.string.subcollection_spends_document_field_category),
+            spendDocRef.update(
+                appContext.getString(R.string.collection_spends_document_field_category),
                 newCategory
             ).await()
             DataResult.Success(FirebaseSuccessMessages.SPEND_CATEGORY_UPDATED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 
     override suspend fun updateSpendSplitMode(
-        spend: Spend,
-        newSplitMode: SplitMode
-    ): FirebaseCallResult<String> {
-        TODO("Not yet implemented")
+        spendDocRef: DocumentReference,
+        newSplitMode: Int
+    ): DataResult<String> {
+        return try {
+            spendDocRef.update(
+                appContext.getString(R.string.collection_spends_document_field_split_mode),
+                newSplitMode
+            ).await()
+            DataResult.Success(FirebaseSuccessMessages.SPEND_SPLIT_MODE_UPDATED)
+        } catch (e: Exception) {
+            DataErrorHandler.handle(e)
+        }
     }
 
     override suspend fun updateSpendAmount(
-        spend: Spend,
+        spendDocRef: DocumentReference,
         newAmount: Double
     ): DataResult<String> {
         return try {
-            spend.docRef.update(
-                appContext.getString(R.string.subcollection_spends_document_field_amount),
+            spendDocRef.update(
+                appContext.getString(R.string.collection_spends_document_field_amount),
                 newAmount
             ).await()
-            FirebaseCallResult.Success(FirebaseSuccessMessages.SPEND_AMOUNT_UPDATED)
+            DataResult.Success(FirebaseSuccessMessages.SPEND_AMOUNT_UPDATED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 
     override suspend fun updateSpendGeoPoint(
-        spend: Spend,
+        spendDocRef: DocumentReference,
         newGeoPoint: GeoPoint
-    ): FirebaseCallResult<String> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addSpendMember(
-        spend: Spend,
-        newMember: Friend
     ): DataResult<String> {
         return try {
-            spend.docRef.update(
-                appContext.getString(R.string.subcollection_spends_document_field_members),
-                FieldValue.arrayUnion(newMember.docRef)
+            spendDocRef.update(
+                appContext.getString(R.string.collection_spends_document_field_geo),
+                newGeoPoint
             ).await()
-
-            FirebaseCallResult.Success(FirebaseSuccessMessages.SPEND_MEMBER_ADDED)
+            DataResult.Success(FirebaseSuccessMessages.SPEND_GEO_UPDATED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 
     override suspend fun addSpendMembers(
-        spend: Spend,
-        newMembers: List<Friend>
+        spendDocRef: DocumentReference,
+        newMembers: List<SpendMember>
     ): DataResult<String> {
         return try {
-            newMembers.forEach { member ->
-                spend.docRef.update(
-                    appContext.getString(R.string.subcollection_spends_document_field_members),
-                    FieldValue.arrayUnion(member.docRef)
-                ).await()
+            val batch = remoteDataSource.db.batch()
+            newMembers.forEach { newMember ->
+                val newSpendMemberDocRef =
+                    spendDocRef.collection(appContext.getString(R.string.collection_name_spend_member))
+                        .document(newMember.friend.docRef.toString())
+
+                val arrayList = arrayListOf<HashMap<String, Double>>()
+                newMember.debt.forEach { debt ->
+                    val userMap = hashMapOf<String, Double>()
+                    userMap[debt.user.docRef.toString()] = debt.debt
+                    arrayList.add(userMap)
+                }
+
+                batch.set(
+                    newSpendMemberDocRef,
+                    mapOf(
+                        appContext.getString(R.string.collection_spend_member_document_field_payment) to
+                                newMember.payment,
+                        appContext.getString(R.string.collection_spend_member_document_field_member) to
+                                newMember.friend.docRef,
+                        appContext.getString(R.string.collection_spend_member_document_field_debt) to
+                                arrayList
+                    )
+                )
             }
-            FirebaseCallResult.Success(FirebaseSuccessMessages.SPEND_MEMBERS_ADDED)
+            batch.commit().await()
+            DataResult.Success(FirebaseSuccessMessages.SPEND_MEMBERS_ADDED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 
-    override suspend fun deleteSpendMember(
-        spend: Spend,
-        member: List<Friend>
+    override suspend fun deleteSpendMembers(
+        spendDocRef: DocumentReference,
+        members: List<SpendMember>
     ): DataResult<String> {
         return try {
-            member.forEach { member ->
-                spend.docRef.update(
-                    appContext.getString(R.string.subcollection_spends_document_field_members),
-                    FieldValue.arrayRemove(member.docRef)
-                ).await()
-
-                TODO("reorganize spends")
+            val batch = remoteDataSource.db.batch()
+            val spendMembersCollectionRef =
+                spendDocRef.collection(appContext.getString(R.string.collection_name_spend_member))
+            members.forEach { member ->
+                batch.delete(
+                    spendMembersCollectionRef.document(member.friend.docRef.toString())
+                )
             }
-            FirebaseCallResult.Success(FirebaseSuccessMessages.TRIP_MEMBERS_REMOVED)
+            batch.commit().await()
+            DataResult.Success(FirebaseSuccessMessages.SPEND_MEMBERS_REMOVED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 
-    override suspend fun deleteSpendSpend(spend: Spend): FirebaseCallResult<String> {
+    override suspend fun deleteSpend(trip: Trip): DataResult<String> {
         return try {
-            val batch = db.batch()
+            val batch = remoteDataSource.db.batch()
+            val spendCollectionRef =
+                trip.docRef.collection(appContext.getString(R.string.collection_name_spends)).get()
+                    .await()
 
-            spend.members.forEach { member ->
-//                batch.update(
-//                    // Is docRef needed in SpendMember for deleting?
-//                    member.docRef,
-//                    appContext.getString(R.string.collection_users_document_field_trips),
-//                    FieldValue.arrayRemove(spend.docRef)
-//                )
+            spendCollectionRef.documents.forEach { document ->
+                batch.delete(document.reference)
             }
-
-            batch.delete(spend.docRef)
 
             batch.commit().await()
             DataResult.Success(FirebaseSuccessMessages.SPEND_DELETED)
         } catch (e: Exception) {
-            FirebaseErrorHandler.handle(e)
+            DataErrorHandler.handle(e)
         }
     }
 }

@@ -6,19 +6,22 @@ import com.example.spender.data.DataResult
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.dao.TripDao
+import com.example.spender.domain.remotedao.RemoteTripDao
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.user.User
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class RemoteTripDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-): TripDao {
+): RemoteTripDao {
+    override var source: Source = Source.SERVER
+
     override suspend fun createTrip(
         name: String,
         creator: User,

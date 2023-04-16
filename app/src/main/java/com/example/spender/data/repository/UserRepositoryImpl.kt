@@ -7,100 +7,136 @@ import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
 import com.example.spender.domain.repository.UserRepository
+import com.google.firebase.firestore.Source
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val remoteUserDaoImpl: RemoteUserDaoImpl
+    private val remoteUserDaoImplServer: RemoteUserDaoImpl,
+    private val remoteUserDaoImplCache: RemoteUserDaoImpl
 ) : UserRepository {
+    init {
+        remoteUserDaoImplServer.source = Source.SERVER
+        remoteUserDaoImplCache.source = Source.CACHE
+    }
+
     override suspend fun getUser(userId: String?): DataResult<User> {
-        return remoteUserDaoImpl.getUser(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUser(userId)
+        }
+        return remoteUserDaoImplCache.getUser(userId)
     }
 
     override suspend fun getUserName(userId: String?): DataResult<UserName> {
-        return remoteUserDaoImpl.getUserName(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserName(userId)
+        }
+        return remoteUserDaoImplCache.getUserName(userId)
     }
 
     override suspend fun getUserAge(userId: String?): DataResult<Long> {
-        return remoteUserDaoImpl.getUserAge(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserAge(userId)
+        }
+        return remoteUserDaoImplCache.getUserAge(userId)
     }
 
     override suspend fun getUserNickname(userId: String?): DataResult<String> {
-        return remoteUserDaoImpl.getUserNickname(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserNickname(userId)
+        }
+        return remoteUserDaoImplCache.getUserNickname(userId)
     }
 
     override suspend fun getUserIncomingFriends(userId: String?): DataResult<List<Friend>> {
-        return remoteUserDaoImpl.getUserIncomingFriends(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserIncomingFriends(userId)
+        }
+        return remoteUserDaoImplCache.getUserIncomingFriends(userId)
     }
 
     override suspend fun getUserOutgoingFriends(userId: String?): DataResult<List<Friend>> {
-        return remoteUserDaoImpl.getUserOutgoingFriends(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserOutgoingFriends(userId)
+        }
+        return remoteUserDaoImplCache.getUserOutgoingFriends(userId)
     }
 
     override suspend fun getUserFriends(userId: String?): DataResult<List<Friend>> {
-        return remoteUserDaoImpl.getUserFriends(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserFriends(userId)
+        }
+        return remoteUserDaoImplCache.getUserFriends(userId)
     }
 
     override suspend fun getUserAdminTrips(userId: String?): DataResult<List<Trip>> {
-        return remoteUserDaoImpl.getUserAdminTrips(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserAdminTrips(userId)
+        }
+        return remoteUserDaoImplCache.getUserAdminTrips(userId)
     }
 
     override suspend fun getUserPassengerTrips(userId: String?): DataResult<List<Trip>> {
-        return remoteUserDaoImpl.getUserPassengerTrips(userId)
+        withContext(Dispatchers.IO) {
+            remoteUserDaoImplServer.getUserPassengerTrips(userId)
+        }
+        return remoteUserDaoImplCache.getUserPassengerTrips(userId)
     }
 
     override suspend fun updateUser(userId: String?, newUser: User): DataResult<String> {
-        return remoteUserDaoImpl.updateUser(userId, newUser)
+        return remoteUserDaoImplServer.updateUser(userId, newUser)
     }
 
     override suspend fun updateUserName(userId: String?, newName: UserName): DataResult<String> {
-        return remoteUserDaoImpl.updateUserName(userId, newName)
+        return remoteUserDaoImplServer.updateUserName(userId, newName)
     }
 
     override suspend fun updateUserAge(userId: String?, newAge: Int): DataResult<String> {
-        return remoteUserDaoImpl.updateUserAge(userId, newAge)
+        return remoteUserDaoImplServer.updateUserAge(userId, newAge)
     }
 
     override suspend fun updateUserNickname(
         userId: String?,
         newNickname: String
     ): DataResult<String> {
-        return remoteUserDaoImpl.updateUserNickname(userId, newNickname)
+        return remoteUserDaoImplServer.updateUserNickname(userId, newNickname)
     }
 
     override suspend fun addUserIncomingFriend(
         userId: String?,
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImpl.addUserIncomingFriend(userId, friend)
+        return remoteUserDaoImplServer.addUserIncomingFriend(userId, friend)
     }
 
     override suspend fun addUserOutgoingFriend(
         userId: String?,
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImpl.addUserOutgoingFriend(userId, friend)
+        return remoteUserDaoImplServer.addUserOutgoingFriend(userId, friend)
     }
 
     override suspend fun removeUserFriend(userId: String?, friend: Friend): DataResult<String> {
-        return remoteUserDaoImpl.removeUserFriend(userId, friend)
+        return remoteUserDaoImplServer.removeUserFriend(userId, friend)
     }
 
     override suspend fun removeUserOutgoingFriend(
         userId: String?,
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImpl.removeUserOutgoingFriend(userId, friend)
+        return remoteUserDaoImplServer.removeUserOutgoingFriend(userId, friend)
     }
 
     override suspend fun removeUserIncomingFriend(
         userId: String?,
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImpl.removeUserIncomingFriend(userId, friend)
+        return remoteUserDaoImplServer.removeUserIncomingFriend(userId, friend)
     }
 
     override suspend fun checkNickname(nickname: String): DataResult<Boolean> {
-        return remoteUserDaoImpl.checkNickname(nickname)
+        return remoteUserDaoImplServer.checkNickname(nickname)
     }
 
 }

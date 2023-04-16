@@ -1,12 +1,15 @@
-package com.example.spender.domain.dao
+package com.example.spender.domain.remotedao
 
 import com.example.spender.data.DataResult
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.SpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Source
 
-interface SpendDao {
+interface RemoteSpendDao {
+    var source: Source
+
     suspend fun createSpend(
         trip: Trip,
         name: String,

@@ -1,12 +1,15 @@
-package com.example.spender.domain.dao
+package com.example.spender.domain.remotedao
 
 import com.example.spender.data.DataResult
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
+import com.google.firebase.firestore.Source
 
-interface TripDao {
+interface RemoteTripDao {
+    var source: Source
+
     suspend fun createTrip(
         name: String,
         creator: User,

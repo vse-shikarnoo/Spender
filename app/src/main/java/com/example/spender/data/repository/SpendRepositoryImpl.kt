@@ -7,11 +7,18 @@ import com.example.spender.domain.model.spend.SpendMember
 import com.example.spender.domain.repository.SpendRepository
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Source
 import javax.inject.Inject
 
 class SpendRepositoryImpl @Inject constructor(
-    private val remoteSpendDaoImpl: RemoteSpendDaoImpl
+    private val remoteSpendDaoImplServer: RemoteSpendDaoImpl,
+    private val remoteSpendDaoImplCache: RemoteSpendDaoImpl
 ) : SpendRepository {
+    init {
+        remoteSpendDaoImplServer.source = Source.SERVER
+        remoteSpendDaoImplCache.source = Source.CACHE
+    }
+
     override suspend fun createSpend(
         trip: Trip,
         name: String,
@@ -21,7 +28,7 @@ class SpendRepositoryImpl @Inject constructor(
         geoPoint: GeoPoint,
         members: List<SpendMember>
     ): DataResult<String> {
-        return remoteSpendDaoImpl.createSpend(
+        return remoteSpendDaoImplServer.createSpend(
             trip,
             name,
             category,
@@ -36,52 +43,52 @@ class SpendRepositoryImpl @Inject constructor(
         spendDocRef: DocumentReference,
         newName: String
     ): DataResult<String> {
-        return remoteSpendDaoImpl.updateSpendName(spendDocRef, newName)
+        return remoteSpendDaoImplServer.updateSpendName(spendDocRef, newName)
     }
 
     override suspend fun updateSpendCategory(
         spendDocRef: DocumentReference,
         newCategory: String
     ): DataResult<String> {
-        return remoteSpendDaoImpl.updateSpendCategory(spendDocRef, newCategory)
+        return remoteSpendDaoImplServer.updateSpendCategory(spendDocRef, newCategory)
     }
 
     override suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,
         newSplitMode: Int
     ): DataResult<String> {
-        return remoteSpendDaoImpl.updateSpendSplitMode(spendDocRef, newSplitMode)
+        return remoteSpendDaoImplServer.updateSpendSplitMode(spendDocRef, newSplitMode)
     }
 
     override suspend fun updateSpendAmount(
         spendDocRef: DocumentReference,
         newAmount: Double
     ): DataResult<String> {
-        return remoteSpendDaoImpl.updateSpendAmount(spendDocRef, newAmount)
+        return remoteSpendDaoImplServer.updateSpendAmount(spendDocRef, newAmount)
     }
 
     override suspend fun updateSpendGeoPoint(
         spendDocRef: DocumentReference,
         newGeoPoint: GeoPoint
     ): DataResult<String> {
-        return remoteSpendDaoImpl.updateSpendGeoPoint(spendDocRef, newGeoPoint)
+        return remoteSpendDaoImplServer.updateSpendGeoPoint(spendDocRef, newGeoPoint)
     }
 
     override suspend fun addSpendMembers(
         spendDocRef: DocumentReference,
         newMembers: List<SpendMember>
     ): DataResult<String> {
-        return remoteSpendDaoImpl.addSpendMembers(spendDocRef, newMembers)
+        return remoteSpendDaoImplServer.addSpendMembers(spendDocRef, newMembers)
     }
 
     override suspend fun deleteSpendMembers(
         spendDocRef: DocumentReference,
         members: List<SpendMember>
     ): DataResult<String> {
-        return remoteSpendDaoImpl.deleteSpendMembers(spendDocRef, members)
+        return remoteSpendDaoImplServer.deleteSpendMembers(spendDocRef, members)
     }
 
     override suspend fun deleteSpend(trip: Trip): DataResult<String> {
-        return remoteSpendDaoImpl.deleteSpend(trip)
+        return remoteSpendDaoImplServer.deleteSpend(trip)
     }
 }

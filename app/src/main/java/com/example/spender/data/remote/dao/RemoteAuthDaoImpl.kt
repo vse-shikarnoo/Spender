@@ -10,7 +10,7 @@ import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoUserSignedInException
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.dao.AuthDao
+import com.example.spender.domain.remotedao.RemoteAuthDao
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Source
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class RemoteAuthDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-): AuthDao {
+): RemoteAuthDao {
     override suspend fun signIn(email: String, password: String): DataResult<String> {
         return try {
             remoteDataSource.auth.signInWithEmailAndPassword(email, password).await()

@@ -1,12 +1,15 @@
-package com.example.spender.domain.dao
+package com.example.spender.domain.remotedao
 
 import com.example.spender.data.DataResult
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
+import com.google.firebase.firestore.Source
 
-interface UserDao {
+interface RemoteUserDao {
+    var source: Source
+
     suspend fun getUser(userId: String? = null): DataResult<User>
     suspend fun getUserName(userId: String? = null): DataResult<UserName>
     suspend fun getUserAge(userId: String? = null): DataResult<Long>

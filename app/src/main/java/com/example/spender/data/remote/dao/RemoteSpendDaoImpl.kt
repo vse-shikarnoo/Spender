@@ -6,18 +6,21 @@ import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.dao.SpendDao
+import com.example.spender.domain.remotedao.RemoteSpendDao
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.SpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class RemoteSpendDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-): SpendDao {
+): RemoteSpendDao {
+    override var source: Source = Source.SERVER
+
     override suspend fun createSpend(
         trip: Trip,
         name: String,
@@ -193,7 +196,7 @@ class RemoteSpendDaoImpl @Inject constructor(
         return try {
             val batch = remoteDataSource.db.batch()
             val spendCollectionRef =
-                trip.docRef.collection(appContext.getString(R.string.collection_name_spends)).get()
+                trip.docRef.collection(appContext.getString(R.string.collection_name_spends)).get(source)
                     .await()
 
             spendCollectionRef.documents.forEach { document ->

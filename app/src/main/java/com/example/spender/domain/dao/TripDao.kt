@@ -1,12 +1,12 @@
-package com.example.spender.domain.repository
+package com.example.spender.domain.dao
 
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
+import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 
-interface TripRepository {
+interface TripDao {
     suspend fun createTrip(
         name: String,
         creator: User,

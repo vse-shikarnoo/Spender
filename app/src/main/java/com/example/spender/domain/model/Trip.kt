@@ -1,7 +1,7 @@
-package com.example.spender.domain.domainmodel
+package com.example.spender.domain.model
 
-import com.example.spender.domain.domainmodel.spend.Spend
-import com.example.spender.domain.domainmodel.user.Friend
+import com.example.spender.domain.model.spend.Spend
+import com.example.spender.domain.model.user.Friend
 import com.google.firebase.firestore.DocumentReference
 
 data class Trip(

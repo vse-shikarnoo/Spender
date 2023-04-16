@@ -1,4 +1,4 @@
-package com.example.spender.domain.domainmodel.spend
+package com.example.spender.domain.model.spend
 
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint

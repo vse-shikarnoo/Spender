@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.R
 import com.example.spender.data.DataResult
-import com.example.spender.data.remote.viewmodel.AuthViewModel
+import com.example.spender.ui.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination

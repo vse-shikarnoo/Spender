@@ -1,30 +1,30 @@
-package com.example.spender.data.remote.repository
+package com.example.spender.data.remote.dao
 
 import android.app.Application
 import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataResult
-import com.example.spender.domain.repository.UserRepository
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.domainmodel.Trip
-import com.example.spender.domain.domainmodel.user.Friend
-import com.example.spender.domain.domainmodel.user.User
-import com.example.spender.domain.domainmodel.user.UserName
+import com.example.spender.domain.dao.UserDao
+import com.example.spender.domain.model.Trip
+import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.model.user.User
+import com.example.spender.domain.model.user.UserName
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor(
+class RemoteUserDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-) : UserRepository {
+): UserDao {
     override suspend fun getUser(
         userId: String?
     ): DataResult<User> {

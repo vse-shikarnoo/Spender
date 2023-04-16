@@ -1,4 +1,4 @@
-package com.example.spender.domain.domainmodel.user
+package com.example.spender.domain.model.user
 
 import com.google.firebase.firestore.DocumentReference
 

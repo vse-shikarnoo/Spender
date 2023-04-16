@@ -1,13 +1,13 @@
-package com.example.spender.data.remote.viewmodel
+package com.example.spender.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
-import com.example.spender.domain.domainmodel.Trip
-import com.example.spender.domain.domainmodel.spend.Spend
-import com.example.spender.domain.domainmodel.spend.SpendMember
+import com.example.spender.domain.model.Trip
+import com.example.spender.domain.model.spend.Spend
+import com.example.spender.domain.model.spend.SpendMember
 import com.example.spender.domain.repository.SpendRepository
 import com.example.spender.domain.usecases.SpendUpdateUseCase
 import com.google.firebase.firestore.GeoPoint

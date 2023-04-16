@@ -1,25 +1,26 @@
-package com.example.spender.data.remote.repository
+package com.example.spender.data.remote.dao
 
 import android.app.Application
 import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataResult
-import com.example.spender.domain.repository.AuthRepository
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoUserSignedInException
 import com.example.spender.data.remote.RemoteDataSourceImpl
+import com.example.spender.domain.dao.AuthDao
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
+class RemoteAuthDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-) : AuthRepository {
+): AuthDao {
     override suspend fun signIn(email: String, password: String): DataResult<String> {
         return try {
             remoteDataSource.auth.signInWithEmailAndPassword(email, password).await()
@@ -136,7 +137,7 @@ class AuthRepositoryImpl @Inject constructor(
                         appContext.getString(R.string.collection_users_document_field_nickname),
                         nickname
                     )
-                    .get().await()
+                    .get(Source.DEFAULT).await()
             DataResult.Success(checkNicknameQuerySnapshot.isEmpty)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)

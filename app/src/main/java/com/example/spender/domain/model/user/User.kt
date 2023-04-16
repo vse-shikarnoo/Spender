@@ -1,6 +1,6 @@
-package com.example.spender.domain.domainmodel.user
+package com.example.spender.domain.model.user
 
-import com.example.spender.domain.domainmodel.Trip
+import com.example.spender.domain.model.Trip
 import com.google.firebase.firestore.DocumentReference
 
 data class User(

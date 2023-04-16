@@ -1,4 +1,4 @@
-package com.example.spender.data.remote.viewmodel
+package com.example.spender.ui.viewmodel
 
 import androidx.lifecycle.*
 import com.example.spender.data.DataResult

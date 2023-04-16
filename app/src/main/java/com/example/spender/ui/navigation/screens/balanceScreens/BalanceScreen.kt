@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.R
 import com.example.spender.data.DataResult
-import com.example.spender.data.remote.viewmodel.UserViewModel
-import com.example.spender.domain.domainmodel.user.User
+import com.example.spender.ui.viewmodel.UserViewModel
+import com.example.spender.domain.model.user.User
 import com.example.spender.ui.navigation.BalanceNavGraph
 import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination

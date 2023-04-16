@@ -2,7 +2,7 @@ package com.example.spender.domain.usecases
 
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
-import com.example.spender.domain.domainmodel.spend.Spend
+import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.repository.SpendRepository
 import javax.inject.Inject
 

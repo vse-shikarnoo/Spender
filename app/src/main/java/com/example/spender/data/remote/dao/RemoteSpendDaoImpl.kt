@@ -1,4 +1,4 @@
-package com.example.spender.data.remote.repository
+package com.example.spender.data.remote.dao
 
 import android.app.Application
 import com.example.spender.R
@@ -6,18 +6,18 @@ import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.repository.SpendRepository
-import com.example.spender.domain.domainmodel.Trip
-import com.example.spender.domain.domainmodel.spend.SpendMember
+import com.example.spender.domain.dao.SpendDao
+import com.example.spender.domain.model.Trip
+import com.example.spender.domain.model.spend.SpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class SpendRepositoryImpl @Inject constructor(
+class RemoteSpendDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-) : SpendRepository {
+): SpendDao {
     override suspend fun createSpend(
         trip: Trip,
         name: String,

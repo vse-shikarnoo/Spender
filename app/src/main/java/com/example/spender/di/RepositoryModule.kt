@@ -1,10 +1,10 @@
 package com.example.spender.di
 
 import com.example.spender.domain.repository.AuthRepository
-import com.example.spender.data.remote.repository.AuthRepositoryImpl
-import com.example.spender.data.remote.repository.SpendRepositoryImpl
-import com.example.spender.data.remote.repository.TripRepositoryImpl
-import com.example.spender.data.remote.repository.UserRepositoryImpl
+import com.example.spender.data.repository.AuthRepositoryImpl
+import com.example.spender.data.repository.SpendRepositoryImpl
+import com.example.spender.data.repository.TripRepositoryImpl
+import com.example.spender.data.repository.UserRepositoryImpl
 import com.example.spender.domain.repository.SpendRepository
 import com.example.spender.domain.repository.TripRepository
 import com.example.spender.domain.repository.UserRepository

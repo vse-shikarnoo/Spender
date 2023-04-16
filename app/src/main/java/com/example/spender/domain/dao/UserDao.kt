@@ -1,12 +1,12 @@
-package com.example.spender.domain.repository
+package com.example.spender.domain.dao
 
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.Trip
+import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
 
-interface UserRepository {
+interface UserDao {
     suspend fun getUser(userId: String? = null): DataResult<User>
     suspend fun getUserName(userId: String? = null): DataResult<UserName>
     suspend fun getUserAge(userId: String? = null): DataResult<Long>

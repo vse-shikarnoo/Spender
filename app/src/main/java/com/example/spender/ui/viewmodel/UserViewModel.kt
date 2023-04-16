@@ -1,4 +1,4 @@
-package com.example.spender.data.remote.viewmodel
+package com.example.spender.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
 import com.example.spender.domain.repository.UserRepository
-import com.example.spender.domain.domainmodel.user.Friend
-import com.example.spender.domain.domainmodel.user.User
-import com.example.spender.domain.domainmodel.Trip
-import com.example.spender.domain.domainmodel.user.UserName
+import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.model.user.User
+import com.example.spender.domain.model.Trip
+import com.example.spender.domain.model.user.UserName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers

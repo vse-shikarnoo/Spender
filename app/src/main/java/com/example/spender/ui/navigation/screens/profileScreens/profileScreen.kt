@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.spender.data.remote.viewmodel.AuthViewModel
+import com.example.spender.ui.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.ProfileNavGraph
 import com.example.spender.ui.navigation.screens.destinations.*
 import com.ramcosta.composedestinations.annotation.Destination

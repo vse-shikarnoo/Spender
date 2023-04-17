@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +21,6 @@ import com.example.spender.R
 import com.example.spender.data.firebase.models.TestFriend
 import com.example.spender.ui.navigation.CreateRideNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
-import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
@@ -45,22 +42,9 @@ fun CreateRideScreen(
                         "Create trip",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navigator.popBackStack()
-                            navigator.navigate(FirstScreenDestination)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Arrow back"
-                        )
-                    }
-                }
             )
         },
         content = {
@@ -140,11 +124,33 @@ fun AddFriendsList(
             items(
                 items = friends,
             ) {
-                FriendCard(it)
+                FriendCard(
+                    friend = it,
+                    button = {
+                        Checkbox(
+                            checked = false,
+                            onCheckedChange = {},
+                            colors = CheckboxDefaults.colors(
+                                uncheckedColor = GreenMain,
+                            )
+                        )
+                    }
+                )
             }
-            for (i in 1..10) {
+            for (i in 1..1) {
                 item {
-                    FriendCard(friend = TestFriend(Triple("A", "B", "C")))
+                    FriendCard(
+                        friend = TestFriend(Triple("A", "B", "C")),
+                        button = {
+                            Checkbox(
+                                checked = false,
+                                onCheckedChange = {},
+                                colors = CheckboxDefaults.colors(
+                                    uncheckedColor = GreenMain,
+                                )
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -161,6 +167,7 @@ fun AddFriendsList(
 @Composable
 fun FriendCard(
     friend: TestFriend,
+    button: @Composable () -> Unit,
 ) {
     Card(
         elevation = CardDefaults.cardElevation(
@@ -197,13 +204,7 @@ fun FriendCard(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-            Checkbox(
-                checked = false,
-                onCheckedChange = {},
-                colors = CheckboxDefaults.colors(
-                    uncheckedColor = GreenMain,
-                )
-            )
+            button()
         }
     }
 }

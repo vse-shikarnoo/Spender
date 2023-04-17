@@ -42,23 +42,12 @@ fun BalanceScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            "Balance",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Image(
-                            modifier = Modifier
-                                .size(32.dp),
-                            painter = painterResource(id = R.drawable.balance),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit
-                        )
-                    }
+                    Text(
+                        "Balance",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 },
             )
         },

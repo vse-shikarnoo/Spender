@@ -7,3 +7,6 @@ data class Friend(
     val nickname: String,
     val docRef: DocumentReference
 )
+data class TestFriend(
+    val name: Triple<String, String, String>
+)

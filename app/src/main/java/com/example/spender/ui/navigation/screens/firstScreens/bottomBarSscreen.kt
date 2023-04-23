@@ -2,9 +2,6 @@ package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
 import androidx.compose.material.Scaffold
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.example.spender.ui.navigation.BottomBar

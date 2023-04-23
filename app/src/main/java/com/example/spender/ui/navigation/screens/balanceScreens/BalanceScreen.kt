@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
-import com.example.spender.data.firebase.models.TestTrip
+import com.example.spender.domain.model.TestTrip
 import com.example.spender.ui.navigation.BalanceNavGraph
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
 import com.example.spender.ui.theme.*

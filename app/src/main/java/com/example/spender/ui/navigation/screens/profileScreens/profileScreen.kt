@@ -24,7 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.data.firebase.models.TestFriend
+import com.example.spender.domain.model.user.TestFriend
 import com.example.spender.ui.navigation.ProfileNavGraph
 import com.example.spender.ui.navigation.screens.createRideScreens.FriendCard
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination

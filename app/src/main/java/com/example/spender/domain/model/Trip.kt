@@ -11,3 +11,7 @@ data class Trip(
     val spends: List<Spend>,
     val docRef: DocumentReference
 )
+
+data class TestTrip(
+    val name: String
+)

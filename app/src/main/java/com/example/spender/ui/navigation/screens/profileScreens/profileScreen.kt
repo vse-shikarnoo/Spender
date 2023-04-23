@@ -1,5 +1,7 @@
 package com.example.spender.ui.navigation.screens.profileScreens
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,16 +16,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.spender.R
+import com.example.spender.data.DataResult
+import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.TestFriend
 import com.example.spender.ui.navigation.ProfileNavGraph
 import com.example.spender.ui.navigation.screens.createRideScreens.FriendCard
@@ -32,6 +47,8 @@ import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.theme.GreenLight
 import com.example.spender.ui.theme.GreenMain
 import com.example.spender.ui.theme.WhiteBackground
+import com.example.spender.ui.viewmodel.AuthViewModel
+import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -40,8 +57,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun ProfileScreen(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
+    var signOut by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
@@ -55,7 +75,12 @@ fun ProfileScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { /* Do Something*/ }) {
+                    IconButton(
+                        onClick = {
+                            authViewModel.signOut()
+                            signOut = true
+                        }
+                    ) {
                         Icon(Icons.Filled.ExitToApp, null, tint = GreenMain)
                     }
                 }
@@ -88,16 +113,28 @@ fun ProfileScreen(
                         contentDescription = null,
                     )
                 }
-                FriendsList(emptyList(), navigator)
+                FriendsList(userViewModel, navigator)
             }
         }
     )
+    if (signOut) {
+        val activity = (LocalContext.current as Activity)
+        val intent: Intent = activity.intent
+        activity.finish()
+        ContextCompat.startActivity(activity, intent, intent.extras)
+    }
+    LaunchedEffect(key1 = 1, block = {
+        userViewModel.getUserFriends()
+    })
 }
+
 @Composable
 fun FriendsList(
-    friends: List<TestFriend>,
+    userViewModel: UserViewModel,
     navigator: DestinationsNavigator
 ) {
+    val friends = userViewModel.getUserFriendsDataResult.observeAsState()
+    val friendsLst = getFriends(friends)
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -131,7 +168,7 @@ fun FriendsList(
                 .requiredSizeIn(maxHeight = 280.dp, maxWidth = 400.dp)
         ) {
             items(
-                items = friends,
+                items = friendsLst,
             ) {
                 FriendCard(
                     friend = it,
@@ -146,24 +183,8 @@ fun FriendsList(
                     }
                 )
             }
-            for (i in 1..10) {
-                item {
-                    FriendCard(
-                        friend = TestFriend(Triple("A", "B", "C")),
-                        button = {
-                            IconButton(onClick = {}) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.baseline_close_24),
-                                    tint = GreenMain,
-                                    contentDescription = ""
-                                )
-                            }
-                        }
-                    )
-                }
-            }
         }
-        if (friends.isEmpty()) {
+        if (friendsLst.isEmpty()) {
             Divider(
                 color = GreenLight,
                 modifier = Modifier.padding(vertical = 12.dp)
@@ -173,12 +194,24 @@ fun FriendsList(
     }
 }
 
+fun getFriends(friends: State<DataResult<List<Friend>>?>): List<Friend> {
+    if (friends.value == null) {
+        return emptyList<Friend>()
+    }
+    if ((friends.value!!) is DataResult.Error) {
+        return emptyList<Friend>()
+    }
+    return (friends.value!! as DataResult.Success).data
+}
+
 @Composable
 fun AddFriendGroup(
     navigator: DestinationsNavigator
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 60.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 60.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         EditTextField(

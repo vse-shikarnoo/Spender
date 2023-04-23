@@ -105,6 +105,19 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    private val _getUserTripsDataResult =
+        MutableLiveData<DataResult<List<Trip>>>()
+    val getUserTripsDataResult: LiveData<DataResult<List<Trip>>> =
+        _getUserTripsDataResult
+
+    fun getUserTrips(userID: String? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getUserTripsDataResult.postValue(
+                repository.get().getUserTrips(userID)
+            )
+        }
+    }
+
     private val _getUserAdminTripsDataResult =
         MutableLiveData<DataResult<List<Trip>>>()
     val getUserAdminTripsDataResult: LiveData<DataResult<List<Trip>>> =

@@ -23,7 +23,7 @@ class SpendViewModel @Inject constructor(
     val createSpendDataResult: LiveData<DataResult<String>> =
         _createSpendDataResult
 
-    suspend fun createSpend(
+    fun createSpend(
         trip: Trip,
         name: String,
         category: String,
@@ -51,7 +51,7 @@ class SpendViewModel @Inject constructor(
     val updateSpendGeoPointDataResult: LiveData<DataResult<String>> =
         _updateSpendGeoPointDataResult
 
-    suspend fun updateSpend(
+    fun updateSpend(
         oldSpend: Spend,
         newSpend: Spend
     ) {

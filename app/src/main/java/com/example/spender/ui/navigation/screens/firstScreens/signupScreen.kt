@@ -147,6 +147,7 @@ fun SignUpButton(
     authViewModel: AuthViewModel,
     navigator: DestinationsNavigator
 ) {
+    var error by remember { mutableStateOf("") }
     val context = LocalContext.current
     val signUpResult = authViewModel.signUpDataResult.observeAsState()
 
@@ -154,6 +155,7 @@ fun SignUpButton(
         androidx.compose.material3.Button(
             onClick = {
                 authViewModel.signUp(email, password, nickname)
+                error = ""
             },
             modifier = Modifier.padding(20.dp),
         ) {
@@ -170,11 +172,14 @@ fun SignUpButton(
                 navigator.navigate(BalanceScreenDestination)
             }
             is DataResult.Error -> {
-                Toast.makeText(
-                    context,
-                    result.exception,
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (error != result.exception) {
+                    Toast.makeText(
+                        context,
+                        result.exception,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                error = result.exception
             }
         }
     }

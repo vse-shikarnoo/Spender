@@ -41,6 +41,7 @@ fun LogInScreen(
 ) {
     val context = LocalContext.current
 
+    var error by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -127,6 +128,7 @@ fun LogInScreen(
                     androidx.compose.material3.Button(
                         onClick = {
                             authViewModel.signIn(email, password)
+                            error = ""
                         },
                         modifier = Modifier.padding(20.dp),
                     ) {
@@ -147,11 +149,14 @@ fun LogInScreen(
                 navigator.navigate(BottomBarScreenDestination)
             }
             is DataResult.Error -> {
-                Toast.makeText(
-                    context,
-                    result.exception,
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (error != result.exception) {
+                    Toast.makeText(
+                        context,
+                        result.exception,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                error = result.exception
             }
         }
     }

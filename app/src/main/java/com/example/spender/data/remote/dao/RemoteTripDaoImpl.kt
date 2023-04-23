@@ -11,6 +11,7 @@ import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.user.User
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
@@ -19,34 +20,31 @@ import javax.inject.Inject
 class RemoteTripDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-): RemoteTripDao {
+) : RemoteTripDao {
     override var source: Source = Source.SERVER
 
     override suspend fun createTrip(
         name: String,
-        creator: User,
         members: List<Friend>,
     ): DataResult<String> {
         return try {
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val batch = remoteDataSource.db.batch()
-            val newTripDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips)).document()
+            val newTripDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
+                    .document()
+            val membersFirebase = ArrayList<DocumentReference>()
+            members.forEach { member ->
+                membersFirebase.add(member.docRef)
+            }
 
-            batch.update(
+            batch.set(
                 newTripDocRef,
-                appContext.getString(R.string.collection_trip_document_field_name),
-                name
-            )
-
-            batch.update(
-                newTripDocRef,
-                appContext.getString(R.string.collection_trip_document_field_creator),
-                creator.docRef
-            )
-
-            batch.update(
-                newTripDocRef,
-                appContext.getString(R.string.collection_trip_document_field_members),
-                FieldValue.arrayUnion(members)
+                mapOf(
+                    appContext.getString(R.string.collection_trip_document_field_name) to name,
+                    appContext.getString(R.string.collection_trip_document_field_creator) to userID,
+                    appContext.getString(R.string.collection_trip_document_field_members) to membersFirebase
+                )
             )
 
             members.forEach { member ->
@@ -69,7 +67,10 @@ class RemoteTripDaoImpl @Inject constructor(
         newName: String
     ): DataResult<String> {
         return try {
-            trip.docRef.update(appContext.getString(R.string.collection_trip_document_field_name), newName).await()
+            trip.docRef.update(
+                appContext.getString(R.string.collection_trip_document_field_name),
+                newName
+            ).await()
             DataResult.Success(FirebaseSuccessMessages.TRIP_NAME_UPDATED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -115,7 +116,8 @@ class RemoteTripDaoImpl @Inject constructor(
 
     override suspend fun addTripSpend(trip: Trip, spend: Spend): DataResult<String> {
         return try {
-            trip.docRef.collection(appContext.getString(R.string.collection_trip_document_field_spends)).document()
+            trip.docRef.collection(appContext.getString(R.string.collection_trip_document_field_spends))
+                .document()
                 .set(spend).await()
             DataResult.Success(FirebaseSuccessMessages.TRIP_SPEND_ADDED)
         } catch (e: Exception) {

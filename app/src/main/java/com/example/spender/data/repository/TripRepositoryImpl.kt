@@ -21,12 +21,10 @@ class TripRepositoryImpl @Inject constructor(
 
     override suspend fun createTrip(
         name: String,
-        creator: User,
         members: List<Friend>
     ): DataResult<String> {
         return remoteTripDaoImplServer.createTrip(
             name,
-            creator,
             members
         )
     }

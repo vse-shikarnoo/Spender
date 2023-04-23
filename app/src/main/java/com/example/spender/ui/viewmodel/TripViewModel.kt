@@ -23,10 +23,10 @@ class TripViewModel @Inject constructor(
     val createTripDataResult: LiveData<DataResult<String>> =
         _createTripDataResult
 
-    suspend fun createTrip(name: String, creator: User, members: List<Friend>) {
+    fun createTrip(name: String, members: List<Friend>) {
         viewModelScope.launch(Dispatchers.IO) {
             _createTripDataResult.postValue(
-                repository.get().createTrip(name, creator, members)
+                repository.get().createTrip(name, members)
             )
         }
     }
@@ -35,7 +35,7 @@ class TripViewModel @Inject constructor(
     val updateTripNameDataResult: LiveData<DataResult<String>> =
         _updateTripNameDataResult
 
-    suspend fun updateTripName(trip: Trip, newName: String) {
+    fun updateTripName(trip: Trip, newName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateTripNameDataResult.postValue(
                 repository.get().updateTripName(trip, newName)
@@ -47,7 +47,7 @@ class TripViewModel @Inject constructor(
     val addTripMemberDataResult: LiveData<DataResult<String>> =
         _addTripMemberDataResult
 
-    suspend fun addTripMember(trip: Trip, newMember: Friend) {
+    fun addTripMember(trip: Trip, newMember: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _addTripMemberDataResult.postValue(
                 repository.get().addTripMember(trip, newMember)
@@ -59,7 +59,7 @@ class TripViewModel @Inject constructor(
     val addTripMembersDataResult: LiveData<DataResult<String>> =
         _addTripMembersDataResult
 
-    suspend fun addTripMembers(trip: Trip, newMembers: List<Friend>) {
+    fun addTripMembers(trip: Trip, newMembers: List<Friend>) {
         viewModelScope.launch(Dispatchers.IO) {
             _addTripMembersDataResult.postValue(
                 repository.get().addTripMembers(trip, newMembers)
@@ -71,7 +71,7 @@ class TripViewModel @Inject constructor(
     val addTripSpendDataResult: LiveData<DataResult<String>> =
         _addTripSpendDataResult
 
-    suspend fun addTripSpend(trip: Trip, spend: Spend) {
+    fun addTripSpend(trip: Trip, spend: Spend) {
         viewModelScope.launch(Dispatchers.IO) {
             _addTripSpendDataResult.postValue(
                 repository.get().addTripSpend(trip, spend)
@@ -83,7 +83,7 @@ class TripViewModel @Inject constructor(
     val removeTripMemberDataResult: LiveData<DataResult<String>> =
         _removeTripMemberDataResult
 
-    suspend fun removeTripMember(trip: Trip, member: Friend) {
+    fun removeTripMember(trip: Trip, member: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeTripMemberDataResult.postValue(
                 repository.get().removeTripMember(trip, member)
@@ -95,7 +95,7 @@ class TripViewModel @Inject constructor(
     val removeTripMembersDataResult: LiveData<DataResult<String>> =
         _removeTripMembersDataResult
 
-    suspend fun removeTripMembers(trip: Trip, members: List<Friend>) {
+    fun removeTripMembers(trip: Trip, members: List<Friend>) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeTripMembersDataResult.postValue(
                 repository.get().removeTripMembers(trip, members)
@@ -107,7 +107,7 @@ class TripViewModel @Inject constructor(
     val removeTripSpendDataResult: LiveData<DataResult<String>> =
         _removeTripSpendDataResult
 
-    suspend fun removeTripSpend(spend: Spend) {
+    fun removeTripSpend(spend: Spend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeTripSpendDataResult.postValue(
                 repository.get().removeTripSpend(spend)
@@ -119,7 +119,7 @@ class TripViewModel @Inject constructor(
     val deleteTripDataResult: LiveData<DataResult<String>> =
         _deleteTripDataResult
 
-    suspend fun deleteTrip(trip: Trip) {
+    fun deleteTrip(trip: Trip) {
         viewModelScope.launch(Dispatchers.IO) {
             _deleteTripDataResult.postValue(
                 repository.get().deleteTrip(trip)

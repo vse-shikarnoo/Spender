@@ -14,6 +14,7 @@ interface UserRepository {
     suspend fun getUserIncomingFriends(userId: String? = null): DataResult<List<Friend>>
     suspend fun getUserOutgoingFriends(userId: String? = null): DataResult<List<Friend>>
     suspend fun getUserFriends(userId: String? = null): DataResult<List<Friend>>
+    suspend fun getUserTrips(userId: String? = null): DataResult<List<Trip>>
     suspend fun getUserAdminTrips(userId: String? = null): DataResult<List<Trip>>
     suspend fun getUserPassengerTrips(userId: String? = null): DataResult<List<Trip>>
     suspend fun updateUser(userId: String? = null, newUser: User): DataResult<String>

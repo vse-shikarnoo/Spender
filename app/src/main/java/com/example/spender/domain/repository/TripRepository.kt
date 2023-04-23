@@ -9,7 +9,6 @@ import com.example.spender.domain.model.user.User
 interface TripRepository {
     suspend fun createTrip(
         name: String,
-        creator: User,
         members: List<Friend>,
     ): DataResult<String>
 

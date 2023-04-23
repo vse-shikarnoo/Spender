@@ -12,7 +12,6 @@ interface RemoteTripDao {
 
     suspend fun createTrip(
         name: String,
-        creator: User,
         members: List<Friend>,
     ): DataResult<String>
 

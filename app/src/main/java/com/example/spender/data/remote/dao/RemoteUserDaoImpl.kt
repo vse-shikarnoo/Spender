@@ -25,7 +25,7 @@ import javax.inject.Inject
 class RemoteUserDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-): RemoteUserDao {
+) : RemoteUserDao {
     override var source: Source = Source.SERVER
 
     override suspend fun getUser(
@@ -34,7 +34,9 @@ class RemoteUserDaoImpl @Inject constructor(
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
 
-            val userDocumentSnapshot = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID).get(source).await()
+            val userDocumentSnapshot =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID).get(source).await()
 
             val name = getUserName(userID)
             if (name is DataResult.Error) {
@@ -93,7 +95,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<UserName> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val firstName = userDocRef.get(source)
                 .await().data!![appContext.getString(R.string.collection_users_document_field_first_name)] as String
             val middleName = userDocRef.get(source)
@@ -111,8 +115,11 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<Long> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
-            val age = userDocRef.get(source).await().data!![appContext.getString(R.string.collection_users_document_field_age)] as Long
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
+            val age = userDocRef.get(source)
+                .await().data!![appContext.getString(R.string.collection_users_document_field_age)] as Long
             DataResult.Success(age)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -124,7 +131,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val nickname =
                 userDocRef.get(source).await()
                     .data!![appContext.getString(R.string.collection_users_document_field_nickname)] as String
@@ -139,7 +148,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<List<Friend>> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val friends = userDocRef.get(source).await()
                 .data!![appContext.getString(R.string.collection_users_document_field_incoming_friends)] as ArrayList<DocumentReference>?
 
@@ -180,7 +191,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<List<Friend>> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val friends = userDocRef.get(source).await()
                 .data!![appContext.getString(R.string.collection_users_document_field_outgoing_friends)] as ArrayList<DocumentReference>?
 
@@ -221,7 +234,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<List<Friend>> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val friends = userDocRef.get(source).await()
                 .data!![appContext.getString(R.string.collection_users_document_field_friends)] as ArrayList<DocumentReference>?
 
@@ -257,6 +272,32 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUserTrips(
+        userId: String?
+    ): DataResult<List<Trip>> {
+        return try {
+            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val tripCollection: CollectionReference =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
+            val tripsQuerySnapshot =
+                tripCollection.whereArrayContains(
+                    appContext.getString(R.string.collection_trip_document_field_members),
+                    userID
+                ).get(source).await()
+            if (!tripsQuerySnapshot.isEmpty) {
+                val lst: MutableList<Trip> = mutableListOf()
+                tripsQuerySnapshot.documents.forEach { tripDocSnapshot ->
+                    lst.add(tripDocSnapshot.toObject(Trip::class.java)!!)
+                }
+                DataResult.Success(lst)
+            } else {
+                DataResult.Success(emptyList())
+            }
+        } catch (e: Exception) {
+            DataErrorHandler.handle(e)
+        }
+    }
+
     override suspend fun getUserAdminTrips(
         userId: String?
     ): DataResult<List<Trip>> {
@@ -265,7 +306,10 @@ class RemoteUserDaoImpl @Inject constructor(
             val tripCollection: CollectionReference =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuery =
-                tripCollection.whereEqualTo(appContext.getString(R.string.collection_trip_document_field_creator), userID).get(source)
+                tripCollection.whereEqualTo(
+                    appContext.getString(R.string.collection_trip_document_field_creator),
+                    userID
+                ).get(source)
                     .await()
             if (!tripsQuery.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
@@ -289,9 +333,15 @@ class RemoteUserDaoImpl @Inject constructor(
             val tripCollection: CollectionReference =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuery =
-                tripCollection.whereNotEqualTo(appContext.getString(R.string.collection_trip_document_field_creator), userID)
+                tripCollection.whereNotEqualTo(
+                    appContext.getString(R.string.collection_trip_document_field_creator),
+                    userID
+                )
             val tripsQuerySnapshot =
-                tripsQuery.whereArrayContains(appContext.getString(R.string.collection_trip_document_field_members), userID)
+                tripsQuery.whereArrayContains(
+                    appContext.getString(R.string.collection_trip_document_field_members),
+                    userID
+                )
                     .get(source).await()
             if (!tripsQuerySnapshot.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
@@ -313,7 +363,8 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID).set(newUser).await()
+            remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                .document(userID).set(newUser).await()
             DataResult.Success(FirebaseSuccessMessages.USER_UPDATED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -326,12 +377,23 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
-            userDocRef.update(appContext.getString(R.string.collection_users_document_field_first_name), newName.firstName)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
+            userDocRef.update(
+                appContext.getString(R.string.collection_users_document_field_first_name),
+                newName.firstName
+            )
                 .await()
-            userDocRef.update(appContext.getString(R.string.collection_users_document_field_middle_name), newName.middleName)
+            userDocRef.update(
+                appContext.getString(R.string.collection_users_document_field_middle_name),
+                newName.middleName
+            )
                 .await()
-            userDocRef.update(appContext.getString(R.string.collection_users_document_field_last_name), newName.lastName).await()
+            userDocRef.update(
+                appContext.getString(R.string.collection_users_document_field_last_name),
+                newName.lastName
+            ).await()
             DataResult.Success(FirebaseSuccessMessages.USER_NAME_UPDATED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -344,8 +406,13 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
-            userDocRef.update(appContext.getString(R.string.collection_users_document_field_age), newAge).await()
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
+            userDocRef.update(
+                appContext.getString(R.string.collection_users_document_field_age),
+                newAge
+            ).await()
             DataResult.Success(FirebaseSuccessMessages.USER_AGE_UPDATED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -361,14 +428,20 @@ class RemoteUserDaoImpl @Inject constructor(
             when (val checkNicknameResult = checkNickname(newNickname)) {
                 is DataResult.Success -> {
                     if (checkNicknameResult.data) {
-                        val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
-                        userDocRef.update(appContext.getString(R.string.collection_users_document_field_nickname), newNickname)
+                        val userDocRef =
+                            remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                                .document(userID)
+                        userDocRef.update(
+                            appContext.getString(R.string.collection_users_document_field_nickname),
+                            newNickname
+                        )
                             .await()
                         DataResult.Success(FirebaseSuccessMessages.USER_NICKNAME_UPDATED)
                     } else {
                         DataErrorHandler.handle(FirebaseNicknameException())
                     }
                 }
+
                 is DataResult.Error -> {
                     checkNicknameResult
                 }
@@ -384,7 +457,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val batch = remoteDataSource.db.batch()
 
             batch.update(
@@ -423,7 +498,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val batch = remoteDataSource.db.batch()
 
             batch.update(
@@ -451,7 +528,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val batch = remoteDataSource.db.batch()
 
             batch.update(
@@ -478,7 +557,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val batch = remoteDataSource.db.batch()
 
             batch.update(
@@ -505,7 +586,9 @@ class RemoteUserDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val batch = remoteDataSource.db.batch()
 
             batch.update(
@@ -535,7 +618,10 @@ class RemoteUserDaoImpl @Inject constructor(
         return try {
             val checkNicknameQuerySnapshot =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
-                    .whereEqualTo(appContext.getString(R.string.collection_users_document_field_nickname), nickname)
+                    .whereEqualTo(
+                        appContext.getString(R.string.collection_users_document_field_nickname),
+                        nickname
+                    )
                     .get(source).await()
             DataResult.Success(checkNicknameQuerySnapshot.isEmpty)
         } catch (e: Exception) {

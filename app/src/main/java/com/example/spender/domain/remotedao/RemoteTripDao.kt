@@ -4,7 +4,6 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.User
 import com.google.firebase.firestore.Source
 
 interface RemoteTripDao {

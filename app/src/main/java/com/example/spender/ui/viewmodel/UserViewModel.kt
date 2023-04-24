@@ -22,10 +22,10 @@ class UserViewModel @Inject constructor(
     private val _getUserDataResult = MutableLiveData<DataResult<User>>()
     val getUserDataResult: LiveData<DataResult<User>> = _getUserDataResult
 
-    fun getUser(userID: String? = null) {
+    fun getUser() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserDataResult.postValue(
-                repository.get().getUser(userID)
+                repository.get().getUser()
             )
         }
     }
@@ -34,10 +34,10 @@ class UserViewModel @Inject constructor(
     val getUserNameDataResult: LiveData<DataResult<UserName>> =
         _getUserNameDataResult
 
-    fun getUserName(userID: String? = null) {
+    fun getUserName() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNameDataResult.postValue(
-                repository.get().getUserName(userID)
+                repository.get().getUserName()
             )
         }
     }
@@ -46,10 +46,10 @@ class UserViewModel @Inject constructor(
     val getUserAgeDataResult: LiveData<DataResult<Long>> =
         _getUserAgeDataResult
 
-    fun getUserAge(userID: String? = null) {
+    fun getUserAge() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserAgeDataResult.postValue(
-                repository.get().getUserAge(userID)
+                repository.get().getUserAge()
             )
         }
     }
@@ -58,10 +58,10 @@ class UserViewModel @Inject constructor(
     val getUserNicknameDataResult: LiveData<DataResult<String>> =
         _getUserNicknameDataResult
 
-    fun getUserNickname(userID: String? = null) {
+    fun getUserNickname() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNicknameDataResult.postValue(
-                repository.get().getUserNickname(userID)
+                repository.get().getUserNickname()
             )
         }
     }
@@ -71,10 +71,10 @@ class UserViewModel @Inject constructor(
     val getUserIncomingFriendsDataResult: LiveData<DataResult<List<Friend>>> =
         _getUserIncomingFriendsDataResult
 
-    fun getUserIncomingFriends(userID: String? = null) {
+    fun getUserIncomingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserIncomingFriendsDataResult.postValue(
-                repository.get().getUserFriends(userID)
+                repository.get().getUserFriends()
             )
         }
     }
@@ -84,10 +84,10 @@ class UserViewModel @Inject constructor(
     val getUserOutgoingFriendsDataResult: LiveData<DataResult<List<Friend>>> =
         _getUserOutgoingFriendsDataResult
 
-    fun getUserOutgoingFriends(userID: String? = null) {
+    fun getUserOutgoingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserOutgoingFriendsDataResult.postValue(
-                repository.get().getUserOutgoingFriends(userID)
+                repository.get().getUserOutgoingFriends()
             )
         }
     }
@@ -97,10 +97,10 @@ class UserViewModel @Inject constructor(
     val getUserFriendsDataResult: LiveData<DataResult<List<Friend>>> =
         _getUserFriendsDataResult
 
-    fun getUserFriends(userID: String? = null) {
+    fun getUserFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserFriendsDataResult.postValue(
-                repository.get().getUserFriends(userID)
+                repository.get().getUserFriends()
             )
         }
     }
@@ -110,10 +110,10 @@ class UserViewModel @Inject constructor(
     val getUserTripsDataResult: LiveData<DataResult<List<Trip>>> =
         _getUserTripsDataResult
 
-    fun getUserTrips(userID: String? = null) {
+    fun getUserTrips() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserTripsDataResult.postValue(
-                repository.get().getUserTrips(userID)
+                repository.get().getUserTrips()
             )
         }
     }
@@ -123,10 +123,10 @@ class UserViewModel @Inject constructor(
     val getUserAdminTripsDataResult: LiveData<DataResult<List<Trip>>> =
         _getUserAdminTripsDataResult
 
-    fun getUserAdminTrips(userID: String? = null) {
+    fun getUserAdminTrips() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserAdminTripsDataResult.postValue(
-                repository.get().getUserAdminTrips(userID)
+                repository.get().getUserAdminTrips()
             )
         }
     }
@@ -136,10 +136,10 @@ class UserViewModel @Inject constructor(
     val getUserPassengerTripsDataResult: LiveData<DataResult<List<Trip>>> =
         _getUserPassengerTripsDataResult
 
-    fun getUserPassengerTrips(userID: String? = null) {
+    fun getUserPassengerTrips() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserPassengerTripsDataResult.postValue(
-                repository.get().getUserPassengerTrips(userID)
+                repository.get().getUserPassengerTrips()
             )
         }
     }
@@ -148,10 +148,10 @@ class UserViewModel @Inject constructor(
     val updateUserDataResult: LiveData<DataResult<String>> =
         _updateUserDataResult
 
-    fun updateUser(userID: String? = null, newUser: User) {
+    fun updateUser(newUser: User) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserDataResult.postValue(
-                repository.get().updateUser(userID, newUser)
+                repository.get().updateUser(newUser)
             )
         }
     }
@@ -160,10 +160,10 @@ class UserViewModel @Inject constructor(
     val updateUserNameDataResult: LiveData<DataResult<String>> =
         _updateUserNameDataResult
 
-    fun updateUserName(userID: String? = null, newName: UserName) {
+    fun updateUserName(newName: UserName) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserNameDataResult.postValue(
-                repository.get().updateUserName(userID, newName)
+                repository.get().updateUserName(newName)
             )
         }
     }
@@ -172,10 +172,10 @@ class UserViewModel @Inject constructor(
     val updateUserAgeDataResult: LiveData<DataResult<String>> =
         _updateUserAgeDataResult
 
-    fun updateUserAge(userID: String? = null, newAge: Int) {
+    fun updateUserAge(newAge: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserAgeDataResult.postValue(
-                repository.get().updateUserAge(userID, newAge)
+                repository.get().updateUserAge(newAge)
             )
         }
     }
@@ -185,10 +185,10 @@ class UserViewModel @Inject constructor(
     val updateUserNicknameDataResult: LiveData<DataResult<String>> =
         _updateUserNicknameDataResult
 
-    fun updateUserNickname(userID: String? = null, newNickname: String) {
+    fun updateUserNickname(newNickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateUserNicknameDataResult.postValue(
-                repository.get().updateUserNickname(userID, newNickname)
+                repository.get().updateUserNickname(newNickname)
             )
         }
     }
@@ -198,10 +198,10 @@ class UserViewModel @Inject constructor(
     val addUserOutgoingFriendDataResult: LiveData<DataResult<String>> =
         _addUserOutgoingFriendDataResult
 
-    fun addUserOutgoingFriend(userID: String? = null, friend: Friend) {
+    fun addUserOutgoingFriend(friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _addUserOutgoingFriendDataResult.postValue(
-                repository.get().addUserOutgoingFriend(userID, friend)
+                repository.get().addUserOutgoingFriend(friend)
             )
         }
     }
@@ -211,10 +211,10 @@ class UserViewModel @Inject constructor(
     val addUserIncomingFriendDataResult: LiveData<DataResult<String>> =
         _addUserIncomingFriendDataResult
 
-    fun addUserIncomingFriend(userID: String? = null, friend: Friend) {
+    fun addUserIncomingFriend(friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _addUserIncomingFriendDataResult.postValue(
-                repository.get().addUserIncomingFriend(userID, friend)
+                repository.get().addUserIncomingFriend(friend)
             )
         }
     }
@@ -223,10 +223,10 @@ class UserViewModel @Inject constructor(
     val removeUserFriendDataResult: LiveData<DataResult<String>> =
         _removeUserFriendDataResult
 
-    fun removeUserFriend(userID: String? = null, friend: Friend) {
+    fun removeUserFriend(friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserFriendDataResult.postValue(
-                repository.get().removeUserFriend(userID, friend)
+                repository.get().removeUserFriend(friend)
             )
         }
     }
@@ -236,10 +236,10 @@ class UserViewModel @Inject constructor(
     val removeUserOutgoingFriendDataResult: LiveData<DataResult<String>> =
         _removeUserOutgoingFriendDataResult
 
-    fun removeUserOutgoingFriend(userID: String? = null, friend: Friend) {
+    fun removeUserOutgoingFriend(friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserOutgoingFriendDataResult.postValue(
-                repository.get().removeUserOutgoingFriend(userID, friend)
+                repository.get().removeUserOutgoingFriend(friend)
             )
         }
     }
@@ -249,10 +249,10 @@ class UserViewModel @Inject constructor(
     val removeUserIncomingFriendDataResult: LiveData<DataResult<String>> =
         _removeUserIncomingFriendDataResult
 
-    fun removeUserIncomingFriend(userID: String? = null, friend: Friend) {
+    fun removeUserIncomingFriend(friend: Friend) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeUserIncomingFriendDataResult.postValue(
-                repository.get().removeUserIncomingFriend(userID, friend)
+                repository.get().removeUserIncomingFriend(friend)
             )
         }
     }

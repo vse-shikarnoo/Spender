@@ -28,11 +28,9 @@ class RemoteUserDaoImpl @Inject constructor(
 ) : RemoteUserDao {
     override var source: Source = Source.SERVER
 
-    override suspend fun getUser(
-        userId: String?
-    ): DataResult<User> {
+    override suspend fun getUser(): DataResult<User> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
 
             val userDocumentSnapshot =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
@@ -42,7 +40,7 @@ class RemoteUserDaoImpl @Inject constructor(
             if (name is DataResult.Error) {
                 return name
             }
-            val age = getUserAge(userID)
+            val age = getUserAge()
             if (age is DataResult.Error) {
                 return age
             }
@@ -50,23 +48,23 @@ class RemoteUserDaoImpl @Inject constructor(
             if (nickname is DataResult.Error) {
                 return nickname
             }
-            val incomingFriends = getUserIncomingFriends(userID)
+            val incomingFriends = getUserIncomingFriends()
             if (incomingFriends is DataResult.Error) {
                 return incomingFriends
             }
-            val outgoingFriends = getUserOutgoingFriends(userID)
+            val outgoingFriends = getUserOutgoingFriends()
             if (outgoingFriends is DataResult.Error) {
                 return outgoingFriends
             }
-            val friends = getUserFriends(userID)
+            val friends = getUserFriends()
             if (friends is DataResult.Error) {
                 return friends
             }
-            val adminTrips = getUserAdminTrips(userID)
+            val adminTrips = getUserAdminTrips()
             if (adminTrips is DataResult.Error) {
                 return adminTrips
             }
-            val passengerTrips = getUserPassengerTrips(userID)
+            val passengerTrips = getUserPassengerTrips()
             if (passengerTrips is DataResult.Error) {
                 return passengerTrips
             }
@@ -90,9 +88,7 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserName(
-        userId: String?
-    ): DataResult<UserName> {
+    override suspend fun getUserName(userId: String?): DataResult<UserName> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
@@ -110,11 +106,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserAge(
-        userId: String?
-    ): DataResult<Long> {
+    override suspend fun getUserAge(): DataResult<Long> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -126,9 +120,7 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserNickname(
-        userId: String?
-    ): DataResult<String> {
+    override suspend fun getUserNickname(userId: String?): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
@@ -143,11 +135,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserIncomingFriends(
-        userId: String?
-    ): DataResult<List<Friend>> {
+    override suspend fun getUserIncomingFriends(): DataResult<List<Friend>> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -186,11 +176,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserOutgoingFriends(
-        userId: String?
-    ): DataResult<List<Friend>> {
+    override suspend fun getUserOutgoingFriends(): DataResult<List<Friend>> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -229,11 +217,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserFriends(
-        userId: String?
-    ): DataResult<List<Friend>> {
+    override suspend fun getUserFriends(): DataResult<List<Friend>> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -272,11 +258,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserTrips(
-        userId: String?
-    ): DataResult<List<Trip>> {
+    override suspend fun getUserTrips(): DataResult<List<Trip>> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val tripCollection: CollectionReference =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuerySnapshot =
@@ -298,11 +282,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserAdminTrips(
-        userId: String?
-    ): DataResult<List<Trip>> {
+    override suspend fun getUserAdminTrips(): DataResult<List<Trip>> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val tripCollection: CollectionReference =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuery =
@@ -325,11 +307,9 @@ class RemoteUserDaoImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserPassengerTrips(
-        userId: String?
-    ): DataResult<List<Trip>> {
+    override suspend fun getUserPassengerTrips(): DataResult<List<Trip>> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val tripCollection: CollectionReference =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuery =
@@ -358,11 +338,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun updateUser(
-        userId: String?,
         newUser: User
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                 .document(userID).set(newUser).await()
             DataResult.Success(FirebaseSuccessMessages.USER_UPDATED)
@@ -372,11 +351,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun updateUserName(
-        userId: String?,
         newName: UserName
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -401,11 +379,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun updateUserAge(
-        userId: String?,
         newAge: Int,
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -420,11 +397,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun updateUserNickname(
-        userId: String?,
         newNickname: String,
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             when (val checkNicknameResult = checkNickname(newNickname)) {
                 is DataResult.Success -> {
                     if (checkNicknameResult.data) {
@@ -452,11 +428,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun addUserIncomingFriend(
-        userId: String?,
         friend: Friend,
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -493,11 +468,10 @@ class RemoteUserDaoImpl @Inject constructor(
 
 
     override suspend fun addUserOutgoingFriend(
-        userId: String?,
         friend: Friend,
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -523,11 +497,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun removeUserFriend(
-        userId: String?,
         friend: Friend,
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -552,11 +525,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun removeUserOutgoingFriend(
-        userId: String?,
         friend: Friend
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)
@@ -581,11 +553,10 @@ class RemoteUserDaoImpl @Inject constructor(
     }
 
     override suspend fun removeUserIncomingFriend(
-        userId: String?,
         friend: Friend
     ): DataResult<String> {
         return try {
-            val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
+            val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
                     .document(userID)

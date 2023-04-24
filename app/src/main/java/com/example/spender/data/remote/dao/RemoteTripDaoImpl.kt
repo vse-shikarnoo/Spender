@@ -29,33 +29,36 @@ class RemoteTripDaoImpl @Inject constructor(
     ): DataResult<String> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val batch = remoteDataSource.db.batch()
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
             val newTripDocRef =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
-                    .document()
-            val membersFirebase = ArrayList<DocumentReference>()
-            members.forEach { member ->
-                membersFirebase.add(member.docRef)
+                    .document().get().await().reference
+            val membersFirebase = buildList {
+                members.forEach { member ->
+                    this.add(member.docRef)
+                }
+                this.add(userDocRef)
             }
 
-            batch.set(
-                newTripDocRef,
+            newTripDocRef.set(
                 mapOf(
                     appContext.getString(R.string.collection_trip_document_field_name) to name,
-                    appContext.getString(R.string.collection_trip_document_field_creator) to userID,
-                    appContext.getString(R.string.collection_trip_document_field_members) to membersFirebase
+                    appContext.getString(R.string.collection_trip_document_field_creator) to userDocRef,
+                    appContext.getString(R.string.collection_trip_document_field_members) to FieldValue.arrayUnion(
+                        *membersFirebase.toTypedArray()
+                    )
                 )
-            )
+            ).await()
 
-            members.forEach { member ->
-                batch.update(
-                    member.docRef,
+            membersFirebase.forEach { docRef ->
+                docRef.update(
                     appContext.getString(R.string.collection_users_document_field_trips),
                     FieldValue.arrayUnion(newTripDocRef)
-                )
+                ).await()
             }
 
-            batch.commit().await()
             DataResult.Success(FirebaseSuccessMessages.TRIP_CREATED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)

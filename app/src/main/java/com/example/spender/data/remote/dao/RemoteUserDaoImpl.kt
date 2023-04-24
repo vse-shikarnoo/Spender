@@ -261,17 +261,22 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun getUserTrips(): DataResult<List<Trip>> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
+            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
             val tripCollection: CollectionReference =
                 remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
             val tripsQuerySnapshot =
                 tripCollection.whereArrayContains(
                     appContext.getString(R.string.collection_trip_document_field_members),
-                    userID
+                    userDocRef
                 ).get(source).await()
             if (!tripsQuerySnapshot.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
                 tripsQuerySnapshot.documents.forEach { tripDocSnapshot ->
-                    lst.add(tripDocSnapshot.toObject(Trip::class.java)!!)
+                    val trip = getTrip(tripDocSnapshot.reference)
+                    if (trip is DataResult.Error) {
+                        return trip
+                    }
+                    lst.add((trip as DataResult.Success).data)
                 }
                 DataResult.Success(lst)
             } else {
@@ -296,7 +301,11 @@ class RemoteUserDaoImpl @Inject constructor(
             if (!tripsQuery.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
                 tripsQuery.documents.forEach { tripDocSnapshot ->
-                    lst.add(tripDocSnapshot.toObject(Trip::class.java)!!)
+                    val trip = getTrip(tripDocSnapshot.reference)
+                    if (trip is DataResult.Error) {
+                        return trip
+                    }
+                    lst.add((trip as DataResult.Success).data)
                 }
                 DataResult.Success(lst)
             } else {
@@ -326,7 +335,11 @@ class RemoteUserDaoImpl @Inject constructor(
             if (!tripsQuerySnapshot.isEmpty) {
                 val lst: MutableList<Trip> = mutableListOf()
                 tripsQuerySnapshot.documents.forEach { tripDocSnapshot ->
-                    lst.add(tripDocSnapshot.toObject(Trip::class.java)!!)
+                    val trip = getTrip(tripDocSnapshot.reference)
+                    if (trip is DataResult.Error) {
+                        return trip
+                    }
+                    lst.add((trip as DataResult.Success).data)
                 }
                 DataResult.Success(lst)
             } else {
@@ -595,6 +608,69 @@ class RemoteUserDaoImpl @Inject constructor(
                     )
                     .get(source).await()
             DataResult.Success(checkNicknameQuerySnapshot.isEmpty)
+        } catch (e: Exception) {
+            DataErrorHandler.handle(e)
+        }
+    }
+
+    override suspend fun getTrip(tripDocRef: DocumentReference): DataResult<Trip> {
+        return try {
+            val tripDocSnapshot = tripDocRef.get(source).await()
+
+            val tripCreatorDocRef = tripDocSnapshot.get(
+                appContext.getString(R.string.collection_trip_document_field_creator)
+            ) as DocumentReference
+            val tripCreatorName = getUserName(tripCreatorDocRef.id)
+            val tripCreatorNickname = getUserNickname(tripCreatorDocRef.id)
+            if (tripCreatorName is DataResult.Error) {
+                return tripCreatorName
+            }
+            if (tripCreatorNickname is DataResult.Error) {
+                return tripCreatorNickname
+            }
+            val tripCreator = Friend(
+                (tripCreatorName as DataResult.Success).data,
+                (tripCreatorNickname as DataResult.Success).data,
+                tripCreatorDocRef
+            )
+
+            val tripName = tripDocSnapshot.get(
+                appContext.getString(R.string.collection_trip_document_field_name)
+            ) as String
+
+            val tripMembersSnapshot = tripDocSnapshot.get(
+                appContext.getString(R.string.collection_trip_document_field_members)
+            ) as ArrayList<DocumentReference>?
+
+            val tripMembers = mutableListOf<Friend>()
+            if (tripMembersSnapshot != null) {
+                for (tripMemberDocRef in tripMembersSnapshot) {
+                    val tripMemberName = getUserName(tripMemberDocRef.id)
+                    val tripMemberNickname = getUserNickname(tripMemberDocRef.id)
+                    if (tripMemberName is DataResult.Error) {
+                        return tripMemberName
+                    }
+                    if (tripMemberNickname is DataResult.Error) {
+                        return tripMemberNickname
+                    }
+                    val tripMember = Friend(
+                        (tripMemberName as DataResult.Success).data,
+                        (tripMemberNickname as DataResult.Success).data,
+                        tripMemberDocRef
+                    )
+                    tripMembers.add(tripMember)
+                }
+            }
+
+            DataResult.Success(
+                Trip(
+                    tripName,
+                    tripCreator,
+                    tripMembers,
+                    emptyList(),
+                    tripDocRef
+                )
+            )
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }

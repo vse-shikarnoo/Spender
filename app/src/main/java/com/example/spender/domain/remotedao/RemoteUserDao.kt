@@ -5,6 +5,7 @@ import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Source
 
 interface RemoteUserDao {
@@ -30,4 +31,5 @@ interface RemoteUserDao {
     suspend fun removeUserOutgoingFriend(friend: Friend): DataResult<String>
     suspend fun removeUserIncomingFriend(friend: Friend): DataResult<String>
     suspend fun checkNickname(nickname: String): DataResult<Boolean>
+    suspend fun getTrip(tripDocRef: DocumentReference): DataResult<Trip>
 }

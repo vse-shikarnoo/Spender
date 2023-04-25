@@ -14,24 +14,28 @@ annotation class BottomNavGraph(
     val start: Boolean = false
 )
 
-@BottomNavGraph(start = true)
+@RootNavGraph
+@BottomNavGraph
 @com.ramcosta.composedestinations.annotation.NavGraph
 annotation class BalanceNavGraph(
     val start: Boolean = false
 )
 
+@RootNavGraph
 @BottomNavGraph
 @com.ramcosta.composedestinations.annotation.NavGraph
 annotation class RideMapNavGraph(
     val start: Boolean = false
 )
 
+@RootNavGraph
 @BottomNavGraph
 @com.ramcosta.composedestinations.annotation.NavGraph
 annotation class CreateRideNavGraph(
     val start: Boolean = false
 )
 
+@RootNavGraph
 @BottomNavGraph
 @com.ramcosta.composedestinations.annotation.NavGraph
 annotation class ProfileNavGraph(

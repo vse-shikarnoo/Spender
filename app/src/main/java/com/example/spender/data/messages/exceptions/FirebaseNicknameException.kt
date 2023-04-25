@@ -1,5 +1,5 @@
 package com.example.spender.data.messages.exceptions
 
-class FirebaseNicknameException: Exception() {
+class FirebaseNicknameException : Exception() {
     override val message = "Nickname is taken"
 }

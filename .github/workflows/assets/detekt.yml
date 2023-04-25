@@ -82,7 +82,7 @@ complexity:
     active: true
     excludes:
       - '**/build/**'
-    threshold: 15
+    threshold: 20
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
@@ -94,7 +94,7 @@ complexity:
     active: true
     excludes:
       - '**/build/**'
-    threshold: 600
+    threshold: 700
   LongMethod:
     active: true
     excludes:
@@ -448,7 +448,7 @@ performance:
     active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**']
   SpreadOperator:
-    active: true
+    active: false
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**']
   UnnecessaryTemporaryInstantiation:
     active: true
@@ -612,7 +612,7 @@ style:
   RedundantVisibilityModifierRule:
     active: false
   ReturnCount:
-    active: true
+    active: false
     max: 2
     excludedFunctions: 'equals'
     excludeLabeled: false

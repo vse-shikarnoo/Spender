@@ -20,12 +20,33 @@ interface RemoteSpendDao {
         members: List<SpendMember>,
     ): DataResult<String>
 
-    suspend fun updateSpendName(spendDocRef: DocumentReference, newName: String): DataResult<String>
-    suspend fun updateSpendCategory(spendDocRef: DocumentReference, newCategory: String): DataResult<String>
-    suspend fun updateSpendSplitMode(spendDocRef: DocumentReference, newSplitMode: Int): DataResult<String>
-    suspend fun updateSpendAmount(spendDocRef: DocumentReference, newAmount: Double): DataResult<String>
-    suspend fun updateSpendGeoPoint(spendDocRef: DocumentReference, newGeoPoint: GeoPoint): DataResult<String>
-    suspend fun addSpendMembers(spendDocRef: DocumentReference, newMembers: List<SpendMember>): DataResult<String>
-    suspend fun deleteSpendMembers(spendDocRef: DocumentReference, members: List<SpendMember>): DataResult<String>
+    suspend fun updateSpendName(
+        spendDocRef: DocumentReference,
+        newName: String
+    ): DataResult<String>
+    suspend fun updateSpendCategory(
+        spendDocRef: DocumentReference,
+        newCategory: String
+    ): DataResult<String>
+    suspend fun updateSpendSplitMode(
+        spendDocRef: DocumentReference,
+        newSplitMode: Int
+    ): DataResult<String>
+    suspend fun updateSpendAmount(
+        spendDocRef: DocumentReference,
+        newAmount: Double
+    ): DataResult<String>
+    suspend fun updateSpendGeoPoint(
+        spendDocRef: DocumentReference,
+        newGeoPoint: GeoPoint
+    ): DataResult<String>
+    suspend fun addSpendMembers(
+        spendDocRef: DocumentReference,
+        newMembers: List<SpendMember>
+    ): DataResult<String>
+    suspend fun deleteSpendMembers(
+        spendDocRef: DocumentReference,
+        members: List<SpendMember>
+    ): DataResult<String>
     suspend fun deleteSpend(trip: Trip): DataResult<String>
 }

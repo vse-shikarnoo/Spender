@@ -12,9 +12,9 @@ import com.example.spender.domain.repository.SpendRepository
 import com.example.spender.domain.usecases.interfaces.SpendUpdateUseCase
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class SpendViewModel @Inject constructor(

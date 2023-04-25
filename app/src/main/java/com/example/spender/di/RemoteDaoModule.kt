@@ -1,10 +1,10 @@
 package com.example.spender.di
 
-import com.example.spender.domain.remotedao.RemoteAuthDao
 import com.example.spender.data.remote.dao.RemoteAuthDaoImpl
 import com.example.spender.data.remote.dao.RemoteSpendDaoImpl
 import com.example.spender.data.remote.dao.RemoteTripDaoImpl
 import com.example.spender.data.remote.dao.RemoteUserDaoImpl
+import com.example.spender.domain.remotedao.RemoteAuthDao
 import com.example.spender.domain.remotedao.RemoteSpendDao
 import com.example.spender.domain.remotedao.RemoteTripDao
 import com.example.spender.domain.remotedao.RemoteUserDao

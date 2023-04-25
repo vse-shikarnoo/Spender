@@ -5,7 +5,6 @@ import com.example.spender.data.remote.dao.RemoteTripDaoImpl
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.User
 import com.example.spender.domain.repository.TripRepository
 import com.google.firebase.firestore.Source
 import javax.inject.Inject
@@ -13,7 +12,7 @@ import javax.inject.Inject
 class TripRepositoryImpl @Inject constructor(
     private val remoteTripDaoImplServer: RemoteTripDaoImpl,
     private val remoteTripDaoImplCache: RemoteTripDaoImpl
-): TripRepository {
+) : TripRepository {
     init {
         remoteTripDaoImplServer.source = Source.SERVER
         remoteTripDaoImplCache.source = Source.CACHE

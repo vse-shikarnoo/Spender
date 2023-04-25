@@ -1,8 +1,8 @@
 package com.example.spender.domain.repository
 
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.Trip
+import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
 

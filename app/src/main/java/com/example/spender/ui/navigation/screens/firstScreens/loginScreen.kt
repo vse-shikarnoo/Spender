@@ -20,13 +20,13 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.spender.ui.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.GreetingGroup
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.spenderTextFieldColors
+import com.example.spender.ui.viewmodel.AuthViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 

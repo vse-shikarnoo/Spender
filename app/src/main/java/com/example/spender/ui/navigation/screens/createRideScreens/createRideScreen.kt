@@ -53,9 +53,12 @@ fun CreateRideScreen(
         topBar = { CreateRideTopBar() },
         content = { CreateRideContent(it, userViewModel, tripViewModel, navigator) }
     )
-    LaunchedEffect(key1 = 1, block = {
-        userViewModel.getUserFriends()
-    })
+    LaunchedEffect(
+        key1 = 1,
+        block = {
+            userViewModel.getUserFriends()
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,7 +131,7 @@ fun AddFriendsList(
     val addedFriends = mutableListOf<Friend>()
     var addFriend by remember { mutableStateOf(false) }
     var friendsLst = emptyList<Friend>()
-    viewModelResultHandler(friends, { friendsLst = it },)
+    viewModelResultHandler(friends, { friendsLst = it })
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

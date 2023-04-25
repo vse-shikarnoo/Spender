@@ -34,7 +34,7 @@ fun BottomBarScreen() {
             DestinationsNavHost(
                 navController = navController,
                 navGraph = NavGraphs.bottom,
-                dependenciesContainerBuilder = { //this: DependenciesContainerBuilder<*>
+                dependenciesContainerBuilder = { // this: DependenciesContainerBuilder<*>
                     // 👇 To tie ActivityViewModel to the activity, making it available to all destinations
                     dependency(hiltViewModel<AuthViewModel>(LocalContext.current.findActivity()!!))
                     dependency(hiltViewModel<UserViewModel>(LocalContext.current.findActivity()!!))

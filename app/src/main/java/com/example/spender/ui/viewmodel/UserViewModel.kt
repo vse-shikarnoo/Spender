@@ -12,9 +12,9 @@ import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
 import com.example.spender.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(

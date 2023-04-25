@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class SpendUpdateUseCaseImpl @Inject constructor(
     private val spendRepository: dagger.Lazy<SpendRepository>
-): SpendUpdateUseCase {
+) : SpendUpdateUseCase {
     override suspend operator fun invoke(oldSpend: Spend, newSpend: Spend): DataResult<String> {
         if (oldSpend.name != newSpend.name) {
             val result = spendRepository.get().updateSpendName(newSpend.docRef, newSpend.name)

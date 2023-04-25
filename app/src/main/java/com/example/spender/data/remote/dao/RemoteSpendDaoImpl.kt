@@ -6,19 +6,19 @@ import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.remotedao.RemoteSpendDao
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.SpendMember
+import com.example.spender.domain.remotedao.RemoteSpendDao
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Source
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlinx.coroutines.tasks.await
 
 class RemoteSpendDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
-): RemoteSpendDao {
+) : RemoteSpendDao {
     override var source: Source = Source.SERVER
 
     override suspend fun createSpend(
@@ -39,8 +39,10 @@ class RemoteSpendDaoImpl @Inject constructor(
                 newSpendDocRef,
                 mapOf(
                     appContext.getString(R.string.collection_spends_document_field_name) to name,
-                    appContext.getString(R.string.collection_spends_document_field_category) to category,
-                    appContext.getString(R.string.collection_spends_document_field_split_mode) to splitMode,
+                    appContext.getString(R.string.collection_spends_document_field_category)
+                        to category,
+                    appContext.getString(R.string.collection_spends_document_field_split_mode)
+                        to splitMode,
                     appContext.getString(R.string.collection_spends_document_field_amount) to amount,
                     appContext.getString(R.string.collection_spends_document_field_geo) to geoPoint,
                 )
@@ -143,7 +145,9 @@ class RemoteSpendDaoImpl @Inject constructor(
             val batch = remoteDataSource.db.batch()
             newMembers.forEach { newMember ->
                 val newSpendMemberDocRef =
-                    spendDocRef.collection(appContext.getString(R.string.collection_name_spend_member))
+                    spendDocRef.collection(
+                        appContext.getString(R.string.collection_name_spend_member)
+                    )
                         .document(newMember.friend.docRef.toString())
 
                 val arrayList = arrayListOf<HashMap<String, Double>>()
@@ -156,12 +160,14 @@ class RemoteSpendDaoImpl @Inject constructor(
                 batch.set(
                     newSpendMemberDocRef,
                     mapOf(
-                        appContext.getString(R.string.collection_spend_member_document_field_payment) to
-                                newMember.payment,
-                        appContext.getString(R.string.collection_spend_member_document_field_member) to
-                                newMember.friend.docRef,
-                        appContext.getString(R.string.collection_spend_member_document_field_debt) to
-                                arrayList
+                        appContext.getString(
+                            R.string.collection_spend_member_document_field_payment
+                        ) to
+                            newMember.payment,
+                        appContext.getString(R.string.collection_spend_member_document_field_member)
+                            to newMember.friend.docRef,
+                        appContext.getString(R.string.collection_spend_member_document_field_debt)
+                            to arrayList
                     )
                 )
             }
@@ -196,7 +202,9 @@ class RemoteSpendDaoImpl @Inject constructor(
         return try {
             val batch = remoteDataSource.db.batch()
             val spendCollectionRef =
-                trip.docRef.collection(appContext.getString(R.string.collection_name_spends)).get(source)
+                trip.docRef.collection(appContext.getString(R.string.collection_name_spends)).get(
+                    source
+                )
                     .await()
 
             spendCollectionRef.documents.forEach { document ->

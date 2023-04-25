@@ -2,20 +2,18 @@ package com.example.spender.data.remote.dao
 
 import android.app.Application
 import com.example.spender.R
-import com.example.spender.data.DataResult
 import com.example.spender.data.DataErrorHandler
+import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.remotedao.RemoteTripDao
-import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
-import com.example.spender.domain.model.user.User
-import com.google.firebase.firestore.DocumentReference
+import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.remotedao.RemoteTripDao
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlinx.coroutines.tasks.await
 
 class RemoteTripDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
@@ -45,10 +43,12 @@ class RemoteTripDaoImpl @Inject constructor(
             newTripDocRef.set(
                 mapOf(
                     appContext.getString(R.string.collection_trip_document_field_name) to name,
-                    appContext.getString(R.string.collection_trip_document_field_creator) to userDocRef,
-                    appContext.getString(R.string.collection_trip_document_field_members) to FieldValue.arrayUnion(
-                        *membersFirebase.toTypedArray()
-                    )
+                    appContext.getString(R.string.collection_trip_document_field_creator) to
+                        userDocRef,
+                    appContext.getString(R.string.collection_trip_document_field_members) to
+                        FieldValue.arrayUnion(
+                            *membersFirebase.toTypedArray()
+                        )
                 )
             ).await()
 
@@ -119,7 +119,9 @@ class RemoteTripDaoImpl @Inject constructor(
 
     override suspend fun addTripSpend(trip: Trip, spend: Spend): DataResult<String> {
         return try {
-            trip.docRef.collection(appContext.getString(R.string.collection_trip_document_field_spends))
+            trip.docRef.collection(
+                appContext.getString(R.string.collection_trip_document_field_spends)
+            )
                 .document()
                 .set(spend).await()
             DataResult.Success(FirebaseSuccessMessages.TRIP_SPEND_ADDED)

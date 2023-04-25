@@ -8,17 +8,16 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.User
 import com.example.spender.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class TripViewModel @Inject constructor(
     private val repository: dagger.Lazy<TripRepository>
-): ViewModel() {
+) : ViewModel() {
     private val _createTripDataResult = MutableLiveData<DataResult<String>>()
     val createTripDataResult: LiveData<DataResult<String>> =
         _createTripDataResult

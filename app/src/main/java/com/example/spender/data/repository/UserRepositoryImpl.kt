@@ -8,9 +8,9 @@ import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
 import com.example.spender.domain.repository.UserRepository
 import com.google.firebase.firestore.Source
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val remoteUserDaoImplServer: RemoteUserDaoImpl,
@@ -140,5 +140,4 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun checkNickname(nickname: String): DataResult<Boolean> {
         return remoteUserDaoImplServer.checkNickname(nickname)
     }
-
 }

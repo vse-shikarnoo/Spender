@@ -72,12 +72,15 @@ fun ProfileScreen(
             )
         }
     )
-    LaunchedEffect(key1 = true, block = {
-        userViewModel.getUserFriends()
-        userViewModel.getUserIncomingFriends()
-        userViewModel.getUserOutgoingFriends()
-        userViewModel.getUserNickname()
-    })
+    LaunchedEffect(
+        key1 = true,
+        block = {
+            userViewModel.getUserFriends()
+            userViewModel.getUserIncomingFriends()
+            userViewModel.getUserOutgoingFriends()
+            userViewModel.getUserNickname()
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,7 +105,9 @@ fun ProfileScreenTopBar(
     TopAppBar(
         title = {
             Text(
-                userNickname, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                userNickname,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleMedium
             )
         },
@@ -177,7 +182,8 @@ fun FriendsList(
                     FriendsListTemplate("Incoming friend requests", it, userViewModel)
             },
         )
-        viewModelResultHandler(outgoingFriends,
+        viewModelResultHandler(
+            outgoingFriends,
             onSuccess = {
                 if (it.isNotEmpty())
                     FriendsListTemplate("Outgoing friend requests", it, userViewModel)
@@ -433,7 +439,8 @@ fun AddFriendGroup(
             )
         }
     }
-    viewModelResultHandler(addOutgoingFriend,
+    viewModelResultHandler(
+        addOutgoingFriend,
         onSuccess = { successMsg ->
             if (showSuccess) {
                 Toast.makeText(LocalContext.current, successMsg, Toast.LENGTH_LONG).show()

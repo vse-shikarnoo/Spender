@@ -6,10 +6,9 @@ import com.example.spender.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 
-
 class AuthRepositoryImpl @Inject constructor(
     private val remoteAuthDaoImpl: RemoteAuthDaoImpl
-): AuthRepository {
+) : AuthRepository {
     override suspend fun signIn(email: String, password: String): DataResult<String> {
         return remoteAuthDaoImpl.signIn(email, password)
     }

@@ -37,7 +37,7 @@ fun AppNavigation(
         ) {
             DestinationsNavHost(
                 navGraph = NavGraphs.root,
-                dependenciesContainerBuilder = { //this: DependenciesContainerBuilder<*>
+                dependenciesContainerBuilder = { // this: DependenciesContainerBuilder<*>
                     // 👇 To tie ActivityViewModel to the activity, making it available to all destinations
                     dependency(hiltViewModel<AuthViewModel>(activity))
                 }

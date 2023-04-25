@@ -47,9 +47,12 @@ fun BalanceScreen(
         topBar = { BalanceScreenTopBar() },
         content = { BalanceScreenContent(paddingValues = it, navigator, userViewModel) }
     )
-    LaunchedEffect(key1 = 1, block = {
-        userViewModel.getUserTrips()
-    })
+    LaunchedEffect(
+        key1 = 1,
+        block = {
+            userViewModel.getUserTrips()
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

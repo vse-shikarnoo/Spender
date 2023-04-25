@@ -1,4 +1,34 @@
 <resources>
     <string name="app_name">Spender</string>
     <string name="title_activity_main">MainActivity</string>
+
+    <string name="collection_name_users">Users</string>
+    <string name="collection_name_trips">Trips</string>
+    <string name="collection_name_spends">Spends</string>
+    <string name="collection_name_spend_member">SpendMember</string>
+
+    <string name="collection_users_document_field_first_name">firstName</string>
+    <string name="collection_users_document_field_middle_name">middleName</string>
+    <string name="collection_users_document_field_last_name">lastName</string>
+    <string name="collection_users_document_field_age">Age</string>
+    <string name="collection_users_document_field_nickname">Nickname</string>
+    <string name="collection_users_document_field_incoming_friends">IncomingFriends</string>
+    <string name="collection_users_document_field_outgoing_friends">OutgoingFriends</string>
+    <string name="collection_users_document_field_friends">Friends</string>
+    <string name="collection_users_document_field_trips">Trips</string>
+
+    <string name="collection_trip_document_field_name">Name</string>
+    <string name="collection_trip_document_field_creator">Creator</string>
+    <string name="collection_trip_document_field_members">Members</string>
+    <string name="collection_trip_document_field_spends">Spends</string>
+
+    <string name="collection_spends_document_field_name">Name</string>
+    <string name="collection_spends_document_field_category">Category</string>
+    <string name="collection_spends_document_field_split_mode">SplitMode</string>
+    <string name="collection_spends_document_field_amount">SpendAmount</string>
+    <string name="collection_spends_document_field_geo">SpendGeo</string>
+
+    <string name="collection_spend_member_document_field_member">Member</string>
+    <string name="collection_spend_member_document_field_payment">Payment</string>
+    <string name="collection_spend_member_document_field_debt">Debt</string>
 </resources>

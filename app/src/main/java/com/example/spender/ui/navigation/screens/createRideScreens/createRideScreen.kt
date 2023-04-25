@@ -26,11 +26,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.R
 import com.example.spender.data.DataResult
 import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.TestFriend
+import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.CreateRideNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
@@ -41,13 +40,14 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
+@BottomNavGraph
 @CreateRideNavGraph(start = true)
 @Destination
 @Composable
 fun CreateRideScreen(
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel = hiltViewModel(),
-    tripViewModel: TripViewModel = hiltViewModel()
+    userViewModel: UserViewModel,
+    tripViewModel: TripViewModel
 ) {
     var tripName by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
@@ -115,6 +115,7 @@ fun AddFriendsList(
     val friends = userViewModel.getUserFriendsDataResult.observeAsState()
     val friendsLst = getFriends(friends)
     val addedFriends = mutableListOf<Friend>()
+    var addFriend by remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -154,10 +155,13 @@ fun AddFriendsList(
                     friend = it,
                     button = {
                         Checkbox(
-                            checked = false,
+                            checked = addFriend,
                             onCheckedChange = { add ->
-                                if (add) {
+                                addFriend = add
+                                if (addFriend) {
                                     addedFriends.add(it)
+                                } else {
+                                    addedFriends.remove(it)
                                 }
                             },
                             colors = CheckboxDefaults.colors(
@@ -224,7 +228,7 @@ fun FriendCard(
                 modifier = Modifier.weight(4f)
             ) {
                 Text(
-                    friend.name.firstName + " " + friend.name.middleName + " " + friend.name.lastName,
+                    friend.nickname,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -242,12 +246,14 @@ fun CreateTripButton(
 ) {
     val context = LocalContext.current
     var error by remember { mutableStateOf("") }
+    var success by remember { mutableStateOf(false) }
     val createTripResult = tripViewModel.createTripDataResult.observeAsState()
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
                 tripViewModel.createTrip(tripName, friends)
                 error = ""
+                success = true
             },
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp
@@ -263,8 +269,12 @@ fun CreateTripButton(
     createTripResult.value?.let { dataResult ->
         when (dataResult) {
             is DataResult.Success -> {
-                navigator.navigate(BalanceScreenDestination)
+                if (success) {
+                    navigator.navigate(BalanceScreenDestination)
+                }
+                success = false
             }
+
             is DataResult.Error -> {
                 if (error != dataResult.exception) {
                     Toast.makeText(

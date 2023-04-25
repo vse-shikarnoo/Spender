@@ -1,24 +1,29 @@
 package com.example.spender.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
-import com.example.spender.domain.repository.UserRepository
+import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
-import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.user.UserName
+import com.example.spender.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val repository: dagger.Lazy<UserRepository>
 ) : ViewModel() {
+    init {
+        Log.d("ABOBA", "init viewModel")
+    }
+
     private val _getUserDataResult = MutableLiveData<DataResult<User>>()
     val getUserDataResult: LiveData<DataResult<User>> = _getUserDataResult
 
@@ -74,7 +79,7 @@ class UserViewModel @Inject constructor(
     fun getUserIncomingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserIncomingFriendsDataResult.postValue(
-                repository.get().getUserFriends()
+                repository.get().getUserIncomingFriends()
             )
         }
     }
@@ -198,10 +203,10 @@ class UserViewModel @Inject constructor(
     val addUserOutgoingFriendDataResult: LiveData<DataResult<String>> =
         _addUserOutgoingFriendDataResult
 
-    fun addUserOutgoingFriend(friend: Friend) {
+    fun addUserOutgoingFriend(nickname: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _addUserOutgoingFriendDataResult.postValue(
-                repository.get().addUserOutgoingFriend(friend)
+                repository.get().addUserOutgoingFriend(nickname)
             )
         }
     }

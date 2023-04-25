@@ -8,15 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.spender.ui.navigation.BalanceNavGraph
+import com.example.spender.ui.navigation.BottomNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@BottomNavGraph
 @BalanceNavGraph
 @Destination
 @Composable
-fun AddSpendingScreen(
-    navigator: DestinationsNavigator
-) {
+fun AddSpendingScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {

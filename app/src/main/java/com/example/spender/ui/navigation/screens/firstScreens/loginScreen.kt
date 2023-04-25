@@ -37,7 +37,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun LogInScreen(
     navigator: DestinationsNavigator,
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel
 ) {
     val context = LocalContext.current
 

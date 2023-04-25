@@ -71,7 +71,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserTrips(): DataResult<List<Trip>> {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             remoteUserDaoImplServer.getUserTrips()
         }
         return remoteUserDaoImplCache.getUserTrips()
@@ -116,9 +116,9 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addUserOutgoingFriend(
-        friend: Friend
+        nickname: String
     ): DataResult<String> {
-        return remoteUserDaoImplServer.addUserOutgoingFriend(friend)
+        return remoteUserDaoImplServer.addUserOutgoingFriend(nickname)
     }
 
     override suspend fun removeUserFriend(friend: Friend): DataResult<String> {

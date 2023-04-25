@@ -1,6 +1,7 @@
 package com.example.spender.di
 
-import com.example.spender.domain.usecases.SpendUpdateUseCase
+import com.example.spender.domain.usecases.interfaces.SpendUpdateUseCase
+import com.example.spender.domain.usecases.implementations.SpendUpdateUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,6 +15,6 @@ abstract class UseCaseModule {
     @Binds
     @Singleton
     abstract fun bindSpendUpdateUseCase(
-        spendUpdateUseCase: SpendUpdateUseCase
+        spendUpdateUseCaseImpl: SpendUpdateUseCaseImpl
     ): SpendUpdateUseCase
 }

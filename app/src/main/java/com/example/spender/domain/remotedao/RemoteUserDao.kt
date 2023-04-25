@@ -26,7 +26,7 @@ interface RemoteUserDao {
     suspend fun updateUserAge(newAge: Int): DataResult<String>
     suspend fun updateUserNickname(newNickname: String): DataResult<String>
     suspend fun addUserIncomingFriend(friend: Friend): DataResult<String>
-    suspend fun addUserOutgoingFriend(friend: Friend): DataResult<String>
+    suspend fun addUserOutgoingFriend(nickname: String): DataResult<String>
     suspend fun removeUserFriend(friend: Friend): DataResult<String>
     suspend fun removeUserOutgoingFriend(friend: Friend): DataResult<String>
     suspend fun removeUserIncomingFriend(friend: Friend): DataResult<String>

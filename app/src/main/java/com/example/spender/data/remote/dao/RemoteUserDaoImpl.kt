@@ -3,23 +3,28 @@ package com.example.spender.data.remote.dao
 import android.app.Application
 import android.util.Log
 import com.example.spender.R
-import com.example.spender.data.DataResult
 import com.example.spender.data.DataErrorHandler
+import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
+import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
 import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.remotedao.RemoteUserDao
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.domain.model.user.User
 import com.example.spender.domain.model.user.UserName
+import com.example.spender.domain.remotedao.RemoteUserDao
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RemoteUserDaoImpl @Inject constructor(
@@ -261,27 +266,37 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun getUserTrips(): DataResult<List<Trip>> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef = remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users)).document(userID)
-            val tripCollection: CollectionReference =
-                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_trips))
-            val tripsQuerySnapshot =
-                tripCollection.whereArrayContains(
-                    appContext.getString(R.string.collection_trip_document_field_members),
-                    userDocRef
-                ).get(source).await()
-            if (!tripsQuerySnapshot.isEmpty) {
-                val lst: MutableList<Trip> = mutableListOf()
-                tripsQuerySnapshot.documents.forEach { tripDocSnapshot ->
-                    val trip = getTrip(tripDocSnapshot.reference)
-                    if (trip is DataResult.Error) {
-                        return trip
-                    }
-                    lst.add((trip as DataResult.Success).data)
-                }
-                DataResult.Success(lst)
-            } else {
-                DataResult.Success(emptyList())
+            val userDocRef =
+                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
+                    .document(userID)
+            val userTrips = userDocRef.get(source).await().get(
+                appContext.getString(R.string.collection_users_document_field_trips)
+            ) as ArrayList<DocumentReference>
+
+            if (userTrips.isEmpty()) {
+                return DataResult.Success(emptyList())
             }
+
+            val tripTasks = buildList {
+                userTrips.forEach { tripDocRef ->
+                    this.add(withContext(Dispatchers.IO) {
+                        async {
+                            getTrip(tripDocRef)
+                        }
+                    })
+                }
+            }
+
+            DataResult.Success(
+                buildList {
+                    tripTasks.awaitAll().forEach { trip ->
+                        if (trip is DataResult.Error) {
+                            return trip
+                        }
+                        this.add((trip as DataResult.Success).data)
+                    }
+                }
+            )
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
@@ -481,8 +496,19 @@ class RemoteUserDaoImpl @Inject constructor(
 
 
     override suspend fun addUserOutgoingFriend(
-        friend: Friend,
+        nickname: String
     ): DataResult<String> {
+        val querySnapshot = remoteDataSource.db.collection(
+            appContext.getString(R.string.collection_name_users)
+        ).whereEqualTo(
+            appContext.getString(R.string.collection_users_document_field_nickname),
+            nickname
+        ).get().await()
+        if (querySnapshot.isEmpty) {
+            return DataErrorHandler.handle(FirebaseNoNicknameUserException())
+        }
+        val friendDocRef = querySnapshot.documents[0].reference
+
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =
@@ -493,11 +519,11 @@ class RemoteUserDaoImpl @Inject constructor(
             batch.update(
                 userDocRef,
                 appContext.getString(R.string.collection_users_document_field_outgoing_friends),
-                FieldValue.arrayUnion(friend.docRef)
+                FieldValue.arrayUnion(friendDocRef)
             )
 
             batch.update(
-                friend.docRef,
+                friendDocRef,
                 appContext.getString(R.string.collection_users_document_field_incoming_friends),
                 FieldValue.arrayUnion(userDocRef)
             )

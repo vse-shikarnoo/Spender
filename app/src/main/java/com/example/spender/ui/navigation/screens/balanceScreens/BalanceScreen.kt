@@ -27,26 +27,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.R
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.TestTrip
 import com.example.spender.domain.model.Trip
 import com.example.spender.ui.navigation.BalanceNavGraph
+import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
 import com.example.spender.ui.theme.*
-import com.example.spender.ui.viewmodel.TripViewModel
 import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
+@BottomNavGraph(start = true)
 @BalanceNavGraph(start = true)
 @Destination
 @Composable
 fun BalanceScreen(
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel = hiltViewModel()
+    userViewModel: UserViewModel
 ) {
     Scaffold(
         topBar = {
@@ -159,7 +158,13 @@ fun TripsList(
     userViewModel: UserViewModel
 ) {
     val trips = userViewModel.getUserTripsDataResult.observeAsState()
-    val tripsLst = getTrips(trips, LocalContext.current)
+    val tripsLst = trips.value?.let { result ->
+        if (result is DataResult.Success) {
+            result.data
+        } else {
+            getTrips(trips, LocalContext.current)
+        }
+    } ?: getTrips(trips, LocalContext.current)
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -229,6 +234,16 @@ fun TripsList(
                         Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
                     }
                 }
+            }
+        }
+    }
+    if (trips.value != null) {
+        when (trips.value!!) {
+            is DataResult.Success -> {
+
+            }
+            is DataResult.Error -> {
+
             }
         }
     }

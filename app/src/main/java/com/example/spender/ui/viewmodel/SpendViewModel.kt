@@ -9,12 +9,14 @@ import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.spend.Spend
 import com.example.spender.domain.model.spend.SpendMember
 import com.example.spender.domain.repository.SpendRepository
-import com.example.spender.domain.usecases.SpendUpdateUseCase
+import com.example.spender.domain.usecases.interfaces.SpendUpdateUseCase
 import com.google.firebase.firestore.GeoPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class SpendViewModel @Inject constructor(
     private val repository: dagger.Lazy<SpendRepository>,
     private val spendUpdateUseCase: dagger.Lazy<SpendUpdateUseCase>

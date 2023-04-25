@@ -1,7 +1,6 @@
 package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
-import android.provider.ContactsContract.CommonDataKinds.Nickname
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.R
 import com.example.spender.data.DataResult
 import com.example.spender.ui.navigation.FirstNavGraph
@@ -45,7 +43,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun SignUpScreen(
     navigator: DestinationsNavigator,
-    authManagerViewModel: AuthViewModel = hiltViewModel(),
+    authManagerViewModel: AuthViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

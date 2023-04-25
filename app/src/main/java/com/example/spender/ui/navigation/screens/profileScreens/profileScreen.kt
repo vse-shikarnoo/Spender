@@ -265,7 +265,7 @@ fun FriendCardButton(
     Row {
         FriendCardIconButton(
             onClick = {
-                if (text == "Your friends") {
+                if (text == "Friends") {
                     userViewModel.removeUserFriend(friend)
                     showSuccessFriend = true
                 }

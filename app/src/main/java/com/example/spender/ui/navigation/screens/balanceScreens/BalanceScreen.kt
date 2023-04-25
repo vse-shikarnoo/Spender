@@ -1,7 +1,5 @@
 package com.example.spender.ui.navigation.screens.balanceScreens
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,19 +18,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
-import com.example.spender.data.DataResult
 import com.example.spender.domain.model.Trip
 import com.example.spender.ui.navigation.BalanceNavGraph
 import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
+import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.*
 import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
@@ -48,41 +44,51 @@ fun BalanceScreen(
     userViewModel: UserViewModel
 ) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Balance",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-            )
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .padding(it)
-                    .padding(horizontal = 16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BalanceCard()
-                TripsList(
-                    navigator,
-                    userViewModel
-                )
-            }
-        }
+        topBar = { BalanceScreenTopBar() },
+        content = { BalanceScreenContent(paddingValues = it, navigator, userViewModel) }
     )
     LaunchedEffect(key1 = 1, block = {
         userViewModel.getUserTrips()
     })
 }
 
-@Preview()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BalanceScreenTopBar() {
+    TopAppBar(
+        title = {
+            Text(
+                "Balance",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+    )
+}
+
+@Composable
+fun BalanceScreenContent(
+    paddingValues: PaddingValues,
+    navigator: DestinationsNavigator,
+    userViewModel: UserViewModel
+) {
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(horizontal = 16.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BalanceCard()
+        TripsList(
+            navigator,
+            userViewModel
+        )
+    }
+}
+
 @Composable
 fun BalanceCard() {
     Card(
@@ -158,13 +164,9 @@ fun TripsList(
     userViewModel: UserViewModel
 ) {
     val trips = userViewModel.getUserTripsDataResult.observeAsState()
-    val tripsLst = trips.value?.let { result ->
-        if (result is DataResult.Success) {
-            result.data
-        } else {
-            getTrips(trips, LocalContext.current)
-        }
-    } ?: getTrips(trips, LocalContext.current)
+    var tripsLst = emptyList<Trip>()
+    viewModelResultHandler(trips, { tripsLst = it })
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -189,104 +191,75 @@ fun TripsList(
                 TripCard(trip = it, navigator)
             }
             if (tripsLst.isEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-                        Box(
-                            modifier = Modifier.weight(1f),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("No trips", color = GreenMain)
-                        }
-                        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-                    }
-                }
+                item { EmptyTripItem() }
             }
-            if (tripsLst.size > 3) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-                        Box(
-                            modifier = Modifier.weight(1f),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Button(
-                                elevation = ButtonDefaults.buttonElevation(
-                                    defaultElevation = 2.dp
-                                ),
-                                onClick = { },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = GreenLightBackground,
-                                    contentColor = GreenMain
-                                ),
-                            ) {
-                                AutoResizedText(text = "Show more", color = GreenMain)
-                            }
-                        }
-                        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-                    }
-                }
-            }
-        }
-    }
-    if (trips.value != null) {
-        when (trips.value!!) {
-            is DataResult.Success -> {
-
-            }
-            is DataResult.Error -> {
-
-            }
+//            if (tripsLst.size == -1) {
+//                item { OverflowTripsItem() }
+//            }
         }
     }
 }
 
-fun getTrips(
-    trips: State<DataResult<List<Trip>>?>,
-    context: Context
-): List<Trip> {
-    if (trips.value == null) {
-        return emptyList<Trip>()
+@Composable
+fun EmptyTripItem() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No trips", color = GreenMain)
+        }
+        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
     }
-    if (trips.value!! is DataResult.Error) {
-        Toast.makeText(
-            context,
-            (trips.value!! as DataResult.Error).exception,
-            Toast.LENGTH_LONG
-        ).show()
-        return emptyList<Trip>()
+}
+
+@Composable
+fun OverflowTripsItem() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 2.dp
+                ),
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = GreenLightBackground,
+                    contentColor = GreenMain
+                ),
+            ) {
+                AutoResizedText(text = "Show more", color = GreenMain)
+            }
+        }
+        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
     }
-    return (trips.value!! as DataResult.Success).data
 }
 
 @Composable
 fun AutoResizedText(
     text: String,
     style: TextStyle = MaterialTheme.typography.labelMedium,
-    modifier: Modifier = Modifier,
     color: Color = style.color
 ) {
-    var resizedTextStyle by remember {
-        mutableStateOf(style)
-    }
-    var shouldDraw by remember {
-        mutableStateOf(false)
-    }
-
+    var resizedTextStyle by remember { mutableStateOf(style) }
+    var shouldDraw by remember { mutableStateOf(false) }
     val defaultFontSize = MaterialTheme.typography.labelMedium.fontSize
-
     Text(
         text = text,
         color = color,
-        modifier = modifier.drawWithContent {
+        modifier = Modifier.drawWithContent {
             if (shouldDraw) {
                 drawContent()
             }
@@ -348,21 +321,12 @@ fun TripCard(trip: Trip, navigator: DestinationsNavigator) {
             Box(
                 modifier = Modifier.weight(1f)
             ) {
-//                if (false) {
-//                    Image(
-//                        painter = painterResource(id = R.drawable.baseline_keyboard_arrow_up_24),
-//                        contentDescription = null,
-//                        modifier = Modifier.size(36.dp),
-//                        colorFilter = ColorFilter.tint(GreenBalance)
-//                    )
-//                } else {
                 Image(
                     painter = painterResource(id = R.drawable.baseline_keyboard_arrow_down_24),
                     contentDescription = null,
                     modifier = Modifier.size(36.dp),
                     colorFilter = ColorFilter.tint(RedBalance)
                 )
-//                }
             }
         }
     }

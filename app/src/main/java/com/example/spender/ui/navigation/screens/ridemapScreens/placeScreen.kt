@@ -16,12 +16,12 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @RideMapNavGraph
 @Destination
 @Composable
-fun ItemScreen() {
+fun ItemScreen(
+    navigator: DestinationsNavigator
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(
-            onClick = {
-                // navigator.
-            }
+            onClick = { navigator.popBackStack() }
         ) {
             Text("Item screen")
         }

@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -40,91 +39,39 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.ProfileNavGraph
-import com.example.spender.ui.navigation.screens.createRideScreens.FriendCard
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
+import com.example.spender.ui.navigation.screens.helperfunctions.FriendCard
+import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.GreenLight
 import com.example.spender.ui.theme.GreenMain
 import com.example.spender.ui.theme.WhiteBackground
 import com.example.spender.ui.viewmodel.AuthViewModel
 import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@OptIn(ExperimentalMaterial3Api::class)
 @BottomNavGraph
 @ProfileNavGraph(start = true)
 @Destination
 @Composable
 fun ProfileScreen(
-    navigator: DestinationsNavigator,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel
 ) {
-    var signOut by remember { mutableStateOf(false) }
-    val userNicknameResult = userViewModel.getUserNicknameDataResult.observeAsState()
-    val userNickname = getUserName(userNicknameResult)
-    val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        userNickname,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            authViewModel.signOut()
-                            signOut = true
-                        }
-                    ) {
-                        Icon(Icons.Filled.ExitToApp, null, tint = GreenMain)
-                    }
-                }
+            ProfileScreenTopBar(
+                authViewModel = authViewModel,
+                userViewModel = userViewModel
             )
         },
         content = {
-            Column(
-                modifier = Modifier
-                    .padding(it)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(scrollState)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // /
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.images),
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, GreenMain, CircleShape),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = null,
-                    )
-                }
-                FriendsList(userViewModel, navigator)
-            }
+            ProfileScreenContent(
+                paddingValues = it,
+                userViewModel = userViewModel
+            )
         }
     )
-    if (signOut) {
-        val activity = (LocalContext.current as Activity)
-        val intent: Intent = activity.intent
-        activity.finish()
-        ContextCompat.startActivity(activity, intent, intent.extras)
-    }
-    LaunchedEffect(key1 = 1, block = {
+    LaunchedEffect(key1 = true, block = {
         userViewModel.getUserFriends()
         userViewModel.getUserIncomingFriends()
         userViewModel.getUserOutgoingFriends()
@@ -132,36 +79,112 @@ fun ProfileScreen(
     })
 }
 
-fun getUserName(nickname: State<DataResult<String>?>): String {
-    if (nickname.value == null) {
-        return "Loading..."
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreenTopBar(
+    authViewModel: AuthViewModel,
+    userViewModel: UserViewModel
+) {
+    val userNicknameResult = userViewModel.getUserNicknameDataResult.observeAsState()
+    val signOutResult = authViewModel.signOutDataResult.observeAsState()
+    var userNickname by remember { mutableStateOf("Loading...") }
+    viewModelResultHandler(userNicknameResult, { userNickname = it })
+    viewModelResultHandler(
+        signOutResult,
+        onSuccess = {
+            val activity = (LocalContext.current as Activity)
+            val intent: Intent = activity.intent
+            activity.finish()
+            ContextCompat.startActivity(activity, intent, intent.extras)
+        }
+    )
+    TopAppBar(
+        title = {
+            Text(
+                userNickname, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        actions = {
+            IconButton(onClick = { authViewModel.signOut() }) {
+                Icon(Icons.Filled.ExitToApp, null, tint = GreenMain)
+            }
+        }
+    )
+}
+
+@Composable
+fun ProfileScreenContent(
+    paddingValues: PaddingValues,
+    userViewModel: UserViewModel
+) {
+    val scrollState = rememberScrollState()
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .padding(horizontal = 16.dp)
+            .verticalScroll(scrollState)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // /
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.images),
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, GreenMain, CircleShape),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+            )
+        }
+        FriendsList(userViewModel)
     }
-    if (nickname.value!! is DataResult.Error) {
-        return "Loading..."
-    }
-    return (nickname.value!! as DataResult.Success).data
 }
 
 @Composable
 fun FriendsList(
     userViewModel: UserViewModel,
-    navigator: DestinationsNavigator
 ) {
     val friends = userViewModel.getUserFriendsDataResult.observeAsState()
     val incomingFriends = userViewModel.getUserIncomingFriendsDataResult.observeAsState()
     val outgoingFriends = userViewModel.getUserOutgoingFriendsDataResult.observeAsState()
 
-    val friendsLst = getFriends(friends)
-    val incomingFriendsLst = getFriends(incomingFriends)
-    val outgoingFriendsLst = getFriends(outgoingFriends)
-
+    var loaded by remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        FriendsListTemplate("Your friends", friendsLst, userViewModel)
-        FriendsListTemplate("Incoming friend requests", incomingFriendsLst, userViewModel)
-        FriendsListTemplate("Outgoing friend requests", outgoingFriendsLst, userViewModel)
-        AddFriendGroup(userViewModel)
+        viewModelResultHandler(
+            friends,
+            onSuccess = {
+                if (it.isNotEmpty())
+                    FriendsListTemplate("Friends", it, userViewModel)
+                loaded = true
+            },
+        )
+        viewModelResultHandler(
+            incomingFriends,
+            onSuccess = {
+                if (it.isNotEmpty())
+                    FriendsListTemplate("Incoming friend requests", it, userViewModel)
+            },
+        )
+        viewModelResultHandler(outgoingFriends,
+            onSuccess = {
+                if (it.isNotEmpty())
+                    FriendsListTemplate("Outgoing friend requests", it, userViewModel)
+            }
+        )
+        if (loaded) {
+            AddFriendGroup((friends.value!! as DataResult.Success).data, userViewModel)
+        }
     }
 }
 
@@ -171,22 +194,32 @@ fun FriendsListTemplate(
     friendsLst: List<Friend>,
     userViewModel: UserViewModel
 ) {
-    val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
-    var errorFriend by remember { mutableStateOf("") }
-    var successFriend by remember { mutableStateOf(false) }
+    FriendListTitle(text)
+    Divider(color = GreenLight, modifier = Modifier.padding(vertical = 12.dp))
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .requiredSizeIn(maxHeight = 280.dp, maxWidth = 400.dp)
+    ) {
+        items(
+            items = friendsLst,
+        ) { friend ->
+            FriendCard(
+                friend = friend,
+                button = { FriendCardButton(text, friend, userViewModel) }
+            )
+        }
+    }
+    if (friendsLst.isEmpty()) {
+        Divider(color = GreenLight, modifier = Modifier.padding(vertical = 12.dp))
+    }
+}
 
-    val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult.observeAsState()
-    var errorIncomingFriend by remember { mutableStateOf("") }
-    var successIncomingFriend by remember { mutableStateOf(false) }
-
-    val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult.observeAsState()
-    var errorOutgoingFriend by remember { mutableStateOf("") }
-    var successOutgoingFriend by remember { mutableStateOf(false) }
-
-    val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
-    var errorAddUserIncomingFriend by remember { mutableStateOf("") }
-    var successAddUserIncomingFriend by remember { mutableStateOf(false) }
-
+@Composable
+fun FriendListTitle(text: String) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
@@ -204,201 +237,154 @@ fun FriendsListTemplate(
             contentScale = ContentScale.Fit
         )
     }
-    Divider(
-        color = GreenLight,
-        modifier = Modifier.padding(vertical = 12.dp)
-    )
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(16.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .requiredSizeIn(maxHeight = 280.dp, maxWidth = 400.dp)
-    ) {
-        items(
-            items = friendsLst,
-        ) {
-            FriendCard(
-                friend = it,
-                button = {
-                    Row {
-                        IconButton(onClick = {
-                            when (text) {
-                                "Your friends" -> {
-                                    userViewModel.removeUserFriend(it)
-                                    errorFriend = ""
-                                    successFriend = true
-                                }
+}
 
-                                "Incoming friend requests" -> {
-                                    userViewModel.removeUserIncomingFriend(it)
-                                    errorIncomingFriend = ""
-                                    successIncomingFriend = true
-                                }
+@Composable
+fun FriendCardButton(
+    text: String,
+    friend: Friend,
+    userViewModel: UserViewModel
+) {
+    val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
+    var errorFriend by remember { mutableStateOf("") }
+    var showSuccessFriend by remember { mutableStateOf(true) }
 
-                                "Outgoing friend requests" -> {
-                                    userViewModel.removeUserOutgoingFriend(it)
-                                    errorOutgoingFriend = ""
-                                    successOutgoingFriend = true
-                                }
-                            }
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_close_24),
-                                tint = GreenMain,
-                                contentDescription = ""
-                            )
-                        }
-                        if (text == "Incoming friend requests") {
-                            IconButton(onClick = {
-                                userViewModel.addUserIncomingFriend(it)
-                                errorAddUserIncomingFriend = ""
-                                successAddUserIncomingFriend = true
-                            }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.add),
-                                    tint = GreenMain,
-                                    contentDescription = ""
-                                )
-                            }
-                        }
-                    }
+    val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult.observeAsState()
+    var errorIncomingFriend by remember { mutableStateOf("") }
+    var showSuccessIncomingFriend by remember { mutableStateOf(true) }
+
+    val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult.observeAsState()
+    var errorOutgoingFriend by remember { mutableStateOf("") }
+    var showSuccessOutgoingFriend by remember { mutableStateOf(true) }
+
+    val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
+    var errorAddIncomingFriend by remember { mutableStateOf("") }
+    var showSuccessAddIncomingFriend by remember { mutableStateOf(true) }
+
+    Row {
+        FriendCardIconButton(
+            onClick = {
+                if (text == "Your friends") {
+                    userViewModel.removeUserFriend(friend)
+                    showSuccessFriend = true
                 }
+                if (text == "Incoming friend requests") {
+                    userViewModel.removeUserIncomingFriend(friend)
+                    showSuccessIncomingFriend = true
+                }
+                if (text == "Outgoing friend requests") {
+                    userViewModel.removeUserOutgoingFriend(friend)
+                    showSuccessOutgoingFriend = true
+                }
+            },
+            R.drawable.baseline_close_24
+        )
+        if (text == "Incoming friend requests") {
+            FriendCardIconButton(
+                onClick = {
+                    userViewModel.addUserIncomingFriend(friend)
+                    showSuccessAddIncomingFriend = true
+                },
+                drawable = R.drawable.add
             )
         }
     }
-    if (friendsLst.isEmpty()) {
-        Divider(
-            color = GreenLight,
-            modifier = Modifier.padding(vertical = 12.dp)
-        )
-    }
-    if (removeUserFriend.value != null) {
-        when (removeUserFriend.value!!) {
-            is DataResult.Success -> {
-                if (successFriend) {
-                    Toast.makeText(LocalContext.current, "Friend removed", Toast.LENGTH_SHORT)
-                        .show()
-                    successFriend = false
-                }
-                userViewModel.getUserFriends()
-            }
 
-            is DataResult.Error -> {
-                if (errorFriend != (removeUserFriend.value!! as DataResult.Error).exception) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        (removeUserFriend.value!! as DataResult.Error).exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                errorFriend = (removeUserFriend.value!! as DataResult.Error).exception
+    viewModelResultHandler(
+        removeUserFriend,
+        onSuccess = {
+            if (showSuccessFriend) {
+                Toast.makeText(LocalContext.current, "Friend removed", Toast.LENGTH_SHORT).show()
+                showSuccessFriend = false
             }
+            userViewModel.getUserFriends()
+        },
+        onError = { newError ->
+            if (errorFriend != newError) {
+                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_SHORT).show()
+            }
+            errorFriend = newError
         }
-    }
-    if (removeUserIncomingFriend.value != null) {
-        when (removeUserIncomingFriend.value!!) {
-            is DataResult.Success -> {
-                if (successIncomingFriend) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        "Incoming request denied",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    successIncomingFriend = false
-                }
-                userViewModel.getUserIncomingFriends()
+    )
+    viewModelResultHandler(
+        removeUserIncomingFriend,
+        onSuccess = {
+            if (showSuccessIncomingFriend) {
+                Toast.makeText(LocalContext.current, "Incoming request denied", Toast.LENGTH_SHORT)
+                    .show()
+                showSuccessIncomingFriend = false
             }
-
-            is DataResult.Error -> {
-                if (errorIncomingFriend != (removeUserIncomingFriend.value!! as DataResult.Error).exception) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        (removeUserIncomingFriend.value!! as DataResult.Error).exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                errorIncomingFriend =
-                    (removeUserIncomingFriend.value!! as DataResult.Error).exception
+            userViewModel.getUserIncomingFriends()
+        },
+        onError = { newError ->
+            if (errorIncomingFriend != newError) {
+                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_SHORT).show()
             }
+            errorIncomingFriend = newError
         }
-    }
-    if (removeUserOutgoingFriend.value != null) {
-        when (removeUserOutgoingFriend.value!!) {
-            is DataResult.Success -> {
-                if (successOutgoingFriend) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        "Outgoing request cancelled",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    successOutgoingFriend = false
-                }
-                userViewModel.getUserOutgoingFriends()
+    )
+    viewModelResultHandler(
+        removeUserOutgoingFriend,
+        onSuccess = {
+            if (showSuccessOutgoingFriend) {
+                Toast.makeText(
+                    LocalContext.current,
+                    "Outgoing request cancelled",
+                    Toast.LENGTH_SHORT
+                ).show()
+                showSuccessOutgoingFriend = false
             }
-
-            is DataResult.Error -> {
-                if (errorOutgoingFriend != (removeUserOutgoingFriend.value!! as DataResult.Error).exception) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        (removeUserOutgoingFriend.value!! as DataResult.Error).exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                errorOutgoingFriend =
-                    (removeUserOutgoingFriend.value!! as DataResult.Error).exception
+            userViewModel.getUserOutgoingFriends()
+        },
+        onError = { newError ->
+            if (errorOutgoingFriend != newError) {
+                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_SHORT).show()
             }
+            errorOutgoingFriend = newError
         }
-    }
-    if (addUserIncomingFriend.value != null) {
-        when (addUserIncomingFriend.value!!) {
-            is DataResult.Success -> {
-                if (successAddUserIncomingFriend) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        "Friend added",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    successAddUserIncomingFriend = false
-                }
-                userViewModel.getUserFriends()
-                userViewModel.getUserIncomingFriends()
+    )
+    viewModelResultHandler(
+        addUserIncomingFriend,
+        onSuccess = {
+            if (showSuccessAddIncomingFriend) {
+                Toast.makeText(
+                    LocalContext.current,
+                    "Friend added",
+                    Toast.LENGTH_SHORT
+                ).show()
+                showSuccessAddIncomingFriend = false
             }
-
-            is DataResult.Error -> {
-                if (errorAddUserIncomingFriend != (addUserIncomingFriend.value!! as DataResult.Error).exception) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        (addUserIncomingFriend.value!! as DataResult.Error).exception,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                errorAddUserIncomingFriend =
-                    (addUserIncomingFriend.value!! as DataResult.Error).exception
+            userViewModel.getUserFriends()
+            userViewModel.getUserIncomingFriends()
+        },
+        onError = { newError ->
+            if (errorAddIncomingFriend != newError) {
+                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_SHORT).show()
             }
+            errorAddIncomingFriend = newError
         }
-    }
+    )
 }
 
-fun getFriends(friends: State<DataResult<List<Friend>>?>): List<Friend> {
-    if (friends.value == null) {
-        return emptyList<Friend>()
+@Composable
+fun FriendCardIconButton(onClick: () -> Unit, drawable: Int) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(id = drawable),
+            tint = GreenMain,
+            contentDescription = ""
+        )
     }
-    if ((friends.value!!) is DataResult.Error) {
-        return emptyList<Friend>()
-    }
-    return (friends.value!! as DataResult.Success).data
 }
 
 @Composable
 fun AddFriendGroup(
+    friendsLst: List<Friend>,
     userViewModel: UserViewModel
 ) {
+    val context = LocalContext.current
     var friendsNickname by remember { mutableStateOf("") }
     var error by remember { mutableStateOf("") }
-    var success by remember { mutableStateOf(false) }
     var clicked by remember { mutableStateOf(false) }
     val addOutgoingFriend = userViewModel.addUserOutgoingFriendDataResult.observeAsState()
     Column(
@@ -416,11 +402,17 @@ fun AddFriendGroup(
         Button(
             onClick = {
                 if (!clicked) {
-                    userViewModel.addUserOutgoingFriend(friendsNickname)
-                    error = ""
+                    if (checkIfNotFriend(friendsNickname, friendsLst)) {
+                        userViewModel.addUserOutgoingFriend(friendsNickname)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "$friendsNickname is already your friend",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    clicked = true
                 }
-                clicked = true
-                success = true
             },
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp
@@ -438,31 +430,23 @@ fun AddFriendGroup(
             )
         }
     }
-    if (addOutgoingFriend.value != null) {
-        when (addOutgoingFriend.value!!) {
-            is DataResult.Success -> {
-                if (success) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        "Friend request sent",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    success = false
-                }
-                userViewModel.getUserOutgoingFriends()
+    viewModelResultHandler(addOutgoingFriend,
+        onSuccess = { successMsg ->
+            Toast.makeText(LocalContext.current, successMsg, Toast.LENGTH_LONG).show()
+            userViewModel.getUserOutgoingFriends()
+            clicked = false
+        },
+        onError = { newError ->
+            if (error != newError) {
+                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
+                error = newError
             }
 
-            is DataResult.Error -> {
-                if (error != (addOutgoingFriend.value!! as DataResult.Error).exception) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        (addOutgoingFriend.value!! as DataResult.Error).exception,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                error = (addOutgoingFriend.value!! as DataResult.Error).exception
-            }
+            clicked = false
         }
-        clicked = false
-    }
+    )
+}
+
+fun checkIfNotFriend(nickname: String, friendsLst: List<Friend>): Boolean {
+    return friendsLst.find { it.nickname == nickname } == null
 }

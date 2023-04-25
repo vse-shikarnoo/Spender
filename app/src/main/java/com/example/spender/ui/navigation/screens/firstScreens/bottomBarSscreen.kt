@@ -18,7 +18,6 @@ import com.example.spender.ui.viewmodel.TripViewModel
 import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.dependency
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

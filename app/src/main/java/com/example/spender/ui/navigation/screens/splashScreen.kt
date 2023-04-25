@@ -1,7 +1,6 @@
 package com.example.spender.ui.navigation.screens
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -15,16 +14,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.data.DataResult
-import com.example.spender.ui.viewmodel.AuthViewModel
 import com.example.spender.ui.navigation.FirstNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
+import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.WhiteBackground
+import com.example.spender.ui.viewmodel.AuthViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
@@ -37,7 +35,6 @@ fun SplashScreen(
     navigator: DestinationsNavigator,
     authViewModel: AuthViewModel
 ) {
-    val context = LocalContext.current
     val currentUserResult = authViewModel.currentUser.observeAsState()
     var startAnimation by remember { mutableStateOf(false) }
     val alphaAnim = animateFloatAsState(
@@ -47,23 +44,17 @@ fun SplashScreen(
         )
     )
 
-    currentUserResult.value?.let { result ->
-        when (result) {
-            is DataResult.Success -> {
-                navigator.popBackStack()
-                navigator.navigate(BottomBarScreenDestination)
-            }
-            is DataResult.Error -> {
-                Toast.makeText(
-                    context,
-                    result.exception,
-                    Toast.LENGTH_SHORT
-                ).show()
-                navigator.popBackStack()
-                navigator.navigate(FirstScreenDestination)
-            }
+    viewModelResultHandler(
+        currentUserResult,
+        onSuccess = {
+            navigator.popBackStack()
+            navigator.navigate(BottomBarScreenDestination)
+        },
+        onError = {
+            navigator.popBackStack()
+            navigator.navigate(FirstScreenDestination)
         }
-    }
+    )
 
     LaunchedEffect(key1 = true) {
         startAnimation = true
@@ -103,30 +94,3 @@ fun Splash(alpha: Float) {
         )
     }
 }
-/*@Composable
-fun SplashScreen(
-    navigator: DestinationsNavigator
-) {
-    // Splash screen layout
-
-    // Тут будет выбор запускаемого экрана в зависимости от того вошел юзер или нет
-    val userIn = true // взятие user_state откуда-нибудь
-    when (userIn) {
-        true -> {
-            val navController = rememberNavController()
-            Scaffold(
-                bottomBar = {
-                    BottomBar(navController)
-                }
-            ) {
-                DestinationsNavHost(
-                    navController = navController, // !! this is important
-                    navGraph = NavGraphs.bottom
-                )
-            }
-        }
-        false -> {
-            navigator.navigate(FirstScreenDestination)
-        }
-    }
-}*/

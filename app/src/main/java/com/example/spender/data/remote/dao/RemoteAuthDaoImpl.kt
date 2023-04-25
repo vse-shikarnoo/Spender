@@ -53,37 +53,7 @@ class RemoteAuthDaoImpl @Inject constructor(
                                 appContext.getString(R.string.collection_name_users)
                             )
                                 .document(it.uid)
-                                .set(
-                                    mapOf(
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_first_name
-                                        ) to "",
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_middle_name
-                                        ) to "",
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_last_name
-                                        ) to "",
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_age
-                                        ) to 0,
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_nickname
-                                        ) to nickname,
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_incoming_friends
-                                        ) to emptyList<DocumentReference>(),
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_outgoing_friends
-                                        ) to emptyList<DocumentReference>(),
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_friends
-                                        ) to emptyList<DocumentReference>(),
-                                        appContext.getString(
-                                            R.string.collection_users_document_field_trips
-                                        ) to emptyList<DocumentReference>(),
-                                    )
-                                ).await()
+                                .set(signUpMap(nickname)).await()
                             DataResult.Success(it)
                         }
                     } catch (e: Exception) {
@@ -96,11 +66,44 @@ class RemoteAuthDaoImpl @Inject constructor(
                     DataErrorHandler.handle(FirebaseNicknameException())
                 }
             }
+
             is DataResult.Error -> {
                 Log.d("ABOBA", "check nickname - ${checkNickname.exception}")
                 checkNickname
             }
         }
+    }
+
+    private fun signUpMap(nickname: String): Map<String, Any> {
+        return mapOf(
+            appContext.getString(
+                R.string.collection_users_document_field_first_name
+            ) to "",
+            appContext.getString(
+                R.string.collection_users_document_field_middle_name
+            ) to "",
+            appContext.getString(
+                R.string.collection_users_document_field_last_name
+            ) to "",
+            appContext.getString(
+                R.string.collection_users_document_field_age
+            ) to 0,
+            appContext.getString(
+                R.string.collection_users_document_field_nickname
+            ) to nickname,
+            appContext.getString(
+                R.string.collection_users_document_field_incoming_friends
+            ) to emptyList<DocumentReference>(),
+            appContext.getString(
+                R.string.collection_users_document_field_outgoing_friends
+            ) to emptyList<DocumentReference>(),
+            appContext.getString(
+                R.string.collection_users_document_field_friends
+            ) to emptyList<DocumentReference>(),
+            appContext.getString(
+                R.string.collection_users_document_field_trips
+            ) to emptyList<DocumentReference>(),
+        )
     }
 
     override suspend fun isEmailVerified(): DataResult<Boolean> {

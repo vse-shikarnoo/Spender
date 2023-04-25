@@ -5,7 +5,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 
-class RemoteDataSourceImpl @Inject constructor() : RemoteDataSource<FirebaseFirestore, FirebaseAuth> {
+class RemoteDataSourceImpl @Inject constructor() :
+    RemoteDataSource<FirebaseFirestore, FirebaseAuth> {
     override val db by lazy { FirebaseFirestore.getInstance() }
     override val auth by lazy { FirebaseAuth.getInstance() }
 

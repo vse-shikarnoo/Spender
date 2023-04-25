@@ -37,14 +37,12 @@ class RemoteSpendDaoImpl @Inject constructor(
                     .document()
             batch.set(
                 newSpendDocRef,
-                mapOf(
-                    appContext.getString(R.string.collection_spends_document_field_name) to name,
-                    appContext.getString(R.string.collection_spends_document_field_category)
-                        to category,
-                    appContext.getString(R.string.collection_spends_document_field_split_mode)
-                        to splitMode,
-                    appContext.getString(R.string.collection_spends_document_field_amount) to amount,
-                    appContext.getString(R.string.collection_spends_document_field_geo) to geoPoint,
+                spendMap(
+                    name,
+                    category,
+                    splitMode,
+                    amount,
+                    geoPoint
                 )
             )
             when (val addSpendMembersResult = addSpendMembers(newSpendDocRef, members)) {
@@ -60,6 +58,24 @@ class RemoteSpendDaoImpl @Inject constructor(
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
+    }
+
+    private fun spendMap(
+        name: String,
+        category: String,
+        splitMode: Int,
+        amount: Double,
+        geoPoint: GeoPoint
+    ): Map<String, Any> {
+        return mapOf(
+            appContext.getString(R.string.collection_spends_document_field_name) to name,
+            appContext.getString(R.string.collection_spends_document_field_category)
+                to category,
+            appContext.getString(R.string.collection_spends_document_field_split_mode)
+                to splitMode,
+            appContext.getString(R.string.collection_spends_document_field_amount) to amount,
+            appContext.getString(R.string.collection_spends_document_field_geo) to geoPoint,
+        )
     }
 
     override suspend fun updateSpendName(

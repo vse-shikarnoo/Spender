@@ -128,7 +128,6 @@ fun LoginButton(
         androidx.compose.material3.Button(
             onClick = {
                 authViewModel.signIn(email, password)
-                error = ""
             },
             modifier = Modifier.padding(20.dp),
         ) {
@@ -143,7 +142,7 @@ fun LoginButton(
         result = signInResult,
         onError = { newError ->
             if (error != newError) {
-                Toast.makeText(LocalContext.current, error, Toast.LENGTH_LONG).show()
+                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
             }
             error = newError
         },

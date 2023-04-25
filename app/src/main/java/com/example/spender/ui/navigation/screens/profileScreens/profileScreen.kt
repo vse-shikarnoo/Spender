@@ -2,6 +2,7 @@ package com.example.spender.ui.navigation.screens.profileScreens
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -383,10 +384,11 @@ fun AddFriendGroup(
     userViewModel: UserViewModel
 ) {
     val context = LocalContext.current
-    var friendsNickname by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf("") }
-    var clicked by remember { mutableStateOf(false) }
     val addOutgoingFriend = userViewModel.addUserOutgoingFriendDataResult.observeAsState()
+    var error by remember { mutableStateOf("") }
+    var showSuccess by remember { mutableStateOf(false) }
+    var friendsNickname by remember { mutableStateOf("") }
+    var clicked by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -412,6 +414,7 @@ fun AddFriendGroup(
                         ).show()
                     }
                     clicked = true
+                    showSuccess = true
                 }
             },
             elevation = ButtonDefaults.buttonElevation(
@@ -432,7 +435,10 @@ fun AddFriendGroup(
     }
     viewModelResultHandler(addOutgoingFriend,
         onSuccess = { successMsg ->
-            Toast.makeText(LocalContext.current, successMsg, Toast.LENGTH_LONG).show()
+            if (showSuccess) {
+                Toast.makeText(LocalContext.current, successMsg, Toast.LENGTH_LONG).show()
+                showSuccess = false
+            }
             userViewModel.getUserOutgoingFriends()
             clicked = false
         },
@@ -441,12 +447,12 @@ fun AddFriendGroup(
                 Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
                 error = newError
             }
-
             clicked = false
         }
     )
 }
 
 fun checkIfNotFriend(nickname: String, friendsLst: List<Friend>): Boolean {
+    Log.d("ABOBA", friendsLst.toString())
     return friendsLst.find { it.nickname == nickname } == null
 }

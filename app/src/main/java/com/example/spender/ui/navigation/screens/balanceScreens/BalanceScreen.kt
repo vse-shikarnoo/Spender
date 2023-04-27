@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -79,6 +80,7 @@ fun BalanceScreenContent(
         modifier = Modifier
             .padding(paddingValues)
             .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -166,7 +168,8 @@ fun TripsList(
     userViewModel: UserViewModel
 ) {
     val trips = userViewModel.getUserTripsDataResult.observeAsState()
-    var tripsLst = emptyList<Trip>()
+    var tripsLst by remember { mutableStateOf(emptyList<Trip>()) }
+    var showMore by remember { mutableStateOf(false) }
     viewModelResultHandler(trips, { tripsLst = it })
 
     Column(
@@ -187,18 +190,53 @@ fun TripsList(
         }
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxHeight()
-        ) {
-            items(tripsLst) {
-                TripCard(trip = it, navigator)
+            modifier = Modifier.fillMaxHeight(),
+            content = {
+                tripListLazyColumnItems(showMore, this, tripsLst, navigator) {
+                    showMore = !showMore
+                }
             }
-            if (tripsLst.isEmpty()) {
-                item { EmptyTripItem() }
-            }
-//            if (tripsLst.size == -1) {
-//                item { OverflowTripsItem() }
-//            }
+        )
+    }
+}
+
+fun tripListLazyColumnItems(
+    showMore: Boolean,
+    lazyListScope: LazyListScope,
+    tripsLst: List<Trip>,
+    navigator: DestinationsNavigator,
+    onClick: () -> Unit
+) {
+    if (tripsLst.isEmpty()) {
+        lazyListScope.item { EmptyTripItem() }
+        return
+    }
+    if (tripsLst.size <= 3) {
+        lazyListScope.items(tripsLst) {
+            TripCard(trip = it, navigator)
         }
+        return
+    }
+    if (!showMore) {
+        lazyListScope.items(tripsLst.subList(0, 3)) {
+            TripCard(trip = it, navigator)
+        }
+    } else {
+        lazyListScope.items(tripsLst) {
+            TripCard(trip = it, navigator)
+        }
+    }
+    lazyListScope.item {
+        OverflowTripsItem(
+            text = {
+                if (!showMore) {
+                    "Show more"
+                } else {
+                    "Show less"
+                }
+            },
+            onClick = onClick
+        )
     }
 }
 
@@ -221,7 +259,10 @@ fun EmptyTripItem() {
 }
 
 @Composable
-fun OverflowTripsItem() {
+fun OverflowTripsItem(
+    text: () -> String,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -236,13 +277,13 @@ fun OverflowTripsItem() {
                 elevation = ButtonDefaults.buttonElevation(
                     defaultElevation = 2.dp
                 ),
-                onClick = { },
+                onClick = onClick,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = GreenLightBackground,
                     contentColor = GreenMain
                 ),
             ) {
-                AutoResizedText(text = "Show more", color = GreenMain)
+                AutoResizedText(text = text.invoke(), color = GreenMain)
             }
         }
         Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)

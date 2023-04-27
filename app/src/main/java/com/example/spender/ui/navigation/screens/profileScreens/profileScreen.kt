@@ -255,19 +255,19 @@ fun FriendCardButton(
 ) {
     val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
     var errorFriend by remember { mutableStateOf("") }
-    var showSuccessFriend by remember { mutableStateOf(true) }
+    var showSuccessFriend by remember { mutableStateOf(false) }
 
     val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult.observeAsState()
     var errorIncomingFriend by remember { mutableStateOf("") }
-    var showSuccessIncomingFriend by remember { mutableStateOf(true) }
+    var showSuccessIncomingFriend by remember { mutableStateOf(false) }
 
     val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult.observeAsState()
     var errorOutgoingFriend by remember { mutableStateOf("") }
-    var showSuccessOutgoingFriend by remember { mutableStateOf(true) }
+    var showSuccessOutgoingFriend by remember { mutableStateOf(false) }
 
     val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
     var errorAddIncomingFriend by remember { mutableStateOf("") }
-    var showSuccessAddIncomingFriend by remember { mutableStateOf(true) }
+    var showSuccessAddIncomingFriend by remember { mutableStateOf(false) }
 
     Row {
         FriendCardIconButton(

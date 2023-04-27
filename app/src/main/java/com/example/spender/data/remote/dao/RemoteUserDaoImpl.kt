@@ -1,7 +1,6 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
-import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
@@ -12,7 +11,6 @@ import com.example.spender.data.messages.exceptions.FirebaseAlreadySentFriendExc
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
-import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.model.Trip
 import com.example.spender.domain.model.user.Friend
@@ -30,308 +28,303 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
+@Suppress("UNCHECKED_CAST")
 class RemoteUserDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
 ) : RemoteUserDao {
     override var source: Source = Source.SERVER
 
+    /*
+     * getUser
+     */
+
     override suspend fun getUser(): DataResult<User> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
 
-            val userDocumentSnapshot =
+            val userDocRef =
                 remoteDataSource.db.collection(
                     appContext.getString(
                         R.string.collection_name_users
                     )
-                )
-                    .document(userID).get(source).await()
+                ).document(userID)
 
-            val name = getUserName(userID)
-            if (name is DataResult.Error) {
-                return name
+            val user = assembleUser(userID, userDocRef)
+            if (user is DataResult.Error) {
+                return user
             }
-            val age = getUserAge()
-            if (age is DataResult.Error) {
-                return age
-            }
-            val nickname = getUserNickname(userID)
-            if (nickname is DataResult.Error) {
-                return nickname
-            }
-            val incomingFriends = getUserIncomingFriends()
-            if (incomingFriends is DataResult.Error) {
-                return incomingFriends
-            }
-            val outgoingFriends = getUserOutgoingFriends()
-            if (outgoingFriends is DataResult.Error) {
-                return outgoingFriends
-            }
-            val friends = getUserFriends()
-            if (friends is DataResult.Error) {
-                return friends
-            }
-            val adminTrips = getUserAdminTrips()
-            if (adminTrips is DataResult.Error) {
-                return adminTrips
-            }
-            val passengerTrips = getUserPassengerTrips()
-            if (passengerTrips is DataResult.Error) {
-                return passengerTrips
-            }
-            val docRef = userDocumentSnapshot.reference
 
-            DataResult.Success(
-                User(
-                    name = (name as DataResult.Success).data,
-                    age = (age as DataResult.Success).data,
-                    nickname = (nickname as DataResult.Success).data,
-                    incomingFriends = (incomingFriends as DataResult.Success).data,
-                    outgoingFriends = (outgoingFriends as DataResult.Success).data,
-                    friends = (friends as DataResult.Success).data,
-                    adminTrips = (adminTrips as DataResult.Success).data,
-                    passengerTrips = (passengerTrips as DataResult.Success).data,
-                    docRef = docRef
-                )
-            )
+            DataResult.Success((user as DataResult.Success).data)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
+
+    private suspend fun assembleUser(
+        userID: String,
+        userDocRef: DocumentReference
+    ): DataResult<User> {
+        val name = getUserName(userID)
+        if (name is DataResult.Error) {
+            return name
+        }
+        val age = getUserAge()
+        if (age is DataResult.Error) {
+            return age
+        }
+        val nickname = getUserNickname(userID)
+        if (nickname is DataResult.Error) {
+            return nickname
+        }
+        val incomingFriends = getUserIncomingFriends()
+        if (incomingFriends is DataResult.Error) {
+            return incomingFriends
+        }
+        val outgoingFriends = getUserOutgoingFriends()
+        if (outgoingFriends is DataResult.Error) {
+            return outgoingFriends
+        }
+        val friends = getUserFriends()
+        if (friends is DataResult.Error) {
+            return friends
+        }
+        val adminTrips = getUserAdminTrips()
+        if (adminTrips is DataResult.Error) {
+            return adminTrips
+        }
+        val passengerTrips = getUserPassengerTrips()
+        if (passengerTrips is DataResult.Error) {
+            return passengerTrips
+        }
+
+        return DataResult.Success(
+            User(
+                name = (name as DataResult.Success).data,
+                age = (age as DataResult.Success).data,
+                nickname = (nickname as DataResult.Success).data,
+                incomingFriends = (incomingFriends as DataResult.Success).data,
+                outgoingFriends = (outgoingFriends as DataResult.Success).data,
+                friends = (friends as DataResult.Success).data,
+                adminTrips = (adminTrips as DataResult.Success).data,
+                passengerTrips = (passengerTrips as DataResult.Success).data,
+                docRef = userDocRef
+            )
+        )
+    }
+
+    /*
+     * getUserName
+     */
 
     override suspend fun getUserName(userId: String?): DataResult<UserName> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
-                )
-                    .document(userID)
-            val firstName = userDocRef.get(source)
-                .await().data!![
+            val userDocRef = remoteDataSource.db.collection(
                 appContext.getString(
-                    R.string.collection_users_document_field_first_name
+                    R.string.collection_name_users
                 )
-            ] as String
-            val middleName = userDocRef.get(source)
-                .await().data!![
-                appContext.getString(
-                    R.string.collection_users_document_field_middle_name
-                )
-            ] as String
-            val lastName = userDocRef.get(source)
-                .await().data!![
-                appContext.getString(
-                    R.string.collection_users_document_field_last_name
-                )
-            ] as String
-            DataResult.Success(UserName(firstName, middleName, lastName))
+            ).document(userID)
+
+            val userName = assembleUserName(userDocRef)
+            if (userName is DataResult.Error) {
+                return userName
+            }
+
+            DataResult.Success((userName as DataResult.Success).data)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
 
+    private suspend fun assembleUserName(userDocRef: DocumentReference): DataResult<UserName> {
+        val firstName = userDocRef.get(source).await().data!![appContext.getString(
+            R.string.collection_users_document_field_first_name
+        )] as String
+        val middleName = userDocRef.get(source).await().data!![appContext.getString(
+            R.string.collection_users_document_field_middle_name
+        )] as String
+        val lastName = userDocRef.get(source).await().data!![appContext.getString(
+            R.string.collection_users_document_field_last_name
+        )] as String
+        return DataResult.Success(UserName(firstName, middleName, lastName))
+    }
+
+    /*
+     * getUserAge
+     */
+
     override suspend fun getUserAge(): DataResult<Long> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
+            val userDocRef = remoteDataSource.db.collection(
+                appContext.getString(
+                    R.string.collection_name_users
                 )
-                    .document(userID)
-            val age = userDocRef.get(source)
-                .await().data!![appContext.getString(R.string.collection_users_document_field_age)]
-                as Long
+            ).document(userID)
+            val age = userDocRef.get(source).await().data!![appContext.getString(
+                R.string.collection_users_document_field_age
+            )] as Long
             DataResult.Success(age)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
 
+    /*
+     * getUserNickname
+     */
+
     override suspend fun getUserNickname(userId: String?): DataResult<String> {
         return try {
             val userID = userId ?: remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
+            val userDocRef = remoteDataSource.db.collection(
+                appContext.getString(
+                    R.string.collection_name_users
                 )
-                    .document(userID)
-            val nickname =
-                userDocRef.get(source).await()
-                    .data!![appContext.getString(R.string.collection_users_document_field_nickname)]
-                    as String
+            ).document(userID)
+            val nickname = userDocRef.get(source).await().data!![appContext.getString(
+                R.string.collection_users_document_field_nickname
+            )] as String
             DataResult.Success(nickname)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
 
+    /*
+     * getUserIncomingFriends
+     */
+
     override suspend fun getUserIncomingFriends(): DataResult<List<Friend>> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
-                )
-                    .document(userID)
-            val friends = userDocRef.get(source).await()
-                .data!![
+            val userDocRef = remoteDataSource.db.collection(
                 appContext.getString(
-                    R.string.collection_users_document_field_incoming_friends
+                    R.string.collection_name_users
                 )
-            ] as ArrayList<DocumentReference>?
+            ).document(userID)
 
-            val lst = mutableListOf<Friend>()
+            val friendsDocRefs = userDocRef.get(source).await().data!![appContext.getString(
+                R.string.collection_users_document_field_incoming_friends
+            )] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
-            if (friends != null) {
-
-                for (friend in friends) {
-                    val resultName = getUserName(friend.id)
-                    val resultNickname = getUserNickname(friend.id)
-                    if (resultName is DataResult.Success &&
-                        resultNickname is DataResult.Success
-                    ) {
-                        lst.add(
-                            Friend(
-                                name = resultName.data,
-                                nickname = resultNickname.data,
-                                docRef = friend
-                            )
-                        )
-                    } else {
-                        Log.d("ABOBA", "GetIncoming undefined")
-                        return DataErrorHandler.handle(FirebaseUndefinedException())
-                    }
-                }
-
-                DataResult.Success(lst)
-            } else {
-                DataResult.Success(emptyList())
+            val friends = assembleFriendsList(friendsDocRefs)
+            if (friends is DataResult.Error) {
+                return friends
             }
+
+            DataResult.Success((friends as DataResult.Success).data)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
+
+    private suspend fun assembleFriendsList(
+        friendsDocRefs: ArrayList<DocumentReference>
+    ): DataResult<List<Friend>> {
+        return DataResult.Success(
+            buildList {
+                friendsDocRefs.forEach { friendDocRef ->
+                    val friend = assembleFriend(friendDocRef)
+                    if (friend is DataResult.Error) {
+                        return friend
+                    }
+                    this.add((friend as DataResult.Success).data)
+                }
+            }
+        )
+    }
+
+    private suspend fun assembleFriend(friendDocRef: DocumentReference): DataResult<Friend> {
+        val resultName = getUserName(friendDocRef.id)
+        if (resultName is DataResult.Error) {
+            return resultName
+        }
+        val resultNickname = getUserNickname(friendDocRef.id)
+        if (resultNickname is DataResult.Error) {
+            return resultNickname
+        }
+        return DataResult.Success(
+            Friend(
+                name = (resultName as DataResult.Success).data,
+                nickname = (resultNickname as DataResult.Success).data,
+                docRef = friendDocRef
+            )
+        )
+    }
+
+    /*
+     * getUserOutgoingFriends
+     */
 
     override suspend fun getUserOutgoingFriends(): DataResult<List<Friend>> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(R.string.collection_name_users)
-                )
-                    .document(userID)
-            val friends = userDocRef.get(source).await()
-                .data!![
-                appContext.getString(
-                    R.string.collection_users_document_field_outgoing_friends
-                )
-            ] as ArrayList<DocumentReference>?
+            val userDocRef = remoteDataSource.db.collection(
+                appContext.getString(R.string.collection_name_users)
+            ).document(userID)
+            val friendsDocRefs = userDocRef.get(source).await().data!![appContext.getString(
+                R.string.collection_users_document_field_outgoing_friends
+            )] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
-            val lst = mutableListOf<Friend>()
-
-            if (friends != null) {
-
-                for (friend in friends) {
-                    val resultName = getUserName(friend.id)
-                    val resultNickname = getUserNickname(friend.id)
-                    if (resultName is DataResult.Success &&
-                        resultNickname is DataResult.Success
-                    ) {
-                        lst.add(
-                            Friend(
-                                name = resultName.data,
-                                nickname = resultNickname.data,
-                                docRef = friend
-                            )
-                        )
-                    } else {
-                        Log.d("ABOBA", "GetOutgoing undefined")
-                        return DataErrorHandler.handle(FirebaseUndefinedException())
-                    }
-                }
-
-                DataResult.Success(lst)
-            } else {
-                DataResult.Success(emptyList())
+            val friends = assembleFriendsList(friendsDocRefs)
+            if (friends is DataResult.Error) {
+                return friends
             }
+
+            DataResult.Success((friends as DataResult.Success).data)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
+
+    /*
+     * getUserFriends
+     */
 
     override suspend fun getUserFriends(): DataResult<List<Friend>> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
+            val userDocRef = remoteDataSource.db.collection(
+                appContext.getString(
+                    R.string.collection_name_users
                 )
-                    .document(userID)
-            val friends = userDocRef.get(source).await()
-                .data!![appContext.getString(R.string.collection_users_document_field_friends)]
-                as ArrayList<DocumentReference>?
+            ).document(userID)
+            val friendsDocRefs = userDocRef.get(source).await().data!![appContext.getString(
+                R.string.collection_users_document_field_friends
+            )] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
-            val lst = mutableListOf<Friend>()
-
-            if (friends != null) {
-
-                for (friend in friends) {
-                    val resultName = getUserName(friend.id)
-                    val resultNickname = getUserNickname(friend.id)
-                    if (resultName is DataResult.Success &&
-                        resultNickname is DataResult.Success
-                    ) {
-                        lst.add(
-                            Friend(
-                                name = resultName.data,
-                                nickname = resultNickname.data,
-                                docRef = friend
-                            )
-                        )
-                    } else {
-                        Log.d("ABOBA", "GetUserFriends undefined")
-                        return DataErrorHandler.handle(FirebaseUndefinedException())
-                    }
-                }
-
-                DataResult.Success(lst)
-            } else {
-                DataResult.Success(emptyList())
+            val friends = assembleFriendsList(friendsDocRefs)
+            if (friends is DataResult.Error) {
+                return friends
             }
+
+            DataResult.Success((friends as DataResult.Success).data)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }
     }
 
+    /*
+     * getUserTrips
+     */
+
+    /**
+     * TODO()
+     */
+
     override suspend fun getUserTrips(): DataResult<List<Trip>> {
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
+            val userDocRef = remoteDataSource.db.collection(
+                appContext.getString(
+                    R.string.collection_name_users
                 )
-                    .document(userID)
-            val userTrips = userDocRef.get(source).await().get(
+            ).document(userID)
+            val userTripsDocRefs = userDocRef.get(source).await().get(
                 appContext.getString(R.string.collection_users_document_field_trips)
-            ) as ArrayList<DocumentReference>
-
-            if (userTrips.isEmpty()) {
-                return DataResult.Success(emptyList())
-            }
+            ) as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
             val tripTasks = buildList {
                 userTrips.forEach { tripDocRef ->
@@ -359,6 +352,12 @@ class RemoteUserDaoImpl @Inject constructor(
             DataErrorHandler.handle(e)
         }
     }
+
+
+
+    /*
+     * getUserAdminTrips
+     */
 
     override suspend fun getUserAdminTrips(): DataResult<List<Trip>> {
         return try {
@@ -622,7 +621,7 @@ class RemoteUserDaoImpl @Inject constructor(
 
         (outgoingFriendsResult as DataResult.Success).data.forEach {
             if (it.docRef == friendDocRef) {
-                return return DataErrorHandler.handle(FirebaseAlreadySentFriendException())
+                return DataErrorHandler.handle(FirebaseAlreadySentFriendException())
             }
         }
 

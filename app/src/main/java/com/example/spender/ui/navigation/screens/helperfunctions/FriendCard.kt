@@ -33,6 +33,7 @@ fun FriendCard(
     button: @Composable () -> Unit,
 ) {
     Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )

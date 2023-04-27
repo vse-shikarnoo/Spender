@@ -2,7 +2,6 @@ package com.example.spender.ui.navigation.screens.profileScreens
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -255,34 +254,34 @@ fun FriendCardButton(
 ) {
     val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
     var errorFriend by remember { mutableStateOf("") }
-    var showSuccessFriend by remember { mutableStateOf(false) }
+    var showSuccessFriend by remember { mutableStateOf("") }
 
     val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult.observeAsState()
     var errorIncomingFriend by remember { mutableStateOf("") }
-    var showSuccessIncomingFriend by remember { mutableStateOf(false) }
+    var showSuccessIncomingFriend by remember { mutableStateOf("") }
 
     val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult.observeAsState()
     var errorOutgoingFriend by remember { mutableStateOf("") }
-    var showSuccessOutgoingFriend by remember { mutableStateOf(false) }
+    var showSuccessOutgoingFriend by remember { mutableStateOf("") }
 
     val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
     var errorAddIncomingFriend by remember { mutableStateOf("") }
-    var showSuccessAddIncomingFriend by remember { mutableStateOf(false) }
+    var showSuccessAddIncomingFriend by remember { mutableStateOf("") }
 
     Row {
         FriendCardIconButton(
             onClick = {
                 if (text == "Friends") {
                     userViewModel.removeUserFriend(friend)
-                    showSuccessFriend = true
+                    showSuccessFriend = ""
                 }
                 if (text == "Incoming friend requests") {
                     userViewModel.removeUserIncomingFriend(friend)
-                    showSuccessIncomingFriend = true
+                    showSuccessIncomingFriend = ""
                 }
                 if (text == "Outgoing friend requests") {
                     userViewModel.removeUserOutgoingFriend(friend)
-                    showSuccessOutgoingFriend = true
+                    showSuccessOutgoingFriend = ""
                 }
             },
             R.drawable.baseline_close_24
@@ -291,7 +290,7 @@ fun FriendCardButton(
             FriendCardIconButton(
                 onClick = {
                     userViewModel.addUserIncomingFriend(friend)
-                    showSuccessAddIncomingFriend = true
+                    showSuccessAddIncomingFriend = ""
                 },
                 drawable = R.drawable.add
             )
@@ -300,10 +299,10 @@ fun FriendCardButton(
 
     viewModelResultHandler(
         removeUserFriend,
-        onSuccess = {
-            if (showSuccessFriend) {
-                Toast.makeText(LocalContext.current, "Friend removed", Toast.LENGTH_SHORT).show()
-                showSuccessFriend = false
+        onSuccess = { success ->
+            if (showSuccessFriend != success) {
+                Toast.makeText(LocalContext.current, success, Toast.LENGTH_SHORT).show()
+                showSuccessFriend = success
             }
             userViewModel.getUserFriends()
         },
@@ -316,11 +315,10 @@ fun FriendCardButton(
     )
     viewModelResultHandler(
         removeUserIncomingFriend,
-        onSuccess = {
-            if (showSuccessIncomingFriend) {
-                Toast.makeText(LocalContext.current, "Incoming request denied", Toast.LENGTH_SHORT)
-                    .show()
-                showSuccessIncomingFriend = false
+        onSuccess = {success ->
+            if (showSuccessFriend != success) {
+                Toast.makeText(LocalContext.current, success, Toast.LENGTH_SHORT).show()
+                showSuccessFriend = success
             }
             userViewModel.getUserIncomingFriends()
         },
@@ -333,14 +331,10 @@ fun FriendCardButton(
     )
     viewModelResultHandler(
         removeUserOutgoingFriend,
-        onSuccess = {
-            if (showSuccessOutgoingFriend) {
-                Toast.makeText(
-                    LocalContext.current,
-                    "Outgoing request cancelled",
-                    Toast.LENGTH_SHORT
-                ).show()
-                showSuccessOutgoingFriend = false
+        onSuccess = { success ->
+            if (showSuccessFriend != success) {
+                Toast.makeText(LocalContext.current, success, Toast.LENGTH_SHORT).show()
+                showSuccessFriend = success
             }
             userViewModel.getUserOutgoingFriends()
         },
@@ -353,14 +347,10 @@ fun FriendCardButton(
     )
     viewModelResultHandler(
         addUserIncomingFriend,
-        onSuccess = {
-            if (showSuccessAddIncomingFriend) {
-                Toast.makeText(
-                    LocalContext.current,
-                    "Friend added",
-                    Toast.LENGTH_SHORT
-                ).show()
-                showSuccessAddIncomingFriend = false
+        onSuccess = {success ->
+            if (showSuccessFriend != success) {
+                Toast.makeText(LocalContext.current, success, Toast.LENGTH_SHORT).show()
+                showSuccessFriend = success
             }
             userViewModel.getUserFriends()
             userViewModel.getUserIncomingFriends()
@@ -390,12 +380,10 @@ fun AddFriendGroup(
     friendsLst: List<Friend>,
     userViewModel: UserViewModel
 ) {
-    val context = LocalContext.current
     val addOutgoingFriend = userViewModel.addUserOutgoingFriendDataResult.observeAsState()
     var error by remember { mutableStateOf("") }
-    var showSuccess by remember { mutableStateOf(false) }
+    var showSuccess by remember { mutableStateOf("") }
     var friendsNickname by remember { mutableStateOf("") }
-    var clicked by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -410,19 +398,8 @@ fun AddFriendGroup(
         )
         Button(
             onClick = {
-                if (!clicked) {
-                    if (checkIfNotFriend(friendsNickname, friendsLst)) {
-                        userViewModel.addUserOutgoingFriend(friendsNickname)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "$friendsNickname is already your friend",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    clicked = true
-                    showSuccess = true
-                }
+                userViewModel.addUserOutgoingFriend(friendsNickname)
+                showSuccess = ""
             },
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp
@@ -442,25 +419,20 @@ fun AddFriendGroup(
     }
     viewModelResultHandler(
         addOutgoingFriend,
-        onSuccess = { successMsg ->
-            if (showSuccess) {
-                Toast.makeText(LocalContext.current, successMsg, Toast.LENGTH_LONG).show()
-                showSuccess = false
+        onSuccess = { success ->
+            if (showSuccess != success) {
+                Toast.makeText(LocalContext.current, success, Toast.LENGTH_SHORT).show()
+                showSuccess = success
             }
             userViewModel.getUserOutgoingFriends()
-            clicked = false
+            userViewModel.getUserIncomingFriends()
+            userViewModel.getUserFriends()
         },
         onError = { newError ->
             if (error != newError) {
                 Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
                 error = newError
             }
-            clicked = false
         }
     )
-}
-
-fun checkIfNotFriend(nickname: String, friendsLst: List<Friend>): Boolean {
-    Log.d("ABOBA", friendsLst.toString())
-    return friendsLst.find { it.nickname == nickname } == null
 }

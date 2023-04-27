@@ -6,11 +6,9 @@ import com.example.spender.data.DataResult
 inline fun <reified T> viewModelResultHandler(
     result: State<DataResult<T>?>,
     onSuccess: (data: T) -> Unit = {},
-    onError: (error: String) -> Unit = {},
+    onError: (newError: String) -> Unit = {},
 ) {
-    if (result.value == null) {
-        return
-    }
+    if (result.value == null) { return }
     if (result.value!! is DataResult.Error) {
         onError.invoke((result.value!! as DataResult.Error).exception)
         return

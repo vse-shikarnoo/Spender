@@ -6,6 +6,8 @@ import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
+import com.example.spender.data.messages.exceptions.FirebaseAddMyselfFriendException
+import com.example.spender.data.messages.exceptions.FirebaseAlreadyFriendException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
@@ -577,15 +579,42 @@ class RemoteUserDaoImpl @Inject constructor(
         }
         val friendDocRef = querySnapshot.documents[0].reference
 
-        return try {
-            val userID = remoteDataSource.auth.currentUser?.uid.toString()
-            val userDocRef =
-                remoteDataSource.db.collection(
-                    appContext.getString(
-                        R.string.collection_name_users
-                    )
+        val friendsResult = getUserFriends()
+        if (friendsResult is DataResult.Error) {
+            return friendsResult
+        }
+
+        val userID = remoteDataSource.auth.currentUser?.uid.toString()
+        val userDocRef =
+            remoteDataSource.db.collection(
+                appContext.getString(
+                    R.string.collection_name_users
                 )
-                    .document(userID)
+            ).document(userID)
+
+        val isAlreadyFriend = (friendsResult as DataResult.Success).data.find {
+            it.docRef == friendDocRef
+        } != null
+        if (isAlreadyFriend) {
+            return DataErrorHandler.handle(FirebaseAlreadyFriendException())
+        }
+        val isMe = userDocRef == friendDocRef
+        if (isMe) {
+            return DataErrorHandler.handle(FirebaseAddMyselfFriendException())
+        }
+
+        val incomingFriendsResult = getUserIncomingFriends()
+        if (incomingFriendsResult is DataResult.Error) {
+            return incomingFriendsResult
+        }
+
+        (incomingFriendsResult as DataResult.Success).data.forEach {
+            if (it.docRef == friendDocRef) {
+                return addUserIncomingFriend(it)
+            }
+        }
+
+        return try {
             val batch = remoteDataSource.db.batch()
 
             batch.update(

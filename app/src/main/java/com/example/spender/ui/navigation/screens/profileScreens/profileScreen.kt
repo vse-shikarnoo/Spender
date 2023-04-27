@@ -2,6 +2,7 @@ package com.example.spender.ui.navigation.screens.profileScreens
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -90,17 +91,7 @@ fun ProfileScreenTopBar(
     val userNicknameResult = userViewModel.getUserNicknameDataResult.observeAsState()
     val signOutResult = authViewModel.signOutDataResult.observeAsState()
     var userNickname by remember { mutableStateOf("Loading...") }
-    viewModelResultHandler(LocalContext.current, userNicknameResult, { userNickname = it })
-    viewModelResultHandler(
-        LocalContext.current,
-        signOutResult,
-        onSuccess = {
-            val activity = (LocalContext.current as Activity)
-            val intent: Intent = activity.intent
-            activity.finish()
-            ContextCompat.startActivity(activity, intent, intent.extras)
-        }
-    )
+
     TopAppBar(
         title = {
             Text(
@@ -114,6 +105,18 @@ fun ProfileScreenTopBar(
             IconButton(onClick = { authViewModel.signOut() }) {
                 Icon(Icons.Filled.ExitToApp, null, tint = GreenMain)
             }
+        }
+    )
+
+    viewModelResultHandler(LocalContext.current, userNicknameResult, { userNickname = it })
+    viewModelResultHandler(
+        LocalContext.current,
+        signOutResult,
+        onSuccess = {
+            val activity = (LocalContext.current as Activity)
+            val intent: Intent = activity.intent
+            activity.finish()
+            ContextCompat.startActivity(activity, intent, intent.extras)
         }
     )
 }
@@ -251,9 +254,18 @@ fun FriendCardButton(
     userViewModel: UserViewModel
 ) {
     val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
-    val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult.observeAsState()
-    val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult.observeAsState()
+    val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult
+        .observeAsState()
+    val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult
+        .observeAsState()
     val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
+
+    val removeUserFriendMsgShow = userViewModel.removeUserFriendMsgShow.observeAsState()
+    val removeUserIncomingFriendMsgShow = userViewModel.removeUserIncomingFriendMsgShow
+        .observeAsState()
+    val removeUserOutgoingFriendMsgShow = userViewModel.removeUserOutgoingFriendMsgShow
+        .observeAsState()
+    val addUserIncomingFriendMsgShow = userViewModel.addUserIncomingFriendMsgShow.observeAsState()
 
     Row {
         FriendCardIconButton(
@@ -286,6 +298,10 @@ fun FriendCardButton(
         onSuccess = {
             userViewModel.getUserFriends()
         },
+        onComplete = {
+            userViewModel.doNotShowRemoveUserFriendMsg()
+        },
+        msgShow = removeUserFriendMsgShow.value ?: false
     )
     viewModelResultHandler(
         LocalContext.current,
@@ -293,6 +309,10 @@ fun FriendCardButton(
         onSuccess = {
             userViewModel.getUserIncomingFriends()
         },
+        onComplete = {
+            userViewModel.doNotShowRemoveUserIncomingFriendMsg()
+        },
+        msgShow = removeUserIncomingFriendMsgShow.value ?: false
     )
     viewModelResultHandler(
         LocalContext.current,
@@ -300,6 +320,10 @@ fun FriendCardButton(
         onSuccess = {
             userViewModel.getUserOutgoingFriends()
         },
+        onComplete = {
+            userViewModel.doNotShowRemoveUserOutgoingFriendMsg()
+        },
+        msgShow = removeUserOutgoingFriendMsgShow.value ?: false
     )
     viewModelResultHandler(
         LocalContext.current,
@@ -308,6 +332,10 @@ fun FriendCardButton(
             userViewModel.getUserFriends()
             userViewModel.getUserIncomingFriends()
         },
+        onComplete = {
+            userViewModel.doNotShowAddUserIncomingFriendMsg()
+        },
+        msgShow = addUserIncomingFriendMsgShow.value ?: false
     )
 }
 
@@ -327,6 +355,8 @@ fun AddFriendGroup(
     userViewModel: UserViewModel
 ) {
     val addOutgoingFriend = userViewModel.addUserOutgoingFriendDataResult.observeAsState()
+    val showMsg = userViewModel.addUserOutgoingFriendMsgShow.observeAsState()
+    Log.d("ABOBA", "AddFriendGroup: $showMsg")
     var friendsNickname by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
@@ -368,5 +398,9 @@ fun AddFriendGroup(
             userViewModel.getUserIncomingFriends()
             userViewModel.getUserFriends()
         },
+        onComplete = {
+            userViewModel.doNotShowAddUserOutgoingFriendMsg()
+        },
+        msgShow = showMsg.value ?: false
     )
 }

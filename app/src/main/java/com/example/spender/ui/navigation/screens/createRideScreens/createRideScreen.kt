@@ -187,7 +187,7 @@ fun AddFriendsList(
                 }
             }
         }
-        CreateTripButton(navigator, tripViewModel, tripName, addedFriends)
+        CreateTripButton(navigator, tripViewModel, userViewModel, tripName, addedFriends)
     }
 }
 
@@ -195,10 +195,13 @@ fun AddFriendsList(
 fun CreateTripButton(
     navigator: DestinationsNavigator,
     tripViewModel: TripViewModel,
+    userViewModel: UserViewModel,
     tripName: String,
     friends: List<Friend>
 ) {
     val createTripResult = tripViewModel.createTripDataResult.observeAsState()
+    val createTripMsgShow = tripViewModel.createTripMsgShow.observeAsState()
+
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
@@ -219,7 +222,14 @@ fun CreateTripButton(
         LocalContext.current,
         createTripResult,
         onSuccess = {
-            navigator.navigate(BalanceScreenDestination)
+            if (createTripMsgShow.value == true) {
+                userViewModel.getUserTrips()
+                navigator.navigate(BalanceScreenDestination)
+            }
         },
+        onComplete = {
+            tripViewModel.doNotShowCreateTripMsg()
+        },
+        msgShow = createTripMsgShow.value ?: false
     )
 }

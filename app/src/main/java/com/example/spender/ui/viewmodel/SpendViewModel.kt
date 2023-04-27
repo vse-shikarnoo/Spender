@@ -21,9 +21,16 @@ class SpendViewModel @Inject constructor(
     private val repository: dagger.Lazy<SpendRepository>,
     private val spendUpdateUseCase: dagger.Lazy<SpendUpdateUseCase>
 ) : ViewModel() {
+
+    /*
+     * Create spend
+     */
+
     private val _createSpendDataResult = MutableLiveData<DataResult<String>>()
     val createSpendDataResult: LiveData<DataResult<String>> =
         _createSpendDataResult
+    private val _createSpendMsgShow = MutableLiveData<Boolean>()
+    val createSpendMsgShow: LiveData<Boolean> = _createSpendMsgShow
 
     fun createSpend(
         trip: Trip,
@@ -46,21 +53,38 @@ class SpendViewModel @Inject constructor(
                     members
                 )
             )
+        }.invokeOnCompletion {
+            _createSpendMsgShow.postValue(true)
         }
     }
 
-    private val _updateSpendGeoPointDataResult = MutableLiveData<DataResult<String>>()
-    val updateSpendGeoPointDataResult: LiveData<DataResult<String>> =
-        _updateSpendGeoPointDataResult
+    fun doNotShowCreateSpendMsg() {
+        _createSpendMsgShow.postValue(false)
+    }
+
+    /*
+     * Update spend
+     */
+
+    private val _updateSpendDataResult = MutableLiveData<DataResult<String>>()
+    val updateSpendDataResult: LiveData<DataResult<String>> = _updateSpendDataResult
+    private val _updateSpendMsgShow = MutableLiveData<Boolean>()
+    val updateSpendMsgShow: LiveData<Boolean> = _updateSpendMsgShow
 
     fun updateSpend(
         oldSpend: Spend,
         newSpend: Spend
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            _updateSpendGeoPointDataResult.postValue(
+            _updateSpendDataResult.postValue(
                 spendUpdateUseCase.get().invoke(oldSpend, newSpend)
             )
+        }.invokeOnCompletion {
+            _updateSpendMsgShow.postValue(true)
         }
+    }
+
+    fun doNotShowUpdateSpendMsg() {
+        _updateSpendMsgShow.postValue(false)
     }
 }

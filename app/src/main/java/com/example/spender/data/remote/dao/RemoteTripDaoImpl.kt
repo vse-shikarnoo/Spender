@@ -25,6 +25,9 @@ class RemoteTripDaoImpl @Inject constructor(
         name: String,
         members: List<Friend>,
     ): DataResult<String> {
+        if (name.isBlank()) {
+            return DataErrorHandler.handle(IllegalArgumentException("Trip name cannot be blank"))
+        }
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef =

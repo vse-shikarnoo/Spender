@@ -10,46 +10,30 @@ inline fun <reified T> viewModelResultHandler(
     result: State<DataResult<T>?>,
     onSuccess: (data: T) -> Unit = {},
     onError: () -> Unit = {},
+    onComplete: () -> Unit = {},
+    msgShow: Boolean = false
 ) {
-    if (result.value == null) { return }
-    if (result.value is DataResult.Error){
+    if (result.value == null) {
+        return
+    }
+    if (result.value is DataResult.Error) {
         val resultError = (result.value as DataResult.Error).exception
-        if (Show.showError(resultError)) {
-            Toast.makeText(
-                context,
-                resultError,
-                Toast.LENGTH_SHORT
-            ).show()
+        if (msgShow) {
+            Toast.makeText(context, resultError, Toast.LENGTH_SHORT).show()
         }
         onError.invoke()
+        onComplete.invoke()
         return
     }
     val resultSuccess = (result.value as DataResult.Success).data
     if (resultSuccess !is String) {
         onSuccess.invoke(resultSuccess)
+        onComplete.invoke()
         return
     }
-    if (Show.showSuccess(resultSuccess as String)) {
-        Toast.makeText(
-            context,
-            resultSuccess as String,
-            Toast.LENGTH_SHORT
-        ).show()
-        onSuccess.invoke(resultSuccess)
+    if (msgShow) {
+        Toast.makeText(context, resultSuccess, Toast.LENGTH_SHORT).show()
     }
-}
-
-object Show {
-    var oldError = ""
-    var oldSuccess = ""
-    fun showError(newError: String): Boolean {
-        val result = oldError != newError
-        oldError = newError
-        return result
-    }
-    fun showSuccess(newSuccess: String): Boolean {
-        val result = oldSuccess != newSuccess
-        oldSuccess = newSuccess
-        return result
-    }
+    onSuccess.invoke(resultSuccess)
+    onComplete.invoke()
 }

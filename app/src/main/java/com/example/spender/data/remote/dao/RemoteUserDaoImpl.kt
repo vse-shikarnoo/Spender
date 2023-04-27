@@ -8,6 +8,7 @@ import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.messages.exceptions.FirebaseAddMyselfFriendException
 import com.example.spender.data.messages.exceptions.FirebaseAlreadyFriendException
+import com.example.spender.data.messages.exceptions.FirebaseAlreadySentFriendException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
@@ -611,6 +612,17 @@ class RemoteUserDaoImpl @Inject constructor(
         (incomingFriendsResult as DataResult.Success).data.forEach {
             if (it.docRef == friendDocRef) {
                 return addUserIncomingFriend(it)
+            }
+        }
+
+        val outgoingFriendsResult = getUserOutgoingFriends()
+        if (outgoingFriendsResult is DataResult.Error) {
+            return outgoingFriendsResult
+        }
+
+        (outgoingFriendsResult as DataResult.Success).data.forEach {
+            if (it.docRef == friendDocRef) {
+                return return DataErrorHandler.handle(FirebaseAlreadySentFriendException())
             }
         }
 

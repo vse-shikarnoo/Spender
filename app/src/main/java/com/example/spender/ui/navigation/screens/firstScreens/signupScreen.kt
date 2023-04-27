@@ -148,6 +148,7 @@ fun SignUpButton(
     navigator: DestinationsNavigator
 ) {
     val signUpResult = authViewModel.signUpDataResult.observeAsState()
+    val signUpMsgShow = authViewModel.signUpMsgShow.observeAsState()
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         androidx.compose.material3.Button(
@@ -169,6 +170,10 @@ fun SignUpButton(
             authViewModel.signUp(email, password, nickname)
             navigator.navigate(BalanceScreenDestination)
         },
+        onComplete = {
+            authViewModel.doNotShowSignUpMsg()
+        },
+        msgShow = signUpMsgShow.value ?: false
     )
 }
 

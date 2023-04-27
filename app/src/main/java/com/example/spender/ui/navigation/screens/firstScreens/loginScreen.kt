@@ -1,7 +1,6 @@
 package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -120,7 +119,6 @@ fun LoginButton(
     password: String
 ) {
     val signInResult = authViewModel.signInDataResult.observeAsState()
-    var error by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         androidx.compose.material3.Button(
@@ -137,13 +135,8 @@ fun LoginButton(
     }
 
     viewModelResultHandler(
+        LocalContext.current,
         result = signInResult,
-        onError = { newError ->
-            if (error != newError) {
-                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
-            }
-            error = newError
-        },
         onSuccess = {
             navigator.popBackStack(FirstScreenDestination, true)
             navigator.navigate(BalanceScreenDestination)

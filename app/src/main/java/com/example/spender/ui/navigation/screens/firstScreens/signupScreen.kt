@@ -1,7 +1,6 @@
 package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -148,7 +147,6 @@ fun SignUpButton(
     authViewModel: AuthViewModel,
     navigator: DestinationsNavigator
 ) {
-    var error by remember { mutableStateOf("") }
     val signUpResult = authViewModel.signUpDataResult.observeAsState()
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -165,17 +163,12 @@ fun SignUpButton(
         }
     }
     viewModelResultHandler(
+        LocalContext.current,
         signUpResult,
         onSuccess = {
             authViewModel.signUp(email, password, nickname)
             navigator.navigate(BalanceScreenDestination)
         },
-        onError = { newError ->
-            if (error != newError) {
-                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
-            }
-            error = newError
-        }
     )
 }
 

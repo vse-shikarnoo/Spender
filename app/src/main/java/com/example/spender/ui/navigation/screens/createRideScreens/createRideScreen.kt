@@ -1,6 +1,5 @@
 package com.example.spender.ui.navigation.screens.createRideScreens
 
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -129,7 +128,7 @@ fun AddFriendsList(
     val addedFriends = mutableListOf<Friend>()
     var addFriend by remember { mutableStateOf(false) }
     var friendsLst = emptyList<Friend>()
-    viewModelResultHandler(friends, { friendsLst = it })
+    viewModelResultHandler(LocalContext.current, friends, { friendsLst = it })
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -199,15 +198,11 @@ fun CreateTripButton(
     tripName: String,
     friends: List<Friend>
 ) {
-    val context = LocalContext.current
-    var error by remember { mutableStateOf("") }
-    var success by remember { mutableStateOf(false) }
     val createTripResult = tripViewModel.createTripDataResult.observeAsState()
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
                 tripViewModel.createTrip(tripName, friends)
-                success = true
             },
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp
@@ -221,18 +216,10 @@ fun CreateTripButton(
         }
     }
     viewModelResultHandler(
+        LocalContext.current,
         createTripResult,
         onSuccess = {
-            if (success) {
-                navigator.navigate(BalanceScreenDestination)
-            }
-            success = false
+            navigator.navigate(BalanceScreenDestination)
         },
-        onError = { newError ->
-            if (error != newError) {
-                Toast.makeText(context, "Error: $newError", Toast.LENGTH_LONG).show()
-            }
-            error = newError
-        }
     )
 }

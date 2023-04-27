@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -170,7 +171,7 @@ fun TripsList(
     val trips = userViewModel.getUserTripsDataResult.observeAsState()
     var tripsLst by remember { mutableStateOf(emptyList<Trip>()) }
     var showMore by remember { mutableStateOf(false) }
-    viewModelResultHandler(trips, { tripsLst = it })
+    viewModelResultHandler(LocalContext.current, trips, { tripsLst = it })
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)

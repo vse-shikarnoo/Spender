@@ -40,8 +40,6 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
-import com.example.spender.ui.navigation.BottomNavGraph
-import com.example.spender.ui.navigation.ProfileNavGraph
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.navigation.screens.helperfunctions.FriendCard
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
@@ -53,8 +51,6 @@ import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@BottomNavGraph
-@ProfileNavGraph(start = true)
 @Destination
 @Composable
 fun ProfileScreen(

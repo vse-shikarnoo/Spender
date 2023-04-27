@@ -7,12 +7,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.spender.ui.navigation.BalanceNavGraph
-import com.example.spender.ui.navigation.BottomNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 
-@BottomNavGraph
-@BalanceNavGraph
 @Destination
 @Composable
 fun AddSpendingScreen() {

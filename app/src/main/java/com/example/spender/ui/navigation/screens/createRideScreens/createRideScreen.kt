@@ -29,8 +29,6 @@ import com.example.spender.R
 import com.example.spender.domain.model.user.Friend
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
-import com.example.spender.ui.navigation.BottomNavGraph
-import com.example.spender.ui.navigation.CreateRideNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.navigation.screens.helperfunctions.FriendCard
@@ -41,9 +39,6 @@ import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@OptIn(ExperimentalMaterial3Api::class)
-@BottomNavGraph
-@CreateRideNavGraph(start = true)
 @Destination
 @Composable
 fun CreateRideScreen(

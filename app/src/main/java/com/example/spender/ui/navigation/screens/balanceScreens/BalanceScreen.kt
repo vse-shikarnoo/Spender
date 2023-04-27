@@ -25,10 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
 import com.example.spender.domain.model.Trip
-import com.example.spender.ui.navigation.BalanceNavGraph
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
-import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.*
@@ -37,8 +35,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
-@BottomNavGraph(start = true)
-@BalanceNavGraph(start = true)
 @Destination
 @Composable
 fun BalanceScreen(

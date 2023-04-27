@@ -27,6 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
 import com.example.spender.domain.model.user.Friend
+import com.example.spender.ui.navigation.BottomBar
+import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.CreateRideNavGraph
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
@@ -51,6 +53,7 @@ fun CreateRideScreen(
 ) {
     Scaffold(
         topBar = { CreateRideTopBar() },
+        bottomBar = { BottomBar(BottomBarDestinations.CreateRide, navigator) },
         content = { CreateRideContent(it, userViewModel, tripViewModel, navigator) }
     )
     LaunchedEffect(

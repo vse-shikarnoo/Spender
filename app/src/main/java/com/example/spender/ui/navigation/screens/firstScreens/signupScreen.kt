@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
 import com.example.spender.ui.navigation.FirstNavGraph
-import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.GreenLight
@@ -170,7 +170,7 @@ fun SignUpButton(
         signUpResult,
         onSuccess = {
             authViewModel.signUp(email, password, nickname)
-            navigator.navigate(BottomBarScreenDestination)
+            navigator.navigate(BalanceScreenDestination)
         },
         onError = { newError ->
             if (error != newError) {

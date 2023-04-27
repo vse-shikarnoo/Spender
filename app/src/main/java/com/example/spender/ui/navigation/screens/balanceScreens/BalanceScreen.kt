@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
 import com.example.spender.domain.model.Trip
 import com.example.spender.ui.navigation.BalanceNavGraph
+import com.example.spender.ui.navigation.BottomBar
+import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.BottomNavGraph
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
@@ -45,6 +47,7 @@ fun BalanceScreen(
 ) {
     Scaffold(
         topBar = { BalanceScreenTopBar() },
+        bottomBar = { BottomBar(BottomBarDestinations.Balance, navigator) },
         content = { BalanceScreenContent(paddingValues = it, navigator, userViewModel) }
     )
     LaunchedEffect(

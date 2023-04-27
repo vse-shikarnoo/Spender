@@ -12,6 +12,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spender.ui.navigation.screens.NavGraphs
 import com.example.spender.ui.theme.SpenderTheme
 import com.example.spender.ui.viewmodel.AuthViewModel
+import com.example.spender.ui.viewmodel.SpendViewModel
+import com.example.spender.ui.viewmodel.TripViewModel
+import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +43,9 @@ fun AppNavigation(
                 dependenciesContainerBuilder = { // this: DependenciesContainerBuilder<*>
                     // 👇 To tie ActivityViewModel to the activity, making it available to all destinations
                     dependency(hiltViewModel<AuthViewModel>(activity))
+                    dependency(hiltViewModel<UserViewModel>(activity))
+                    dependency(hiltViewModel<TripViewModel>(activity))
+                    dependency(hiltViewModel<SpendViewModel>(activity))
                 }
             )
         }

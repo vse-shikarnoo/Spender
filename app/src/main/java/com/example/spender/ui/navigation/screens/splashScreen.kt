@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
 import com.example.spender.ui.navigation.FirstNavGraph
-import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.WhiteBackground
@@ -48,7 +48,7 @@ fun SplashScreen(
         currentUserResult,
         onSuccess = {
             navigator.popBackStack()
-            navigator.navigate(BottomBarScreenDestination)
+            navigator.navigate(BalanceScreenDestination)
         },
         onError = {
             navigator.popBackStack()

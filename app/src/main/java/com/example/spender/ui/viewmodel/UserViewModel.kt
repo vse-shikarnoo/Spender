@@ -21,8 +21,8 @@ class UserViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** Geters
-    * They do not have showMsg live data variables
-    * */
+     * They do not have showMsg live data variables
+     * */
 
     private val _getUserDataResult = MutableLiveData<DataResult<User>>()
     val getUserDataResult: LiveData<DataResult<User>> = _getUserDataResult

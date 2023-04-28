@@ -36,7 +36,7 @@ class SpendViewModel @Inject constructor(
         trip: Trip,
         name: String,
         category: String,
-        splitMode: Int,
+        splitMode: String,
         amount: Double,
         geoPoint: GeoPoint,
         members: List<SpendMember>

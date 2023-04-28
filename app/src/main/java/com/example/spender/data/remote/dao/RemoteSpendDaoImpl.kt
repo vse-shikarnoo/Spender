@@ -25,7 +25,7 @@ class RemoteSpendDaoImpl @Inject constructor(
         trip: Trip,
         name: String,
         category: String,
-        splitMode: Int,
+        splitMode: String,
         amount: Double,
         geoPoint: GeoPoint,
         members: List<SpendMember>
@@ -63,7 +63,7 @@ class RemoteSpendDaoImpl @Inject constructor(
     private fun spendMap(
         name: String,
         category: String,
-        splitMode: Int,
+        splitMode: String,
         amount: Double,
         geoPoint: GeoPoint
     ): Map<String, Any> {
@@ -110,7 +110,7 @@ class RemoteSpendDaoImpl @Inject constructor(
 
     override suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,
-        newSplitMode: Int
+        newSplitMode: String
     ): DataResult<String> {
         return try {
             spendDocRef.update(

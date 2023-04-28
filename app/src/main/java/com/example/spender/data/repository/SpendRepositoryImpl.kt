@@ -23,7 +23,7 @@ class SpendRepositoryImpl @Inject constructor(
         trip: Trip,
         name: String,
         category: String,
-        splitMode: Int,
+        splitMode: String,
         amount: Double,
         geoPoint: GeoPoint,
         members: List<SpendMember>
@@ -55,7 +55,7 @@ class SpendRepositoryImpl @Inject constructor(
 
     override suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,
-        newSplitMode: Int
+        newSplitMode: String
     ): DataResult<String> {
         return remoteSpendDaoImplServer.updateSpendSplitMode(spendDocRef, newSplitMode)
     }

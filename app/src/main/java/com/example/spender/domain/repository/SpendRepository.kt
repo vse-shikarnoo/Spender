@@ -11,7 +11,7 @@ interface SpendRepository {
         trip: Trip,
         name: String,
         category: String = "No category",
-        splitMode: Int = 0,
+        splitMode: String = "No split mode",
         amount: Double = 0.0,
         geoPoint: GeoPoint = GeoPoint(0.0, 0.0),
         members: List<SpendMember>,
@@ -27,7 +27,7 @@ interface SpendRepository {
     ): DataResult<String>
     suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,
-        newSplitMode: Int
+        newSplitMode: String
     ): DataResult<String>
     suspend fun updateSpendAmount(
         spendDocRef: DocumentReference,

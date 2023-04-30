@@ -1,6 +1,7 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
+import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
@@ -10,6 +11,7 @@ import com.example.spender.data.messages.exceptions.FirebaseAlreadyFriendExcepti
 import com.example.spender.data.messages.exceptions.FirebaseAlreadySentFriendException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
+import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
 import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.model.Trip
@@ -27,7 +29,6 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-
 
 @Suppress("UNCHECKED_CAST")
 class RemoteUserDaoImpl @Inject constructor(
@@ -553,7 +554,7 @@ class RemoteUserDaoImpl @Inject constructor(
         }
 
         // already outgoing
-        val alreadyOutgoing = checkAlreadyOutgoing(userDocRef)
+        val alreadyOutgoing = checkAlreadyOutgoing(friendDocRef)
         if (alreadyOutgoing is DataResult.Error) {
             return alreadyOutgoing
         }
@@ -591,9 +592,9 @@ class RemoteUserDaoImpl @Inject constructor(
                 nickname
             ).get().await()
             if (querySnapshot.documents.isEmpty()) {
-                return DataErrorHandler.handle(FirebaseNicknameException())
+                return DataErrorHandler.handle(FirebaseNoNicknameUserException())
             }
-            DataResult.Success(querySnapshot.documents[0].reference)
+            DataResult.Success(querySnapshot.documents.first().reference)
         } catch (e: Exception) {
             return DataErrorHandler.handle(e)
         }
@@ -625,7 +626,7 @@ class RemoteUserDaoImpl @Inject constructor(
         }
 
         (incomingFriendsResult as DataResult.Success).data.forEach {
-            if (it.docRef == friendDocRef) {
+            if (it.docRef.path == friendDocRef.path) {
                 return DataResult.Success(it)
             }
         }
@@ -639,7 +640,6 @@ class RemoteUserDaoImpl @Inject constructor(
         if (outgoingFriendsResult is DataResult.Error) {
             return outgoingFriendsResult
         }
-
         (outgoingFriendsResult as DataResult.Success).data.forEach {
             if (it.docRef == friendDocRef) {
                 return DataErrorHandler.handle(FirebaseAlreadySentFriendException())

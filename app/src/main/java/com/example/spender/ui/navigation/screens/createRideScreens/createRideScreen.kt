@@ -227,7 +227,7 @@ fun CreateTripButton(
                 navigator.navigate(BalanceScreenDestination)
             }
         },
-        onComplete = {
+        restMsgShowState = {
             tripViewModel.doNotShowCreateTripMsg()
         },
         msgShow = createTripMsgShow.value ?: false

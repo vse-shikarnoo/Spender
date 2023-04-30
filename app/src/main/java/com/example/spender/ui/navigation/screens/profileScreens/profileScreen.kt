@@ -2,7 +2,6 @@ package com.example.spender.ui.navigation.screens.profileScreens
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -202,6 +201,21 @@ fun FriendsListTemplate(
     friendsLst: List<Friend>,
     userViewModel: UserViewModel
 ) {
+    val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
+    val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult
+        .observeAsState()
+    val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult
+        .observeAsState()
+    val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
+
+    val removeUserFriendMsgShow = userViewModel.removeUserFriendMsgShow.observeAsState()
+    val removeUserIncomingFriendMsgShow = userViewModel.removeUserIncomingFriendMsgShow
+        .observeAsState()
+    val removeUserOutgoingFriendMsgShow = userViewModel.removeUserOutgoingFriendMsgShow
+        .observeAsState()
+    val addUserIncomingFriendMsgShow = userViewModel.addUserIncomingFriendMsgShow.observeAsState()
+
+
     FriendListTitle(text)
     Divider(color = GreenLight, modifier = Modifier.padding(vertical = 12.dp))
     LazyColumn(
@@ -224,6 +238,52 @@ fun FriendsListTemplate(
     if (friendsLst.isEmpty()) {
         Divider(color = GreenLight, modifier = Modifier.padding(vertical = 12.dp))
     }
+
+    viewModelResultHandler(
+        LocalContext.current,
+        removeUserFriend,
+        onSuccess = {
+            userViewModel.getUserFriends()
+        },
+        restMsgShowState = {
+            userViewModel.doNotShowRemoveUserFriendMsg()
+        },
+        msgShow = removeUserFriendMsgShow.value ?: false
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        removeUserIncomingFriend,
+        onSuccess = {
+            userViewModel.getUserIncomingFriends()
+        },
+        restMsgShowState = {
+            userViewModel.doNotShowRemoveUserIncomingFriendMsg()
+        },
+        msgShow = removeUserIncomingFriendMsgShow.value ?: false
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        removeUserOutgoingFriend,
+        onSuccess = {
+            userViewModel.getUserOutgoingFriends()
+        },
+        restMsgShowState = {
+            userViewModel.doNotShowRemoveUserOutgoingFriendMsg()
+        },
+        msgShow = removeUserOutgoingFriendMsgShow.value ?: false
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        addUserIncomingFriend,
+        onSuccess = {
+            userViewModel.getUserFriends()
+            userViewModel.getUserIncomingFriends()
+        },
+        restMsgShowState = {
+            userViewModel.doNotShowAddUserIncomingFriendMsg()
+        },
+        msgShow = addUserIncomingFriendMsgShow.value ?: false
+    )
 }
 
 @Composable
@@ -253,20 +313,6 @@ fun FriendCardButton(
     friend: Friend,
     userViewModel: UserViewModel
 ) {
-    val removeUserFriend = userViewModel.removeUserFriendDataResult.observeAsState()
-    val removeUserIncomingFriend = userViewModel.removeUserIncomingFriendDataResult
-        .observeAsState()
-    val removeUserOutgoingFriend = userViewModel.removeUserOutgoingFriendDataResult
-        .observeAsState()
-    val addUserIncomingFriend = userViewModel.addUserIncomingFriendDataResult.observeAsState()
-
-    val removeUserFriendMsgShow = userViewModel.removeUserFriendMsgShow.observeAsState()
-    val removeUserIncomingFriendMsgShow = userViewModel.removeUserIncomingFriendMsgShow
-        .observeAsState()
-    val removeUserOutgoingFriendMsgShow = userViewModel.removeUserOutgoingFriendMsgShow
-        .observeAsState()
-    val addUserIncomingFriendMsgShow = userViewModel.addUserIncomingFriendMsgShow.observeAsState()
-
     Row {
         FriendCardIconButton(
             onClick = {
@@ -291,52 +337,6 @@ fun FriendCardButton(
             )
         }
     }
-
-    viewModelResultHandler(
-        LocalContext.current,
-        removeUserFriend,
-        onSuccess = {
-            userViewModel.getUserFriends()
-        },
-        onComplete = {
-            userViewModel.doNotShowRemoveUserFriendMsg()
-        },
-        msgShow = removeUserFriendMsgShow.value ?: false
-    )
-    viewModelResultHandler(
-        LocalContext.current,
-        removeUserIncomingFriend,
-        onSuccess = {
-            userViewModel.getUserIncomingFriends()
-        },
-        onComplete = {
-            userViewModel.doNotShowRemoveUserIncomingFriendMsg()
-        },
-        msgShow = removeUserIncomingFriendMsgShow.value ?: false
-    )
-    viewModelResultHandler(
-        LocalContext.current,
-        removeUserOutgoingFriend,
-        onSuccess = {
-            userViewModel.getUserOutgoingFriends()
-        },
-        onComplete = {
-            userViewModel.doNotShowRemoveUserOutgoingFriendMsg()
-        },
-        msgShow = removeUserOutgoingFriendMsgShow.value ?: false
-    )
-    viewModelResultHandler(
-        LocalContext.current,
-        addUserIncomingFriend,
-        onSuccess = {
-            userViewModel.getUserFriends()
-            userViewModel.getUserIncomingFriends()
-        },
-        onComplete = {
-            userViewModel.doNotShowAddUserIncomingFriendMsg()
-        },
-        msgShow = addUserIncomingFriendMsgShow.value ?: false
-    )
 }
 
 @Composable
@@ -356,7 +356,6 @@ fun AddFriendGroup(
 ) {
     val addOutgoingFriend = userViewModel.addUserOutgoingFriendDataResult.observeAsState()
     val showMsg = userViewModel.addUserOutgoingFriendMsgShow.observeAsState()
-    Log.d("ABOBA", "AddFriendGroup: $showMsg")
     var friendsNickname by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
@@ -398,7 +397,7 @@ fun AddFriendGroup(
             userViewModel.getUserIncomingFriends()
             userViewModel.getUserFriends()
         },
-        onComplete = {
+        restMsgShowState = {
             userViewModel.doNotShowAddUserOutgoingFriendMsg()
         },
         msgShow = showMsg.value ?: false

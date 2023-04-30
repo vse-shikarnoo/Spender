@@ -170,7 +170,7 @@ fun SignUpButton(
             authViewModel.signUp(email, password, nickname)
             navigator.navigate(BalanceScreenDestination)
         },
-        onComplete = {
+        restMsgShowState = {
             authViewModel.doNotShowSignUpMsg()
         },
         msgShow = signUpMsgShow.value ?: false

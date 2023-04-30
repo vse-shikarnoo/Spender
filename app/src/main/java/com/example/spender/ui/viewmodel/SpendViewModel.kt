@@ -5,12 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.spend.Spend
-import com.example.spender.domain.model.spend.SpendMember
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.RemoteSpend
+import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.repository.SpendRepository
-import com.example.spender.domain.usecases.interfaces.SpendUpdateUseCase
-import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +17,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SpendViewModel @Inject constructor(
     private val repository: dagger.Lazy<SpendRepository>,
-    private val spendUpdateUseCase: dagger.Lazy<SpendUpdateUseCase>
 ) : ViewModel() {
 
     /*
@@ -32,26 +29,10 @@ class SpendViewModel @Inject constructor(
     private val _createSpendMsgShow = MutableLiveData<Boolean>()
     val createSpendMsgShow: LiveData<Boolean> = _createSpendMsgShow
 
-    fun createSpend(
-        trip: Trip,
-        name: String,
-        category: String,
-        splitMode: String,
-        amount: Double,
-        geoPoint: GeoPoint,
-        members: List<SpendMember>
-    ) {
+    fun createSpend(trip: Trip, spend: Spend) {
         viewModelScope.launch(Dispatchers.IO) {
             _createSpendDataResult.postValue(
-                repository.get().createSpend(
-                    trip,
-                    name,
-                    category,
-                    splitMode,
-                    amount,
-                    geoPoint,
-                    members
-                )
+                repository.get().createSpend(trip, spend)
             )
         }.invokeOnCompletion {
             _createSpendMsgShow.postValue(true)
@@ -60,6 +41,21 @@ class SpendViewModel @Inject constructor(
 
     fun doNotShowCreateSpendMsg() {
         _createSpendMsgShow.postValue(false)
+    }
+
+    /*
+     * Get spends
+     */
+
+    private val _getSpendsDataResult = MutableLiveData<DataResult<List<RemoteSpend>>>()
+    val getSpendsDataResult: LiveData<DataResult<List<RemoteSpend>>> = _getSpendsDataResult
+
+    fun getSpends(trip: Trip) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getSpendsDataResult.postValue(
+                repository.get().getSpends(trip)
+            )
+        }
     }
 
     /*
@@ -72,12 +68,12 @@ class SpendViewModel @Inject constructor(
     val updateSpendMsgShow: LiveData<Boolean> = _updateSpendMsgShow
 
     fun updateSpend(
-        oldSpend: Spend,
-        newSpend: Spend
+        oldRemoteSpend: RemoteSpend,
+        newRemoteSpend: RemoteSpend
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateSpendDataResult.postValue(
-                spendUpdateUseCase.get().invoke(oldSpend, newSpend)
+                repository.get().updateSpend(oldRemoteSpend, newRemoteSpend)
             )
         }.invokeOnCompletion {
             _updateSpendMsgShow.postValue(true)

@@ -26,13 +26,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
-import com.example.spender.domain.model.Trip
+import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.*
-import com.example.spender.ui.viewmodel.UserViewModel
+import com.example.spender.ui.viewmodel.TripViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -41,17 +41,17 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun BalanceScreen(
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel
+    tripViewModel: TripViewModel
 ) {
     Scaffold(
         topBar = { BalanceScreenTopBar() },
         bottomBar = { BottomBar(BottomBarDestinations.Balance, navigator) },
-        content = { BalanceScreenContent(paddingValues = it, navigator, userViewModel) }
+        content = { BalanceScreenContent(paddingValues = it, navigator, tripViewModel) }
     )
     LaunchedEffect(
         key1 = 1,
         block = {
-            userViewModel.getUserTrips()
+            tripViewModel.getAdminTrips()
         }
     )
 }
@@ -75,7 +75,7 @@ fun BalanceScreenTopBar() {
 fun BalanceScreenContent(
     paddingValues: PaddingValues,
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel
+    tripViewModel: TripViewModel
 ) {
     Column(
         modifier = Modifier
@@ -89,7 +89,7 @@ fun BalanceScreenContent(
         BalanceCard()
         TripsList(
             navigator,
-            userViewModel
+            tripViewModel
         )
     }
 }
@@ -166,9 +166,9 @@ fun OweCard(text: String) {
 @Composable
 fun TripsList(
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel
+    tripViewModel: TripViewModel
 ) {
-    val trips = userViewModel.getUserTripsDataResult.observeAsState()
+    val trips = tripViewModel.getAdminTripsDataResult.observeAsState()
     var tripsLst by remember { mutableStateOf(emptyList<Trip>()) }
     var showMore by remember { mutableStateOf(false) }
     viewModelResultHandler(LocalContext.current, trips, { tripsLst = it })

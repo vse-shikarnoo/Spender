@@ -1,15 +1,12 @@
 package com.example.spender.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.User
-import com.example.spender.domain.model.user.UserName
+import com.example.spender.domain.remotemodel.user.Friend
+import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -24,17 +21,6 @@ class UserViewModel @Inject constructor(
     /** Geters
      * They do not have showMsg live data variables
      * */
-
-    private val _getUserDataResult = MutableLiveData<DataResult<User>>()
-    val getUserDataResult: LiveData<DataResult<User>> = _getUserDataResult
-
-    fun getUser() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserDataResult.postValue(
-                repository.get().getUser()
-            )
-        }
-    }
 
     private val _getUserNameDataResult = MutableLiveData<DataResult<UserName>>()
     val getUserNameDataResult: LiveData<DataResult<UserName>> =
@@ -111,73 +97,10 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    private val _getUserTripsDataResult =
-        MutableLiveData<DataResult<List<Trip>>>()
-    val getUserTripsDataResult: LiveData<DataResult<List<Trip>>> =
-        _getUserTripsDataResult
-
-    fun getUserTrips() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserTripsDataResult.postValue(
-                repository.get().getUserTrips()
-            )
-        }
-    }
-
-    private val _getUserAdminTripsDataResult =
-        MutableLiveData<DataResult<List<Trip>>>()
-    val getUserAdminTripsDataResult: LiveData<DataResult<List<Trip>>> =
-        _getUserAdminTripsDataResult
-
-    fun getUserAdminTrips() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserAdminTripsDataResult.postValue(
-                repository.get().getUserAdminTrips()
-            )
-        }
-    }
-
-    private val _getUserPassengerTripsDataResult =
-        MutableLiveData<DataResult<List<Trip>>>()
-    val getUserPassengerTripsDataResult: LiveData<DataResult<List<Trip>>> =
-        _getUserPassengerTripsDataResult
-
-    fun getUserPassengerTrips() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserPassengerTripsDataResult.postValue(
-                repository.get().getUserPassengerTrips()
-            )
-        }
-    }
-
     /** Updaters and adders
-     * They have showMsg live data variables that must be resetted in viewModelResultHandler
+     * They have showMsg live data variables that must be reset in viewModelResultHandler
      * function if we want to show messages to user
      * */
-
-    /*
-    * updateUser
-     */
-
-    private val _updateUserDataResult = MutableLiveData<DataResult<String>>()
-    val updateUserDataResult: LiveData<DataResult<String>> =
-        _updateUserDataResult
-    private val _updateUserMsgShow = MutableLiveData<Boolean>()
-    val updateUserMsgShow: LiveData<Boolean> = _updateUserMsgShow
-
-    fun updateUser(newUser: User) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _updateUserDataResult.postValue(
-                repository.get().updateUser(newUser)
-            )
-        }.invokeOnCompletion {
-            _updateUserMsgShow.postValue(true)
-        }
-    }
-
-    fun doNotShowUpdateUserMsg() {
-        _updateUserMsgShow.postValue(false)
-    }
 
     /*
     * updateUserName

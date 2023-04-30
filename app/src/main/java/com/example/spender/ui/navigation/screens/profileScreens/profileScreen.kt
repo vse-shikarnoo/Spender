@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.spender.R
-import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField

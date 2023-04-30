@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
@@ -187,7 +187,7 @@ fun AddFriendsList(
                 }
             }
         }
-        CreateTripButton(navigator, tripViewModel, userViewModel, tripName, addedFriends)
+        CreateTripButton(navigator, tripViewModel, tripName, addedFriends)
     }
 }
 
@@ -195,7 +195,6 @@ fun AddFriendsList(
 fun CreateTripButton(
     navigator: DestinationsNavigator,
     tripViewModel: TripViewModel,
-    userViewModel: UserViewModel,
     tripName: String,
     friends: List<Friend>
 ) {
@@ -223,7 +222,7 @@ fun CreateTripButton(
         createTripResult,
         onSuccess = {
             if (createTripMsgShow.value == true) {
-                userViewModel.getUserTrips()
+                tripViewModel.getAdminTrips()
                 navigator.navigate(BalanceScreenDestination)
             }
         },

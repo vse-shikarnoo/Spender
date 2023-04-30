@@ -215,7 +215,6 @@ fun FriendsListTemplate(
         .observeAsState()
     val addUserIncomingFriendMsgShow = userViewModel.addUserIncomingFriendMsgShow.observeAsState()
 
-
     FriendListTitle(text)
     Divider(color = GreenLight, modifier = Modifier.padding(vertical = 12.dp))
     LazyColumn(

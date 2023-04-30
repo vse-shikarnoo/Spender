@@ -38,10 +38,12 @@ interface RemoteSpendDao {
         key: String
     ): DataResult<DebtToUser>
     suspend fun updateSpendName(
-        spendDocRef: DocumentReference, newName: String
+        spendDocRef: DocumentReference,
+        newName: String
     ): DataResult<String>
     suspend fun updateSpendCategory(
-        spendDocRef: DocumentReference, newCategory: String
+        spendDocRef: DocumentReference,
+        newCategory: String
     ): DataResult<String>
     suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,

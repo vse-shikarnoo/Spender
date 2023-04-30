@@ -7,12 +7,12 @@ import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
-import com.example.spender.domain.remotemodel.Trip
-import com.example.spender.domain.remotemodel.spendmember.DebtToUser
-import com.example.spender.domain.remotemodel.spend.RemoteSpend
-import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.example.spender.domain.remotedao.RemoteSpendDao
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
+import com.example.spender.domain.remotemodel.spendmember.DebtToUser
+import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Source
@@ -54,30 +54,30 @@ class RemoteSpendDaoImpl @Inject constructor(
     private fun spendMap(spend: Spend): Map<String, Any> {
         return mapOf(
             appContext.getString(R.string.collection_spends_document_field_name) to
-                    spend.name,
+                spend.name,
             appContext.getString(R.string.collection_spends_document_field_category) to
-                    spend.category,
+                spend.category,
             appContext.getString(R.string.collection_spends_document_field_split_mode) to
-                    spend.splitMode,
+                spend.splitMode,
             appContext.getString(R.string.collection_spends_document_field_amount) to
-                    spend.amount,
+                spend.amount,
             appContext.getString(R.string.collection_spends_document_field_geo) to
-                    spend.geoPoint,
+                spend.geoPoint,
         )
     }
 
     private fun spendMemberMap(remoteSpendMember: RemoteSpendMember): Map<String, Any> {
         return mapOf(
             appContext.getString(R.string.collection_spend_member_document_field_member) to
-                    remoteSpendMember.docRef,
+                remoteSpendMember.docRef,
             appContext.getString(R.string.collection_spend_member_document_field_payment) to
-                    remoteSpendMember.payment,
+                remoteSpendMember.payment,
             appContext.getString(R.string.collection_spend_member_document_field_debt) to
-                    buildMap {
-                        remoteSpendMember.debt.forEach {
-                            this[it.user.docRef] = it.debt
-                        }
+                buildMap {
+                    remoteSpendMember.debt.forEach {
+                        this[it.user.docRef] = it.debt
                     }
+                }
         )
     }
 
@@ -381,11 +381,11 @@ class RemoteSpendDaoImpl @Inject constructor(
                         appContext.getString(
                             R.string.collection_spend_member_document_field_payment
                         ) to
-                                newMember.payment,
+                            newMember.payment,
                         appContext.getString(R.string.collection_spend_member_document_field_member)
-                                to newMember.friend.docRef,
+                            to newMember.friend.docRef,
                         appContext.getString(R.string.collection_spend_member_document_field_debt)
-                                to debtToUser
+                            to debtToUser
                     )
                 )
             }

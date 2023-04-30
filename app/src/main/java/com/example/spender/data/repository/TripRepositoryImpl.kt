@@ -6,9 +6,9 @@ import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.repository.TripRepository
 import com.google.firebase.firestore.Source
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 class TripRepositoryImpl @Inject constructor(
     private val remoteTripDaoImplServer: RemoteTripDaoImpl,

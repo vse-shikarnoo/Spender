@@ -12,14 +12,14 @@ import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
 import com.example.spender.data.remote.RemoteDataSourceImpl
+import com.example.spender.domain.remotedao.RemoteUserDao
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
-import com.example.spender.domain.remotedao.RemoteUserDao
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlinx.coroutines.tasks.await
 
 class RemoteUserDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
@@ -43,9 +43,10 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun getUserAge(): DataResult<Long> {
         return try {
             val age = sharedFunctions.getUserDocRef(null).get(source).await().data!![
-                    appContext.getString(
-                        R.string.collection_users_document_field_age
-                    )] as Long
+                appContext.getString(
+                    R.string.collection_users_document_field_age
+                )
+            ] as Long
             DataResult.Success(age)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -67,9 +68,11 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun getUserIncomingFriends(): DataResult<List<Friend>> {
         return try {
             val friendsDocRefs = sharedFunctions.getUserDocRef(null).get(source).await()
-                .data!![appContext.getString(
-                R.string.collection_users_document_field_incoming_friends
-            )] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
+                .data!![
+                appContext.getString(
+                    R.string.collection_users_document_field_incoming_friends
+                )
+            ] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
             val friends = sharedFunctions.assembleFriendsList(friendsDocRefs, source)
             if (friends is DataResult.Error) {
@@ -89,9 +92,11 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun getUserOutgoingFriends(): DataResult<List<Friend>> {
         return try {
             val friendsDocRefs = sharedFunctions.getUserDocRef(null).get(source).await()
-                .data!![appContext.getString(
-                R.string.collection_users_document_field_outgoing_friends
-            )] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
+                .data!![
+                appContext.getString(
+                    R.string.collection_users_document_field_outgoing_friends
+                )
+            ] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
             val friends = sharedFunctions.assembleFriendsList(friendsDocRefs, source)
             if (friends is DataResult.Error) {
@@ -111,9 +116,10 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun getUserFriends(): DataResult<List<Friend>> {
         return try {
             val friendsDocRefs = sharedFunctions.getUserDocRef(null).get(source).await().data!![
-                    appContext.getString(
-                        R.string.collection_users_document_field_friends
-                    )] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
+                appContext.getString(
+                    R.string.collection_users_document_field_friends
+                )
+            ] as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
             val friends = sharedFunctions.assembleFriendsList(friendsDocRefs, source)
             if (friends is DataResult.Error) {
@@ -330,8 +336,8 @@ class RemoteUserDaoImpl @Inject constructor(
         }
 
         if ((friendsResult as DataResult.Success).data.find {
-                it.docRef == friendDocRef
-            } != null
+            it.docRef == friendDocRef
+        } != null
         ) {
             return DataErrorHandler.handle(FirebaseAlreadyFriendException())
         }

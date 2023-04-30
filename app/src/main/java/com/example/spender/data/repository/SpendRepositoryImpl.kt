@@ -38,26 +38,41 @@ class SpendRepositoryImpl @Inject constructor(
         newRemoteSpend: RemoteSpend
     ): DataResult<String> {
         if (oldRemoteSpend.name != newRemoteSpend.name) {
-            val result = remoteSpendDaoImplServer.updateSpendName(newRemoteSpend.docRef, newRemoteSpend.name)
+            val result = remoteSpendDaoImplServer.updateSpendName(
+                newRemoteSpend.docRef,
+                newRemoteSpend.name
+            )
             if (result is DataResult.Error) return result
         }
         if (oldRemoteSpend.category != newRemoteSpend.category) {
             val result =
-                remoteSpendDaoImplServer.updateSpendCategory(newRemoteSpend.docRef, newRemoteSpend.category)
+                remoteSpendDaoImplServer.updateSpendCategory(
+                    newRemoteSpend.docRef,
+                    newRemoteSpend.category
+                )
             if (result is DataResult.Error) return result
         }
         if (oldRemoteSpend.splitMode != newRemoteSpend.splitMode) {
             val result =
-                remoteSpendDaoImplServer.updateSpendSplitMode(newRemoteSpend.docRef, newRemoteSpend.splitMode)
+                remoteSpendDaoImplServer.updateSpendSplitMode(
+                    newRemoteSpend.docRef,
+                    newRemoteSpend.splitMode
+                )
             if (result is DataResult.Error) return result
         }
         if (oldRemoteSpend.amount != newRemoteSpend.amount) {
-            val result = remoteSpendDaoImplServer.updateSpendAmount(newRemoteSpend.docRef, newRemoteSpend.amount)
+            val result = remoteSpendDaoImplServer.updateSpendAmount(
+                newRemoteSpend.docRef,
+                newRemoteSpend.amount
+            )
             if (result is DataResult.Error) return result
         }
         if (oldRemoteSpend.geoPoint != newRemoteSpend.geoPoint) {
             val result =
-                remoteSpendDaoImplServer.updateSpendGeoPoint(newRemoteSpend.docRef, newRemoteSpend.geoPoint)
+                remoteSpendDaoImplServer.updateSpendGeoPoint(
+                    newRemoteSpend.docRef,
+                    newRemoteSpend.geoPoint
+                )
             if (result is DataResult.Error) return result
         }
 

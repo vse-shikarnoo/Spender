@@ -13,8 +13,8 @@ import com.example.spender.domain.remotemodel.user.Friend
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlinx.coroutines.tasks.await
 
 class RemoteTripDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
@@ -50,11 +50,11 @@ class RemoteTripDaoImpl @Inject constructor(
                 mapOf(
                     appContext.getString(R.string.collection_trip_document_field_name) to name,
                     appContext.getString(R.string.collection_trip_document_field_creator) to
-                            userDocRef,
+                        userDocRef,
                     appContext.getString(R.string.collection_trip_document_field_members) to
-                            FieldValue.arrayUnion(
-                                *membersFirebase.toTypedArray()
-                            )
+                        FieldValue.arrayUnion(
+                            *membersFirebase.toTypedArray()
+                        )
                 )
             ).await()
 
@@ -134,7 +134,6 @@ class RemoteTripDaoImpl @Inject constructor(
             }
         )
     }
-
 
     /*
      * Get trips

@@ -40,7 +40,7 @@ class TripRepositoryImpl @Inject constructor(
 
     override suspend fun getPassengerTrips(source: Source): DataResult<List<Trip>> {
         return if (source == Source.CACHE) {
-            remoteTripDaoImplCache.getAdminTrips()
+            remoteTripDaoImplCache.getPassengerTrips()
         } else {
             remoteTripDaoImplCache.getPassengerTrips()
         }

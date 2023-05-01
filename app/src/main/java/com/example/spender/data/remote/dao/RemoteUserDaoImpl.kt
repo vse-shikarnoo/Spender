@@ -1,6 +1,9 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import androidx.compose.ui.platform.LocalContext
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
@@ -11,15 +14,19 @@ import com.example.spender.data.messages.exceptions.FirebaseAlreadySentFriendExc
 import com.example.spender.data.messages.exceptions.FirebaseNicknameException
 import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
+import com.example.spender.data.messages.exceptions.NoInternetConnectionException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.remotedao.RemoteUserDao
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
+import com.example.spender.ui.viewmodel.InternetChecker
+import com.google.android.gms.common.api.Api.ApiOptions
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
-import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+
 
 class RemoteUserDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
@@ -210,6 +217,10 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun addUserIncomingFriend(
         friend: Friend,
     ): DataResult<String> {
+        if (!InternetChecker.check(appContext)) {
+            return DataErrorHandler.handle(NoInternetConnectionException())
+        }
+
         return try {
             val userDocRef = sharedFunctions.getUserDocRef(null)
             val batch = remoteDataSource.db.batch()
@@ -250,6 +261,9 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun addUserOutgoingFriend(
         nickname: String
     ): DataResult<String> {
+        if (!InternetChecker.check(appContext)) {
+            return DataErrorHandler.handle(NoInternetConnectionException())
+        }
 
         // nickname Exists
         val nicknameExists = checkExistNickname(nickname)
@@ -382,6 +396,10 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun removeUserFriend(
         friend: Friend,
     ): DataResult<String> {
+        if (!InternetChecker.check(appContext)) {
+            return DataErrorHandler.handle(NoInternetConnectionException())
+        }
+
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef = remoteDataSource.db.collection(
@@ -412,6 +430,10 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun removeUserOutgoingFriend(
         friend: Friend
     ): DataResult<String> {
+        if (!InternetChecker.check(appContext)) {
+            return DataErrorHandler.handle(NoInternetConnectionException())
+        }
+
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef = remoteDataSource.db.collection(
@@ -442,6 +464,10 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun removeUserIncomingFriend(
         friend: Friend
     ): DataResult<String> {
+        if (!InternetChecker.check(appContext)) {
+            return DataErrorHandler.handle(NoInternetConnectionException())
+        }
+
         return try {
             val userID = remoteDataSource.auth.currentUser?.uid.toString()
             val userDocRef = remoteDataSource.db.collection(

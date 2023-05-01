@@ -1,5 +1,6 @@
 package com.example.spender.ui.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val repository: dagger.Lazy<UserRepository>
+    private val repository: dagger.Lazy<UserRepository>,
+    private val appContext: Application
 ) : ViewModel() {
 
     /** Geters
@@ -33,10 +35,12 @@ class UserViewModel @Inject constructor(
                 repository.get().getUserName(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getUserNameDataResult.postValue(
-                    repository.get().getUserName(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserNameDataResult.postValue(
+                        repository.get().getUserName(Source.SERVER)
+                    )
+                }
             }
         }
     }
@@ -51,10 +55,12 @@ class UserViewModel @Inject constructor(
                 repository.get().getUserAge(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getUserAgeDataResult.postValue(
-                    repository.get().getUserAge(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserAgeDataResult.postValue(
+                        repository.get().getUserAge(Source.SERVER)
+                    )
+                }
             }
         }
     }
@@ -69,10 +75,12 @@ class UserViewModel @Inject constructor(
                 repository.get().getUserNickname(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getUserNicknameDataResult.postValue(
-                    repository.get().getUserNickname(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserNicknameDataResult.postValue(
+                        repository.get().getUserNickname(Source.SERVER)
+                    )
+                }
             }
         }
     }
@@ -88,10 +96,12 @@ class UserViewModel @Inject constructor(
                 repository.get().getUserIncomingFriends(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getUserIncomingFriendsDataResult.postValue(
-                    repository.get().getUserIncomingFriends(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserIncomingFriendsDataResult.postValue(
+                        repository.get().getUserIncomingFriends(Source.SERVER)
+                    )
+                }
             }
         }
     }
@@ -107,10 +117,12 @@ class UserViewModel @Inject constructor(
                 repository.get().getUserOutgoingFriends(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getUserOutgoingFriendsDataResult.postValue(
-                    repository.get().getUserOutgoingFriends(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserOutgoingFriendsDataResult.postValue(
+                        repository.get().getUserOutgoingFriends(Source.SERVER)
+                    )
+                }
             }
         }
     }
@@ -126,10 +138,12 @@ class UserViewModel @Inject constructor(
                 repository.get().getUserFriends(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getUserFriendsDataResult.postValue(
-                    repository.get().getUserFriends(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserFriendsDataResult.postValue(
+                        repository.get().getUserFriends(Source.SERVER)
+                    )
+                }
             }
         }
     }

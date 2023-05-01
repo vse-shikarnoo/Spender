@@ -1,23 +1,33 @@
 package com.example.spender.ui.viewmodel
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
+import com.example.spender.data.messages.exceptions.NoInternetConnectionException
 import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.repository.TripRepository
 import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class TripViewModel @Inject constructor(
-    private val repository: dagger.Lazy<TripRepository>
+    private val repository: dagger.Lazy<TripRepository>,
+    private val appContext: Application
 ) : ViewModel() {
 
     /*
@@ -59,10 +69,12 @@ class TripViewModel @Inject constructor(
                 repository.get().getAdminTrips(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getAdminTripsDataResult.postValue(
-                    repository.get().getAdminTrips(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getAdminTripsDataResult.postValue(
+                        repository.get().getAdminTrips(Source.SERVER)
+                    )
+                }
             }
         }
     }
@@ -82,10 +94,12 @@ class TripViewModel @Inject constructor(
                 repository.get().getPassengerTrips(Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getPassengerTripsDataResult.postValue(
-                    repository.get().getPassengerTrips(Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getPassengerTripsDataResult.postValue(
+                        repository.get().getPassengerTrips(Source.SERVER)
+                    )
+                }
             }
         }
     }

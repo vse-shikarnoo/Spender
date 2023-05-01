@@ -79,28 +79,23 @@ class RemoteTripDaoImpl @Inject constructor(
     override suspend fun getTrip(tripDocRef: DocumentReference): DataResult<Trip> {
         return try {
             val tripDocSnapshot = tripDocRef.get(source).await()
-            Log.d("tripDocSnapshot", tripDocSnapshot.toString())
             val tripCreatorDocRef = tripDocSnapshot.get(
                 appContext.getString(R.string.collection_trip_document_field_creator)
             ) as DocumentReference
-            Log.d("tripCreatorDocRef", tripCreatorDocRef.toString())
             val creator = sharedFunctions.assembleFriend(tripCreatorDocRef, source)
             if (creator is DataResult.Error) {
                 return creator
             }
-            Log.d("creator", (creator as DataResult.Success).data.toString())
 
             val name = getTripName(tripDocRef)
             if (name is DataResult.Error) {
                 return name
             }
-            Log.d("name", (name as DataResult.Success).data)
 
             val members = getTripMembers(tripDocRef)
             if (members is DataResult.Error) {
                 return members
             }
-            Log.d("members", (members as DataResult.Success).data.toString())
 
             DataResult.Success(
                 Trip(
@@ -200,12 +195,10 @@ class RemoteTripDaoImpl @Inject constructor(
             if (trips is DataResult.Error) {
                 return trips
             }
-
-            DataResult.Success(
-                (trips as DataResult.Success).data.filter { trip ->
-                    trip.creator.docRef != userDocRef
-                }
-            )
+            val passengerTrips = (trips as DataResult.Success).data.filter { trip ->
+                trip.creator.docRef != userDocRef
+            }
+            DataResult.Success(passengerTrips)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
         }

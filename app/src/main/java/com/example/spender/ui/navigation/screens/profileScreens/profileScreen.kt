@@ -2,6 +2,7 @@ package com.example.spender.ui.navigation.screens.profileScreens
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -135,7 +136,6 @@ fun ProfileScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // /
         Column(
             modifier = Modifier
                 .padding(horizontal = 20.dp),
@@ -163,36 +163,42 @@ fun FriendsList(
     val friends = userViewModel.getUserFriendsDataResult.observeAsState()
     val incomingFriends = userViewModel.getUserIncomingFriendsDataResult.observeAsState()
     val outgoingFriends = userViewModel.getUserOutgoingFriendsDataResult.observeAsState()
+    var friendsLst by remember { mutableStateOf(listOf<Friend>()) }
+    var incomingFriendsLst by remember { mutableStateOf(listOf<Friend>()) }
+    var outgoingFriendsLst by remember { mutableStateOf(listOf<Friend>()) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        viewModelResultHandler(
-            LocalContext.current,
-            friends,
-            onSuccess = {
-                if (it.isNotEmpty())
-                    FriendsListTemplate("Friends", it, userViewModel)
-            },
-        )
-        viewModelResultHandler(
-            LocalContext.current,
-            incomingFriends,
-            onSuccess = {
-                if (it.isNotEmpty())
-                    FriendsListTemplate("Incoming friend requests", it, userViewModel)
-            },
-        )
-        viewModelResultHandler(
-            LocalContext.current,
-            outgoingFriends,
-            onSuccess = {
-                if (it.isNotEmpty())
-                    FriendsListTemplate("Outgoing friend requests", it, userViewModel)
-            }
-        )
+        if (friendsLst.isNotEmpty())
+            FriendsListTemplate("Friends", friendsLst, userViewModel)
+        if (incomingFriendsLst.isNotEmpty())
+            FriendsListTemplate("Incoming friend requests", incomingFriendsLst, userViewModel)
+        if (outgoingFriendsLst.isNotEmpty())
+            FriendsListTemplate("Outgoing friend requests", outgoingFriendsLst, userViewModel)
         AddFriendGroup(userViewModel)
     }
+    viewModelResultHandler(
+        LocalContext.current,
+        friends,
+        onSuccess = {
+            friendsLst = it
+        },
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        incomingFriends,
+        onSuccess = {
+            incomingFriendsLst = it
+        },
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        outgoingFriends,
+        onSuccess = {
+            outgoingFriendsLst = it
+        }
+    )
 }
 
 @Composable

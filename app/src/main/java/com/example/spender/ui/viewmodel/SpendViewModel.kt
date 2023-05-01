@@ -1,5 +1,6 @@
 package com.example.spender.ui.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SpendViewModel @Inject constructor(
     private val repository: dagger.Lazy<SpendRepository>,
+    private val appContext: Application
 ) : ViewModel() {
 
     /*
@@ -57,10 +59,12 @@ class SpendViewModel @Inject constructor(
                 repository.get().getSpends(trip, Source.CACHE)
             )
         }.invokeOnCompletion {
-            viewModelScope.launch(Dispatchers.IO) {
-                _getSpendsDataResult.postValue(
-                    repository.get().getSpends(trip, Source.SERVER)
-                )
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getSpendsDataResult.postValue(
+                        repository.get().getSpends(trip, Source.SERVER)
+                    )
+                }
             }
         }
     }

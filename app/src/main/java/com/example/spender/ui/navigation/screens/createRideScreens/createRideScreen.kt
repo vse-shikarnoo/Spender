@@ -1,5 +1,6 @@
 package com.example.spender.ui.navigation.screens.createRideScreens
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -82,6 +83,18 @@ fun CreateRideContent(
 ) {
     val scrollState = rememberScrollState()
     var tripName by remember { mutableStateOf("") }
+
+    val friends = userViewModel.getUserFriendsDataResult.observeAsState()
+    var friendsList by remember { mutableStateOf(listOf<Friend>()) }
+    viewModelResultHandler(
+        LocalContext.current,
+        friends,
+        onSuccess = {
+            Log.d("CreateTripButton", " friends : $it")
+            friendsList = it
+        }
+    )
+
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -113,7 +126,8 @@ fun CreateRideContent(
                 keyboardType = KeyboardType.Text
             )
         }
-        AddFriendsList(userViewModel, tripViewModel, tripName, navigator)
+        if (friendsList.isNotEmpty())
+            AddFriendsList(userViewModel, tripViewModel, tripName, navigator, friendsList)
     }
 }
 
@@ -122,17 +136,15 @@ fun AddFriendsList(
     userViewModel: UserViewModel,
     tripViewModel: TripViewModel,
     tripName: String,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    friendsList: List<Friend>
 ) {
-    val friends = userViewModel.getUserFriendsDataResult.observeAsState()
-    val addedFriends = mutableListOf<Friend>()
-    var addFriend by remember { mutableStateOf(false) }
-    var friendsLst = emptyList<Friend>()
-    viewModelResultHandler(LocalContext.current, friends, { friendsLst = it })
+    var addList by remember { mutableStateOf(List(friendsList.size) {false}) }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        if (friendsLst.isNotEmpty()) {
+        if (friendsList.isNotEmpty()) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -163,20 +175,17 @@ fun AddFriendsList(
                     .requiredSizeIn(maxHeight = 280.dp, maxWidth = 400.dp)
             ) {
                 items(
-                    items = friendsLst,
-                ) {
+                    items = friendsList,
+                ) { friend ->
                     FriendCard(
-                        friend = it,
+                        friend = friend,
                         button = {
                             Checkbox(
-                                checked = addFriend,
+                                checked = addList[friendsList.indexOf(friend)],
                                 onCheckedChange = { add ->
-                                    addFriend = add
-                                    if (addFriend) {
-                                        addedFriends.add(it)
-                                    } else {
-                                        addedFriends.remove(it)
-                                    }
+                                    val mutableList = addList.toMutableList()
+                                    mutableList[friendsList.indexOf(friend)] = add
+                                    addList = mutableList
                                 },
                                 colors = CheckboxDefaults.colors(
                                     uncheckedColor = GreenMain,
@@ -187,7 +196,17 @@ fun AddFriendsList(
                 }
             }
         }
-        CreateTripButton(navigator, tripViewModel, tripName, addedFriends)
+        CreateTripButton(
+            navigator,
+            tripViewModel,
+            tripName,
+            buildList {
+                friendsList.forEachIndexed { index, friend ->
+                    if (addList[index])
+                        add(friend)
+                }
+            }
+        )
     }
 }
 
@@ -196,15 +215,18 @@ fun CreateTripButton(
     navigator: DestinationsNavigator,
     tripViewModel: TripViewModel,
     tripName: String,
-    friends: List<Friend>
+    addFriendList: List<Friend>
 ) {
     val createTripResult = tripViewModel.createTripDataResult.observeAsState()
     val createTripMsgShow = tripViewModel.createTripMsgShow.observeAsState()
-
+    Log.d("CreateTripButton", "add friends : $addFriendList")
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
-                tripViewModel.createTrip(tripName, friends)
+                tripViewModel.createTrip(
+                    tripName,
+                    addFriendList
+                )
             },
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp

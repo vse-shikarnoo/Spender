@@ -1,12 +1,14 @@
 package com.example.spender.ui.navigation.screens.balanceScreens
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,12 +48,18 @@ fun BalanceScreen(
     Scaffold(
         topBar = { BalanceScreenTopBar() },
         bottomBar = { BottomBar(BottomBarDestinations.Balance, navigator) },
-        content = { BalanceScreenContent(paddingValues = it, navigator, tripViewModel) }
-    )
+    ) {
+        BalanceScreenContent(
+            paddingValues = it,
+            navigator = navigator,
+            tripViewModel = tripViewModel
+        )
+    }
     LaunchedEffect(
         key1 = 1,
         block = {
             tripViewModel.getAdminTrips()
+            tripViewModel.getPassengerTrips()
         }
     )
 }
@@ -71,27 +79,66 @@ fun BalanceScreenTopBar() {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BalanceScreenContent(
     paddingValues: PaddingValues,
     navigator: DestinationsNavigator,
     tripViewModel: TripViewModel
 ) {
+    val adminTrips = tripViewModel.getAdminTripsDataResult.observeAsState()
+    var adminTripsLst by remember { mutableStateOf(emptyList<Trip>()) }
+
+    val passengerTrips = tripViewModel.getPassengerTripsDataResult.observeAsState()
+    var passengerTripsLst by remember { mutableStateOf(emptyList<Trip>()) }
+
     Column(
         modifier = Modifier
             .padding(paddingValues)
             .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BalanceCard()
-        TripsList(
-            navigator,
-            tripViewModel
-        )
+        HorizontalPager(
+            pageCount = 2
+        ) { pageNumber ->
+            when (pageNumber) {
+                0 -> {
+                    TripsList(
+                        navigator = navigator,
+                        tripViewModel = tripViewModel,
+                        tripsList = adminTripsLst,
+                        text = "Your trips"
+                    )
+                }
+
+                1 -> {
+                    TripsList(
+                        navigator = navigator,
+                        tripViewModel = tripViewModel,
+                        tripsList = passengerTripsLst,
+                        text = "Associated trips"
+                    )
+                }
+            }
+        }
     }
+
+    viewModelResultHandler(
+        LocalContext.current,
+        adminTrips,
+        onSuccess = {
+            adminTripsLst = it
+        }
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        passengerTrips,
+        onSuccess = {
+            passengerTripsLst = it
+        }
+    )
 }
 
 @Composable
@@ -166,21 +213,23 @@ fun OweCard(text: String) {
 @Composable
 fun TripsList(
     navigator: DestinationsNavigator,
-    tripViewModel: TripViewModel
+    tripViewModel: TripViewModel,
+    tripsList: List<Trip>,
+    text: String
 ) {
-    val trips = tripViewModel.getAdminTripsDataResult.observeAsState()
-    var tripsLst by remember { mutableStateOf(emptyList<Trip>()) }
     var showMore by remember { mutableStateOf(false) }
-    viewModelResultHandler(LocalContext.current, trips, { tripsLst = it })
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
-            Text("Your Trips", style = MaterialTheme.typography.titleMedium)
+            Text(text, style = MaterialTheme.typography.titleMedium)
             Image(
                 modifier = Modifier
                     .size(32.dp),
@@ -191,52 +240,42 @@ fun TripsList(
         }
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             content = {
-                tripListLazyColumnItems(showMore, this, tripsLst, navigator) {
-                    showMore = !showMore
+                if (tripsList.isEmpty()) {
+                    item { EmptyTripItem() }
+                    return@LazyColumn
+                }
+                if (tripsList.size <= 3) {
+                    items(tripsList) {
+                        TripCard(trip = it, navigator)
+                    }
+                    return@LazyColumn
+                }
+                if (!showMore) {
+                    items(tripsList.subList(0, 3)) {
+                        TripCard(trip = it, navigator)
+                    }
+                } else {
+                    items(tripsList) {
+                        TripCard(trip = it, navigator)
+                    }
+                }
+                item {
+                    OverflowTripsItem(
+                        text = {
+                            if (!showMore) {
+                                "Show more"
+                            } else {
+                                "Show less"
+                            }
+                        },
+                        onClick = { showMore = !showMore }
+                    )
                 }
             }
-        )
-    }
-}
-
-fun tripListLazyColumnItems(
-    showMore: Boolean,
-    lazyListScope: LazyListScope,
-    tripsLst: List<Trip>,
-    navigator: DestinationsNavigator,
-    onClick: () -> Unit
-) {
-    if (tripsLst.isEmpty()) {
-        lazyListScope.item { EmptyTripItem() }
-        return
-    }
-    if (tripsLst.size <= 3) {
-        lazyListScope.items(tripsLst) {
-            TripCard(trip = it, navigator)
-        }
-        return
-    }
-    if (!showMore) {
-        lazyListScope.items(tripsLst.subList(0, 3)) {
-            TripCard(trip = it, navigator)
-        }
-    } else {
-        lazyListScope.items(tripsLst) {
-            TripCard(trip = it, navigator)
-        }
-    }
-    lazyListScope.item {
-        OverflowTripsItem(
-            text = {
-                if (!showMore) {
-                    "Show more"
-                } else {
-                    "Show less"
-                }
-            },
-            onClick = onClick
         )
     }
 }

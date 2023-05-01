@@ -1,6 +1,7 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
+import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
@@ -38,7 +39,7 @@ class RemoteTripDaoImpl @Inject constructor(
             val userDocRef = sharedFunctions.getUserDocRef(null)
             val newTripDocRef = remoteDataSource.db.collection(
                 appContext.getString(R.string.collection_name_trips)
-            ).document().get(source).await().reference
+            ).document()
             val membersFirebase = buildList {
                 members.forEach { member ->
                     this.add(member.docRef)
@@ -56,13 +57,13 @@ class RemoteTripDaoImpl @Inject constructor(
                             *membersFirebase.toTypedArray()
                         )
                 )
-            ).await()
+            )
 
             membersFirebase.forEach { docRef ->
                 docRef.update(
                     appContext.getString(R.string.collection_users_document_field_trips),
                     FieldValue.arrayUnion(newTripDocRef)
-                ).await()
+                )
             }
 
             DataResult.Success(FirebaseSuccessMessages.TRIP_CREATED)
@@ -78,24 +79,28 @@ class RemoteTripDaoImpl @Inject constructor(
     override suspend fun getTrip(tripDocRef: DocumentReference): DataResult<Trip> {
         return try {
             val tripDocSnapshot = tripDocRef.get(source).await()
+            Log.d("tripDocSnapshot", tripDocSnapshot.toString())
             val tripCreatorDocRef = tripDocSnapshot.get(
                 appContext.getString(R.string.collection_trip_document_field_creator)
             ) as DocumentReference
-
+            Log.d("tripCreatorDocRef", tripCreatorDocRef.toString())
             val creator = sharedFunctions.assembleFriend(tripCreatorDocRef, source)
             if (creator is DataResult.Error) {
                 return creator
             }
+            Log.d("creator", (creator as DataResult.Success).data.toString())
 
             val name = getTripName(tripDocRef)
             if (name is DataResult.Error) {
                 return name
             }
+            Log.d("name", (name as DataResult.Success).data)
 
             val members = getTripMembers(tripDocRef)
             if (members is DataResult.Error) {
                 return members
             }
+            Log.d("members", (members as DataResult.Success).data.toString())
 
             DataResult.Success(
                 Trip(
@@ -142,7 +147,7 @@ class RemoteTripDaoImpl @Inject constructor(
     override suspend fun getTrips(): DataResult<List<Trip>> {
         return try {
             val userDocRef = sharedFunctions.getUserDocRef(null)
-                val tripsDocRefs = userDocRef.get(source).await().get(
+            val tripsDocRefs = userDocRef.get(source).await().get(
                 appContext.getString(R.string.collection_users_document_field_trips)
             ) as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
             val trips = assembleTripList(

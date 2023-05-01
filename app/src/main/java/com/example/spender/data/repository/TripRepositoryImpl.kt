@@ -38,11 +38,12 @@ class TripRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPassengerTrips(): DataResult<List<Trip>> {
-        withContext(Dispatchers.IO) {
-            remoteTripDaoImplServer.getPassengerTrips()
+    override suspend fun getPassengerTrips(source: Source): DataResult<List<Trip>> {
+        return if (source == Source.CACHE) {
+            remoteTripDaoImplCache.getAdminTrips()
+        } else {
+            remoteTripDaoImplCache.getPassengerTrips()
         }
-        return remoteTripDaoImplCache.getPassengerTrips()
     }
 
     override suspend fun updateTripName(trip: Trip, newName: String): DataResult<String> {

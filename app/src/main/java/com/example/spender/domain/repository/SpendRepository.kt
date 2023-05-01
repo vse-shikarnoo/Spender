@@ -7,10 +7,11 @@ import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Source
 
 interface SpendRepository {
     suspend fun createSpend(trip: Trip, spend: Spend): DataResult<String>
-    suspend fun getSpends(trip: Trip): DataResult<List<RemoteSpend>>
+    suspend fun getSpends(trip: Trip, source: Source): DataResult<List<RemoteSpend>>
     suspend fun updateSpend(
         oldRemoteSpend: RemoteSpend,
         newRemoteSpend: RemoteSpend

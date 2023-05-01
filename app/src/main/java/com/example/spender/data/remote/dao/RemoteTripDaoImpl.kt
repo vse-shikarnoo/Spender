@@ -38,7 +38,7 @@ class RemoteTripDaoImpl @Inject constructor(
             val userDocRef = sharedFunctions.getUserDocRef(null)
             val newTripDocRef = remoteDataSource.db.collection(
                 appContext.getString(R.string.collection_name_trips)
-            ).document().get().await().reference
+            ).document().get(source).await().reference
             val membersFirebase = buildList {
                 members.forEach { member ->
                     this.add(member.docRef)

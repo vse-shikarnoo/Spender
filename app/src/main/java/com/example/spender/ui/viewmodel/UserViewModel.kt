@@ -8,6 +8,7 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.domain.repository.UserRepository
+import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -29,8 +30,14 @@ class UserViewModel @Inject constructor(
     fun getUserName() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNameDataResult.postValue(
-                repository.get().getUserName()
+                repository.get().getUserName(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getUserNameDataResult.postValue(
+                    repository.get().getUserName(Source.SERVER)
+                )
+            }
         }
     }
 
@@ -41,8 +48,14 @@ class UserViewModel @Inject constructor(
     fun getUserAge() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserAgeDataResult.postValue(
-                repository.get().getUserAge()
+                repository.get().getUserAge(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getUserAgeDataResult.postValue(
+                    repository.get().getUserAge(Source.SERVER)
+                )
+            }
         }
     }
 
@@ -53,8 +66,14 @@ class UserViewModel @Inject constructor(
     fun getUserNickname() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNicknameDataResult.postValue(
-                repository.get().getUserNickname()
+                repository.get().getUserNickname(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getUserNicknameDataResult.postValue(
+                    repository.get().getUserNickname(Source.SERVER)
+                )
+            }
         }
     }
 
@@ -66,8 +85,14 @@ class UserViewModel @Inject constructor(
     fun getUserIncomingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserIncomingFriendsDataResult.postValue(
-                repository.get().getUserIncomingFriends()
+                repository.get().getUserIncomingFriends(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getUserIncomingFriendsDataResult.postValue(
+                    repository.get().getUserIncomingFriends(Source.SERVER)
+                )
+            }
         }
     }
 
@@ -79,8 +104,14 @@ class UserViewModel @Inject constructor(
     fun getUserOutgoingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserOutgoingFriendsDataResult.postValue(
-                repository.get().getUserOutgoingFriends()
+                repository.get().getUserOutgoingFriends(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getUserOutgoingFriendsDataResult.postValue(
+                    repository.get().getUserOutgoingFriends(Source.SERVER)
+                )
+            }
         }
     }
 
@@ -92,8 +123,14 @@ class UserViewModel @Inject constructor(
     fun getUserFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserFriendsDataResult.postValue(
-                repository.get().getUserFriends()
+                repository.get().getUserFriends(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getUserFriendsDataResult.postValue(
+                    repository.get().getUserFriends(Source.SERVER)
+                )
+            }
         }
     }
 

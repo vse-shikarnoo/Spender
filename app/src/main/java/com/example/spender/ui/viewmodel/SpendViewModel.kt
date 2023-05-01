@@ -9,6 +9,7 @@ import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.repository.SpendRepository
+import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -53,8 +54,14 @@ class SpendViewModel @Inject constructor(
     fun getSpends(trip: Trip) {
         viewModelScope.launch(Dispatchers.IO) {
             _getSpendsDataResult.postValue(
-                repository.get().getSpends(trip)
+                repository.get().getSpends(trip, Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getSpendsDataResult.postValue(
+                    repository.get().getSpends(trip, Source.SERVER)
+                )
+            }
         }
     }
 

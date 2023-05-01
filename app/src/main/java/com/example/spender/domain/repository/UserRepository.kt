@@ -3,14 +3,15 @@ package com.example.spender.domain.repository
 import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
+import com.google.firebase.firestore.Source
 
 interface UserRepository {
-    suspend fun getUserName(): DataResult<UserName>
-    suspend fun getUserAge(): DataResult<Long>
-    suspend fun getUserNickname(): DataResult<String>
-    suspend fun getUserIncomingFriends(): DataResult<List<Friend>>
-    suspend fun getUserOutgoingFriends(): DataResult<List<Friend>>
-    suspend fun getUserFriends(): DataResult<List<Friend>>
+    suspend fun getUserName(source: Source): DataResult<UserName>
+    suspend fun getUserAge(source: Source): DataResult<Long>
+    suspend fun getUserNickname(source: Source): DataResult<String>
+    suspend fun getUserIncomingFriends(source: Source): DataResult<List<Friend>>
+    suspend fun getUserOutgoingFriends(source: Source): DataResult<List<Friend>>
+    suspend fun getUserFriends(source: Source): DataResult<List<Friend>>
     suspend fun updateUserName(newName: UserName): DataResult<String>
     suspend fun updateUserAge(newAge: Int): DataResult<String>
     suspend fun updateUserNickname(newNickname: String): DataResult<String>

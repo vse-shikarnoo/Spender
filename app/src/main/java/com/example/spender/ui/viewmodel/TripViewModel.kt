@@ -78,8 +78,14 @@ class TripViewModel @Inject constructor(
     fun getPassengerTrips() {
         viewModelScope.launch(Dispatchers.IO) {
             _getPassengerTripsDataResult.postValue(
-                repository.get().getPassengerTrips()
+                repository.get().getPassengerTrips(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getPassengerTripsDataResult.postValue(
+                    repository.get().getPassengerTrips(Source.SERVER)
+                )
+            }
         }
     }
 

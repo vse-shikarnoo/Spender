@@ -12,7 +12,7 @@ interface TripRepository {
     ): DataResult<String>
 
     suspend fun getAdminTrips(source: Source): DataResult<List<Trip>>
-    suspend fun getPassengerTrips(): DataResult<List<Trip>>
+    suspend fun getPassengerTrips(source: Source): DataResult<List<Trip>>
     suspend fun updateTripName(trip: Trip, newName: String): DataResult<String>
     suspend fun addTripMembers(trip: Trip, newMembers: List<Friend>): DataResult<String>
     suspend fun removeTripMembers(trip: Trip, members: List<Friend>): DataResult<String>

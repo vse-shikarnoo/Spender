@@ -160,7 +160,7 @@ class RemoteAuthDaoImpl @Inject constructor(
                         appContext.getString(R.string.collection_users_document_field_nickname),
                         nickname
                     )
-                    .get(Source.DEFAULT).await()
+                    .get().await()
             DataResult.Success(checkNicknameQuerySnapshot.isEmpty)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)

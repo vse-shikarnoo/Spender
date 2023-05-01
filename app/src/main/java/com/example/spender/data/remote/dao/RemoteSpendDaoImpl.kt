@@ -84,7 +84,7 @@ class RemoteSpendDaoImpl @Inject constructor(
     override suspend fun getSpends(trip: Trip): DataResult<List<RemoteSpend>> {
         val spendsDocumentsSnapshot = trip.docRef.collection(
             appContext.getString(R.string.collection_trip_document_field_spends)
-        ).get().await().documents
+        ).get(source).await().documents
         if (spendsDocumentsSnapshot.isEmpty()) {
             return DataResult.Success(emptyList())
         }
@@ -185,7 +185,7 @@ class RemoteSpendDaoImpl @Inject constructor(
     ): DataResult<List<RemoteSpendMember>> {
         val spendMembersSnapshot = spendDocRef.collection(
             appContext.getString(R.string.collection_name_spend_member)
-        ).get().await().documents
+        ).get(source).await().documents
         if (spendMembersSnapshot.isEmpty()) {
             return DataResult.Success(emptyList())
         }
@@ -246,7 +246,7 @@ class RemoteSpendDaoImpl @Inject constructor(
     override suspend fun getDebtsToUsers(
         spendMemberDocRef: DocumentReference
     ): DataResult<List<DebtToUser>> {
-        val spendDebtsToUsers = spendMemberDocRef.get().await().get(
+        val spendDebtsToUsers = spendMemberDocRef.get(source).await().get(
             appContext.getString(R.string.collection_spend_member_document_field_debt)
         ) as HashMap<String, Double>? ?: return DataResult.Success(emptyList())
 

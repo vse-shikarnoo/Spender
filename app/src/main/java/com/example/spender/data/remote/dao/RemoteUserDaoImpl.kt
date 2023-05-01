@@ -317,7 +317,7 @@ class RemoteUserDaoImpl @Inject constructor(
             ).whereEqualTo(
                 appContext.getString(R.string.collection_users_document_field_nickname),
                 nickname
-            ).get().await()
+            ).get(source).await()
             if (querySnapshot.documents.isEmpty()) {
                 return DataErrorHandler.handle(FirebaseNoNicknameUserException())
             }

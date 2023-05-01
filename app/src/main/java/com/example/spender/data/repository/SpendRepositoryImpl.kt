@@ -29,8 +29,12 @@ class SpendRepositoryImpl @Inject constructor(
         return remoteSpendDaoImplServer.createSpend(trip, spend)
     }
 
-    override suspend fun getSpends(trip: Trip): DataResult<List<RemoteSpend>> {
-        return remoteSpendDaoImplServer.getSpends(trip)
+    override suspend fun getSpends(trip: Trip, source: Source): DataResult<List<RemoteSpend>> {
+        return if (source == Source.CACHE) {
+            remoteSpendDaoImplCache.getSpends(trip)
+        } else {
+            remoteSpendDaoImplServer.getSpends(trip)
+        }
     }
 
     override suspend fun updateSpend(

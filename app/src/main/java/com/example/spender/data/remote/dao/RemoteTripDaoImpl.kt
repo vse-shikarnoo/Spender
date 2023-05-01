@@ -118,7 +118,7 @@ class RemoteTripDaoImpl @Inject constructor(
     }
 
     override suspend fun getTripMembers(tripDocRef: DocumentReference): DataResult<List<Friend>> {
-        val tripMembersSnapshot = tripDocRef.get().await().get(
+        val tripMembersSnapshot = tripDocRef.get(source).await().get(
             appContext.getString(R.string.collection_trip_document_field_members)
         ) as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
 
@@ -142,7 +142,7 @@ class RemoteTripDaoImpl @Inject constructor(
     override suspend fun getTrips(): DataResult<List<Trip>> {
         return try {
             val userDocRef = sharedFunctions.getUserDocRef(null)
-            val tripsDocRefs = userDocRef.get().await().get(
+                val tripsDocRefs = userDocRef.get(source).await().get(
                 appContext.getString(R.string.collection_users_document_field_trips)
             ) as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
             val trips = assembleTripList(

@@ -8,6 +8,7 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.repository.TripRepository
+import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -54,8 +55,14 @@ class TripViewModel @Inject constructor(
     fun getAdminTrips() {
         viewModelScope.launch(Dispatchers.IO) {
             _getAdminTripsDataResult.postValue(
-                repository.get().getAdminTrips()
+                repository.get().getAdminTrips(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.IO) {
+                _getAdminTripsDataResult.postValue(
+                    repository.get().getAdminTrips(Source.SERVER)
+                )
+            }
         }
     }
 

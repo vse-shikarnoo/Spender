@@ -8,6 +8,7 @@ import com.example.spender.domain.repository.TripRepository
 import com.google.firebase.firestore.Source
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class TripRepositoryImpl @Inject constructor(
@@ -29,11 +30,12 @@ class TripRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getAdminTrips(): DataResult<List<Trip>> {
-        withContext(Dispatchers.IO) {
+    override suspend fun getAdminTrips(source: Source): DataResult<List<Trip>> {
+        return if (source == Source.CACHE) {
+            remoteTripDaoImplCache.getAdminTrips()
+        } else {
             remoteTripDaoImplServer.getAdminTrips()
         }
-        return remoteTripDaoImplCache.getAdminTrips()
     }
 
     override suspend fun getPassengerTrips(): DataResult<List<Trip>> {

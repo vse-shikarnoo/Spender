@@ -83,7 +83,7 @@ fun ProfileScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                //contentColor = GreenMain,
+                // contentColor = GreenMain,
                 containerColor = GreenMain,
                 shape = CircleShape,
                 onClick = { isSendFriendRequestClicked = true }

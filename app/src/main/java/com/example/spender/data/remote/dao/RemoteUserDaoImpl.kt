@@ -1,9 +1,6 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
-import androidx.compose.ui.platform.LocalContext
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
@@ -11,8 +8,6 @@ import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.messages.exceptions.FirebaseAddMyselfFriendException
 import com.example.spender.data.messages.exceptions.FirebaseAlreadyFriendException
 import com.example.spender.data.messages.exceptions.FirebaseAlreadySentFriendException
-import com.example.spender.data.messages.exceptions.FirebaseNicknameException
-import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoNicknameUserException
 import com.example.spender.data.messages.exceptions.NoInternetConnectionException
 import com.example.spender.data.remote.RemoteDataSourceImpl
@@ -20,13 +15,11 @@ import com.example.spender.domain.remotedao.RemoteUserDao
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.ui.viewmodel.InternetChecker
-import com.google.android.gms.common.api.Api.ApiOptions
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Source
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-
+import kotlinx.coroutines.tasks.await
 
 class RemoteUserDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,

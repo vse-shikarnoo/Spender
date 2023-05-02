@@ -1,15 +1,11 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
-import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
-import com.example.spender.data.messages.exceptions.FirebaseNicknameException
-import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoUserSignedInException
-import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.remotedao.RemoteAuthDao
 import com.google.firebase.auth.FirebaseUser

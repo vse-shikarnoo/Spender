@@ -1,7 +1,6 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
-import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult

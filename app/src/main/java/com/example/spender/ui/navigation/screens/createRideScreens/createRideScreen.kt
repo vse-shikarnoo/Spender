@@ -139,9 +139,9 @@ fun AddFriendsList(
     friendsList: List<Friend>
 ) {
     var addList by if (friendsList.isNotEmpty())
-        remember { mutableStateOf(List(friendsList.size) {false}) }
+        remember { mutableStateOf(List(friendsList.size) { false }) }
     else
-        remember { mutableStateOf(List(0) {false}) }
+        remember { mutableStateOf(List(0) { false }) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)

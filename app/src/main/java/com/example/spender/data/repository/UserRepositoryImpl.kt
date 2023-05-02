@@ -7,8 +7,6 @@ import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.domain.repository.UserRepository
 import com.google.firebase.firestore.Source
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class UserRepositoryImpl @Inject constructor(
     private val remoteUserDaoImplServer: RemoteUserDaoImpl,

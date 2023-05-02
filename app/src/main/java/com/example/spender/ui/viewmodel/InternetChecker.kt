@@ -7,7 +7,7 @@ import android.net.ConnectivityManager
 object InternetChecker {
     fun check(appContext: Application): Boolean {
         val cm = appContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager
+            as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting
     }

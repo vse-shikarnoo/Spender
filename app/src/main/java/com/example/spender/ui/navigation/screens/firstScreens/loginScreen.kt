@@ -119,6 +119,7 @@ fun LoginButton(
     password: String
 ) {
     val signInResult = authViewModel.signInDataResult.observeAsState()
+    val signInMsgShow = authViewModel.signInMsgShow.observeAsState()
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         androidx.compose.material3.Button(
@@ -143,7 +144,8 @@ fun LoginButton(
         },
         restMsgShowState = {
             authViewModel.doNotShowSignInMsg()
-        }
+        },
+        msgShow = signInMsgShow.value ?: false
     )
 }
 

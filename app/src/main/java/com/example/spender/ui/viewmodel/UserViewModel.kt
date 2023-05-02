@@ -1,16 +1,15 @@
 package com.example.spender.ui.viewmodel
 
-import android.util.Log
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.User
-import com.example.spender.domain.model.user.UserName
+import com.example.spender.domain.remotemodel.user.Friend
+import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.domain.repository.UserRepository
+import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -18,23 +17,13 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val repository: dagger.Lazy<UserRepository>
+    private val repository: dagger.Lazy<UserRepository>,
+    private val appContext: Application
 ) : ViewModel() {
 
     /** Geters
      * They do not have showMsg live data variables
      * */
-
-    private val _getUserDataResult = MutableLiveData<DataResult<User>>()
-    val getUserDataResult: LiveData<DataResult<User>> = _getUserDataResult
-
-    fun getUser() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserDataResult.postValue(
-                repository.get().getUser()
-            )
-        }
-    }
 
     private val _getUserNameDataResult = MutableLiveData<DataResult<UserName>>()
     val getUserNameDataResult: LiveData<DataResult<UserName>> =
@@ -43,8 +32,16 @@ class UserViewModel @Inject constructor(
     fun getUserName() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNameDataResult.postValue(
-                repository.get().getUserName()
+                repository.get().getUserName(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserNameDataResult.postValue(
+                        repository.get().getUserName(Source.SERVER)
+                    )
+                }
+            }
         }
     }
 
@@ -55,8 +52,16 @@ class UserViewModel @Inject constructor(
     fun getUserAge() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserAgeDataResult.postValue(
-                repository.get().getUserAge()
+                repository.get().getUserAge(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserAgeDataResult.postValue(
+                        repository.get().getUserAge(Source.SERVER)
+                    )
+                }
+            }
         }
     }
 
@@ -67,8 +72,16 @@ class UserViewModel @Inject constructor(
     fun getUserNickname() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserNicknameDataResult.postValue(
-                repository.get().getUserNickname()
+                repository.get().getUserNickname(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserNicknameDataResult.postValue(
+                        repository.get().getUserNickname(Source.SERVER)
+                    )
+                }
+            }
         }
     }
 
@@ -80,8 +93,16 @@ class UserViewModel @Inject constructor(
     fun getUserIncomingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserIncomingFriendsDataResult.postValue(
-                repository.get().getUserIncomingFriends()
+                repository.get().getUserIncomingFriends(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserIncomingFriendsDataResult.postValue(
+                        repository.get().getUserIncomingFriends(Source.SERVER)
+                    )
+                }
+            }
         }
     }
 
@@ -93,8 +114,16 @@ class UserViewModel @Inject constructor(
     fun getUserOutgoingFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserOutgoingFriendsDataResult.postValue(
-                repository.get().getUserOutgoingFriends()
+                repository.get().getUserOutgoingFriends(Source.CACHE)
             )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserOutgoingFriendsDataResult.postValue(
+                        repository.get().getUserOutgoingFriends(Source.SERVER)
+                    )
+                }
+            }
         }
     }
 
@@ -106,78 +135,23 @@ class UserViewModel @Inject constructor(
     fun getUserFriends() {
         viewModelScope.launch(Dispatchers.IO) {
             _getUserFriendsDataResult.postValue(
-                repository.get().getUserFriends()
+                repository.get().getUserFriends(Source.CACHE)
             )
-        }
-    }
-
-    private val _getUserTripsDataResult =
-        MutableLiveData<DataResult<List<Trip>>>()
-    val getUserTripsDataResult: LiveData<DataResult<List<Trip>>> =
-        _getUserTripsDataResult
-
-    fun getUserTrips() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserTripsDataResult.postValue(
-                repository.get().getUserTrips()
-            )
-        }
-    }
-
-    private val _getUserAdminTripsDataResult =
-        MutableLiveData<DataResult<List<Trip>>>()
-    val getUserAdminTripsDataResult: LiveData<DataResult<List<Trip>>> =
-        _getUserAdminTripsDataResult
-
-    fun getUserAdminTrips() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserAdminTripsDataResult.postValue(
-                repository.get().getUserAdminTrips()
-            )
-        }
-    }
-
-    private val _getUserPassengerTripsDataResult =
-        MutableLiveData<DataResult<List<Trip>>>()
-    val getUserPassengerTripsDataResult: LiveData<DataResult<List<Trip>>> =
-        _getUserPassengerTripsDataResult
-
-    fun getUserPassengerTrips() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _getUserPassengerTripsDataResult.postValue(
-                repository.get().getUserPassengerTrips()
-            )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getUserFriendsDataResult.postValue(
+                        repository.get().getUserFriends(Source.SERVER)
+                    )
+                }
+            }
         }
     }
 
     /** Updaters and adders
-     * They have showMsg live data variables that must be resetted in viewModelResultHandler
+     * They have showMsg live data variables that must be reset in viewModelResultHandler
      * function if we want to show messages to user
      * */
-
-    /*
-    * updateUser
-     */
-
-    private val _updateUserDataResult = MutableLiveData<DataResult<String>>()
-    val updateUserDataResult: LiveData<DataResult<String>> =
-        _updateUserDataResult
-    private val _updateUserMsgShow = MutableLiveData<Boolean>()
-    val updateUserMsgShow: LiveData<Boolean> = _updateUserMsgShow
-
-    fun updateUser(newUser: User) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _updateUserDataResult.postValue(
-                repository.get().updateUser(newUser)
-            )
-        }.invokeOnCompletion {
-            _updateUserMsgShow.postValue(true)
-        }
-    }
-
-    fun doNotShowUpdateUserMsg() {
-        _updateUserMsgShow.postValue(false)
-    }
 
     /*
     * updateUserName

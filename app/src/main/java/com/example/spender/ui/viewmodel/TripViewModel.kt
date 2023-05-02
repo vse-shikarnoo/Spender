@@ -1,22 +1,33 @@
 package com.example.spender.ui.viewmodel
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.util.Log
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.spend.Spend
-import com.example.spender.domain.model.user.Friend
+import com.example.spender.data.messages.exceptions.NoInternetConnectionException
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.repository.TripRepository
+import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class TripViewModel @Inject constructor(
-    private val repository: dagger.Lazy<TripRepository>
+    private val repository: dagger.Lazy<TripRepository>,
+    private val appContext: Application
 ) : ViewModel() {
 
     /*
@@ -44,6 +55,56 @@ class TripViewModel @Inject constructor(
     }
 
     /*
+     * Get admin trips
+     */
+
+    private val _getAdminTripsDataResult =
+        MutableLiveData<DataResult<List<Trip>>>()
+    val getAdminTripsDataResult: LiveData<DataResult<List<Trip>>> =
+        _getAdminTripsDataResult
+
+    fun getAdminTrips() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getAdminTripsDataResult.postValue(
+                repository.get().getAdminTrips(Source.CACHE)
+            )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getAdminTripsDataResult.postValue(
+                        repository.get().getAdminTrips(Source.SERVER)
+                    )
+                }
+            }
+        }
+    }
+
+    /*
+     * Get passenger trips
+     */
+
+    private val _getPassengerTripsDataResult =
+        MutableLiveData<DataResult<List<Trip>>>()
+    val getPassengerTripsDataResult: LiveData<DataResult<List<Trip>>> =
+        _getPassengerTripsDataResult
+
+    fun getPassengerTrips() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getPassengerTripsDataResult.postValue(
+                repository.get().getPassengerTrips(Source.CACHE)
+            )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getPassengerTripsDataResult.postValue(
+                        repository.get().getPassengerTrips(Source.SERVER)
+                    )
+                }
+            }
+        }
+    }
+
+    /*
      * Update trip
      */
 
@@ -65,30 +126,6 @@ class TripViewModel @Inject constructor(
 
     fun doNotShowUpdateTripMsg() {
         _updateTripMsgShow.postValue(false)
-    }
-
-    /*
-     * Add trip member
-     */
-
-    private val _addTripMemberDataResult = MutableLiveData<DataResult<String>>()
-    val addTripMemberDataResult: LiveData<DataResult<String>> =
-        _addTripMemberDataResult
-    private val _addTripMemberMsgShow = MutableLiveData<Boolean>()
-    val addTripMemberMsgShow: LiveData<Boolean> = _addTripMemberMsgShow
-
-    fun addTripMember(trip: Trip, newMember: Friend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _addTripMemberDataResult.postValue(
-                repository.get().addTripMember(trip, newMember)
-            )
-        }.invokeOnCompletion {
-            _addTripMemberMsgShow.postValue(true)
-        }
-    }
-
-    fun doNotShowAddTripMemberMsg() {
-        _addTripMemberMsgShow.postValue(false)
     }
 
     /*
@@ -116,54 +153,6 @@ class TripViewModel @Inject constructor(
     }
 
     /*
-     * Add trip spend
-     */
-
-    private val _addTripSpendDataResult = MutableLiveData<DataResult<String>>()
-    val addTripSpendDataResult: LiveData<DataResult<String>> =
-        _addTripSpendDataResult
-    private val _addTripSpendMsgShow = MutableLiveData<Boolean>()
-    val addTripSpendMsgShow: LiveData<Boolean> = _addTripSpendMsgShow
-
-    fun addTripSpend(trip: Trip, spend: Spend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _addTripSpendDataResult.postValue(
-                repository.get().addTripSpend(trip, spend)
-            )
-        }.invokeOnCompletion {
-            _addTripSpendMsgShow.postValue(true)
-        }
-    }
-
-    fun doNotShowAddTripSpendMsg() {
-        _addTripSpendMsgShow.postValue(false)
-    }
-
-    /*
-     * Remove trip member
-     */
-
-    private val _removeTripMemberDataResult = MutableLiveData<DataResult<String>>()
-    val removeTripMemberDataResult: LiveData<DataResult<String>> =
-        _removeTripMemberDataResult
-    private val _removeTripMemberMsgShow = MutableLiveData<Boolean>()
-    val removeTripMemberMsgShow: LiveData<Boolean> = _removeTripMemberMsgShow
-
-    fun removeTripMember(trip: Trip, member: Friend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _removeTripMemberDataResult.postValue(
-                repository.get().removeTripMember(trip, member)
-            )
-        }.invokeOnCompletion {
-            _removeTripMemberMsgShow.postValue(true)
-        }
-    }
-
-    fun doNotShowRemoveTripMemberMsg() {
-        _removeTripMemberMsgShow.postValue(false)
-    }
-
-    /*
      * Remove trip members
      */
 
@@ -185,30 +174,6 @@ class TripViewModel @Inject constructor(
 
     fun doNotShowRemoveTripMembersMsg() {
         _removeTripMembersMsgShow.postValue(false)
-    }
-
-    /*
-     * Remove trip spend
-     */
-
-    private val _removeTripSpendDataResult = MutableLiveData<DataResult<String>>()
-    val removeTripSpendDataResult: LiveData<DataResult<String>> =
-        _removeTripSpendDataResult
-    private val _removeTripSpendMsgShow = MutableLiveData<Boolean>()
-    val removeTripSpendMsgShow: LiveData<Boolean> = _removeTripSpendMsgShow
-
-    fun removeTripSpend(spend: Spend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _removeTripSpendDataResult.postValue(
-                repository.get().removeTripSpend(spend)
-            )
-        }.invokeOnCompletion {
-            _removeTripSpendMsgShow.postValue(true)
-        }
-    }
-
-    fun doNotShowRemoveTripSpendMsg() {
-        _removeTripSpendMsgShow.postValue(false)
     }
 
     /*

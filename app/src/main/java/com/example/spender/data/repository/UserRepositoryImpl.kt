@@ -2,10 +2,8 @@ package com.example.spender.data.repository
 
 import com.example.spender.data.DataResult
 import com.example.spender.data.remote.dao.RemoteUserDaoImpl
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.user.Friend
-import com.example.spender.domain.model.user.User
-import com.example.spender.domain.model.user.UserName
+import com.example.spender.domain.remotemodel.user.Friend
+import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.domain.repository.UserRepository
 import com.google.firebase.firestore.Source
 import javax.inject.Inject
@@ -21,78 +19,52 @@ class UserRepositoryImpl @Inject constructor(
         remoteUserDaoImplCache.source = Source.CACHE
     }
 
-    override suspend fun getUser(): DataResult<User> {
-        withContext(Dispatchers.IO) {
-            remoteUserDaoImplServer.getUser()
+    override suspend fun getUserName(source: Source): DataResult<UserName> {
+        return if (source == Source.CACHE) {
+            remoteUserDaoImplCache.getUserName()
+        } else {
+            remoteUserDaoImplServer.getUserName()
         }
-        return remoteUserDaoImplCache.getUser()
     }
 
-    override suspend fun getUserName(userId: String?): DataResult<UserName> {
-        withContext(Dispatchers.IO) {
-            remoteUserDaoImplServer.getUserName(userId)
-        }
-        return remoteUserDaoImplCache.getUserName(userId)
-    }
-
-    override suspend fun getUserAge(): DataResult<Long> {
-        withContext(Dispatchers.IO) {
+    override suspend fun getUserAge(source: Source): DataResult<Long> {
+        return if (source == Source.CACHE) {
+            remoteUserDaoImplCache.getUserAge()
+        } else {
             remoteUserDaoImplServer.getUserAge()
         }
-        return remoteUserDaoImplCache.getUserAge()
     }
 
-    override suspend fun getUserNickname(userId: String?): DataResult<String> {
-        withContext(Dispatchers.IO) {
-            remoteUserDaoImplServer.getUserNickname(userId)
+    override suspend fun getUserNickname(source: Source): DataResult<String> {
+        return if (source == Source.CACHE) {
+            remoteUserDaoImplCache.getUserNickname()
+        } else {
+            remoteUserDaoImplServer.getUserNickname()
         }
-        return remoteUserDaoImplCache.getUserNickname(userId)
     }
 
-    override suspend fun getUserIncomingFriends(): DataResult<List<Friend>> {
-        withContext(Dispatchers.IO) {
+    override suspend fun getUserIncomingFriends(source: Source): DataResult<List<Friend>> {
+        return if (source == Source.CACHE) {
+            remoteUserDaoImplCache.getUserIncomingFriends()
+        } else {
             remoteUserDaoImplServer.getUserIncomingFriends()
         }
-        return remoteUserDaoImplCache.getUserIncomingFriends()
     }
 
-    override suspend fun getUserOutgoingFriends(): DataResult<List<Friend>> {
-        withContext(Dispatchers.IO) {
+    override suspend fun getUserOutgoingFriends(source: Source): DataResult<List<Friend>> {
+        return if (source == Source.CACHE) {
+            remoteUserDaoImplCache.getUserOutgoingFriends()
+        } else {
             remoteUserDaoImplServer.getUserOutgoingFriends()
         }
-        return remoteUserDaoImplCache.getUserOutgoingFriends()
     }
 
-    override suspend fun getUserFriends(): DataResult<List<Friend>> {
-        withContext(Dispatchers.IO) {
+    override suspend fun getUserFriends(source: Source): DataResult<List<Friend>> {
+        return if (source == Source.CACHE) {
+            remoteUserDaoImplCache.getUserFriends()
+        } else {
             remoteUserDaoImplServer.getUserFriends()
         }
-        return remoteUserDaoImplCache.getUserFriends()
-    }
-
-    override suspend fun getUserTrips(): DataResult<List<Trip>> {
-        withContext(Dispatchers.Default) {
-            remoteUserDaoImplServer.getUserTrips()
-        }
-        return remoteUserDaoImplCache.getUserTrips()
-    }
-
-    override suspend fun getUserAdminTrips(): DataResult<List<Trip>> {
-        withContext(Dispatchers.IO) {
-            remoteUserDaoImplServer.getUserAdminTrips()
-        }
-        return remoteUserDaoImplCache.getUserAdminTrips()
-    }
-
-    override suspend fun getUserPassengerTrips(): DataResult<List<Trip>> {
-        withContext(Dispatchers.IO) {
-            remoteUserDaoImplServer.getUserPassengerTrips()
-        }
-        return remoteUserDaoImplCache.getUserPassengerTrips()
-    }
-
-    override suspend fun updateUser(newUser: User): DataResult<String> {
-        return remoteUserDaoImplServer.updateUser(newUser)
     }
 
     override suspend fun updateUserName(newName: UserName): DataResult<String> {
@@ -135,9 +107,5 @@ class UserRepositoryImpl @Inject constructor(
         friend: Friend
     ): DataResult<String> {
         return remoteUserDaoImplServer.removeUserIncomingFriend(friend)
-    }
-
-    override suspend fun checkNickname(nickname: String): DataResult<Boolean> {
-        return remoteUserDaoImplServer.checkNickname(nickname)
     }
 }

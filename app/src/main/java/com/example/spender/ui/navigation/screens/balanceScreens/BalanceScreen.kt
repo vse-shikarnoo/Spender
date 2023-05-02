@@ -1,13 +1,16 @@
 package com.example.spender.ui.navigation.screens.balanceScreens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -26,32 +29,41 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
-import com.example.spender.domain.model.Trip
+import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
+import com.example.spender.ui.navigation.screens.helperfunctions.EmptyListItem
+import com.example.spender.ui.navigation.screens.helperfunctions.OverflowListItem
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.*
-import com.example.spender.ui.viewmodel.UserViewModel
+import com.example.spender.ui.viewmodel.TripViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun BalanceScreen(
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel
+    tripViewModel: TripViewModel
 ) {
     Scaffold(
         topBar = { BalanceScreenTopBar() },
         bottomBar = { BottomBar(BottomBarDestinations.Balance, navigator) },
-        content = { BalanceScreenContent(paddingValues = it, navigator, userViewModel) }
-    )
+    ) {
+        BalanceScreenContent(
+            paddingValues = it,
+            navigator = navigator,
+            tripViewModel = tripViewModel
+        )
+    }
     LaunchedEffect(
         key1 = 1,
         block = {
-            userViewModel.getUserTrips()
+            tripViewModel.getAdminTrips()
+            tripViewModel.getPassengerTrips()
         }
     )
 }
@@ -71,27 +83,94 @@ fun BalanceScreenTopBar() {
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun BalanceScreenContent(
     paddingValues: PaddingValues,
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel
+    tripViewModel: TripViewModel
 ) {
+    val adminTrips = tripViewModel.getAdminTripsDataResult.observeAsState()
+    var adminTripsLst by remember { mutableStateOf(emptyList<Trip>()) }
+
+    val passengerTrips = tripViewModel.getPassengerTripsDataResult.observeAsState()
+    var passengerTripsLst by remember { mutableStateOf(emptyList<Trip>()) }
+
+    val tabs = listOf("Your trips", "Associated trips")
+    val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(0, 0f)
     Column(
         modifier = Modifier
             .padding(paddingValues)
             .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BalanceCard()
-        TripsList(
-            navigator,
-            userViewModel
-        )
+        TabRow(
+            modifier = Modifier.padding(bottom = 16.dp),
+            selectedTabIndex = pagerState.currentPage
+        ) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    text = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(title)
+                            Image(
+                                painter = painterResource(id = R.drawable.bag),
+                                contentDescription = "TripIcon",
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.scrollToPage(index, 0f)
+                        }
+                    },
+                )
+            }
+        }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f),
+            pageCount = tabs.size
+        ) { page ->
+            when (page) {
+                0 -> TripsList(
+                    navigator = navigator,
+                    tripViewModel = tripViewModel,
+                    tripsList = adminTripsLst,
+                    text = "Your trips"
+                )
+
+                1 -> TripsList(
+                    navigator = navigator,
+                    tripViewModel = tripViewModel,
+                    tripsList = passengerTripsLst,
+                    text = "Associated trips"
+                )
+            }
+        }
     }
+
+    viewModelResultHandler(
+        LocalContext.current,
+        adminTrips,
+        onSuccess = {
+            adminTripsLst = it
+        }
+    )
+    viewModelResultHandler(
+        LocalContext.current,
+        passengerTrips,
+        onSuccess = {
+            passengerTripsLst = it
+        }
+    )
 }
 
 @Composable
@@ -166,129 +245,51 @@ fun OweCard(text: String) {
 @Composable
 fun TripsList(
     navigator: DestinationsNavigator,
-    userViewModel: UserViewModel
+    tripViewModel: TripViewModel,
+    tripsList: List<Trip>,
+    text: String
 ) {
-    val trips = userViewModel.getUserTripsDataResult.observeAsState()
-    var tripsLst by remember { mutableStateOf(emptyList<Trip>()) }
     var showMore by remember { mutableStateOf(false) }
-    viewModelResultHandler(LocalContext.current, trips, { tripsLst = it })
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Your Trips", style = MaterialTheme.typography.titleMedium)
-            Image(
-                modifier = Modifier
-                    .size(32.dp),
-                painter = painterResource(id = R.drawable.bag),
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
-        }
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxHeight(),
-            content = {
-                tripListLazyColumnItems(showMore, this, tripsLst, navigator) {
-                    showMore = !showMore
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.fillMaxSize(),
+        content = {
+            if (tripsList.isEmpty()) {
+                item { EmptyListItem("No trips") }
+                return@LazyColumn
+            }
+            if (tripsList.size <= 3) {
+                items(tripsList) {
+                    TripCard(trip = it, navigator)
+                }
+                return@LazyColumn
+            }
+            if (!showMore) {
+                items(tripsList.subList(0, 3)) {
+                    TripCard(trip = it, navigator)
+                }
+            } else {
+                items(tripsList) {
+                    TripCard(trip = it, navigator)
                 }
             }
-        )
-    }
-}
-
-fun tripListLazyColumnItems(
-    showMore: Boolean,
-    lazyListScope: LazyListScope,
-    tripsLst: List<Trip>,
-    navigator: DestinationsNavigator,
-    onClick: () -> Unit
-) {
-    if (tripsLst.isEmpty()) {
-        lazyListScope.item { EmptyTripItem() }
-        return
-    }
-    if (tripsLst.size <= 3) {
-        lazyListScope.items(tripsLst) {
-            TripCard(trip = it, navigator)
-        }
-        return
-    }
-    if (!showMore) {
-        lazyListScope.items(tripsLst.subList(0, 3)) {
-            TripCard(trip = it, navigator)
-        }
-    } else {
-        lazyListScope.items(tripsLst) {
-            TripCard(trip = it, navigator)
-        }
-    }
-    lazyListScope.item {
-        OverflowTripsItem(
-            text = {
-                if (!showMore) {
-                    "Show more"
-                } else {
-                    "Show less"
-                }
-            },
-            onClick = onClick
-        )
-    }
-}
-
-@Composable
-fun EmptyTripItem() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("No trips", color = GreenMain)
-        }
-        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-    }
-}
-
-@Composable
-fun OverflowTripsItem(
-    text: () -> String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 2.dp
-                ),
-                onClick = onClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = GreenLightBackground,
-                    contentColor = GreenMain
-                ),
-            ) {
-                AutoResizedText(text = text.invoke(), color = GreenMain)
+            item {
+                OverflowListItem(
+                    text = {
+                        if (!showMore) {
+                            "Show more"
+                        } else {
+                            "Show less"
+                        }
+                    },
+                    onClick = { showMore = !showMore }
+                )
             }
         }
-        Divider(modifier = Modifier.weight(1f), color = GreenLightBackground)
-    }
+    )
 }
 
 @Composable

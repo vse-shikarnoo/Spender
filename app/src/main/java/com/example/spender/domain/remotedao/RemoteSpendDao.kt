@@ -1,8 +1,11 @@
 package com.example.spender.domain.remotedao
 
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.spend.SpendMember
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.RemoteSpend
+import com.example.spender.domain.remotemodel.spend.Spend
+import com.example.spender.domain.remotemodel.spendmember.DebtToUser
+import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Source
@@ -10,16 +13,30 @@ import com.google.firebase.firestore.Source
 interface RemoteSpendDao {
     var source: Source
 
-    suspend fun createSpend(
-        trip: Trip,
-        name: String,
-        category: String = "No category",
-        splitMode: String = "No split mode",
-        amount: Double = 0.0,
-        geoPoint: GeoPoint = GeoPoint(0.0, 0.0),
-        members: List<SpendMember>,
-    ): DataResult<String>
-
+    suspend fun createSpend(trip: Trip, spend: Spend): DataResult<String>
+    suspend fun getSpends(trip: Trip): DataResult<List<RemoteSpend>>
+    suspend fun assembleSpend(spendDocRef: DocumentReference): DataResult<RemoteSpend>
+    suspend fun getSpendName(spendDocRef: DocumentReference): DataResult<String>
+    suspend fun getSpendCategory(spendDocRef: DocumentReference): DataResult<String>
+    suspend fun getSpendSplitMode(spendDocRef: DocumentReference): DataResult<String>
+    suspend fun getSpendAmount(spendDocRef: DocumentReference): DataResult<Double>
+    suspend fun getSpendGeoPoint(spendDocRef: DocumentReference): DataResult<GeoPoint>
+    suspend fun getSpendMembers(
+        spendDocRef: DocumentReference
+    ): DataResult<List<RemoteSpendMember>>
+    suspend fun assembleSpendMember(
+        spendMemberDocRef: DocumentReference
+    ): DataResult<RemoteSpendMember>
+    suspend fun getSpendMemberPayment(
+        spendMemberDocRef: DocumentReference
+    ): DataResult<Double>
+    suspend fun getDebtsToUsers(
+        spendMemberDocRef: DocumentReference
+    ): DataResult<List<DebtToUser>>
+    suspend fun assembleDebtToUser(
+        debtToUserMap: HashMap<String, Double>,
+        key: String
+    ): DataResult<DebtToUser>
     suspend fun updateSpendName(
         spendDocRef: DocumentReference,
         newName: String
@@ -42,11 +59,10 @@ interface RemoteSpendDao {
     ): DataResult<String>
     suspend fun addSpendMembers(
         spendDocRef: DocumentReference,
-        newMembers: List<SpendMember>
+        newMembers: List<RemoteSpendMember>
     ): DataResult<String>
     suspend fun deleteSpendMembers(
-        spendDocRef: DocumentReference,
-        members: List<SpendMember>
+        members: List<RemoteSpendMember>
     ): DataResult<String>
-    suspend fun deleteSpend(trip: Trip): DataResult<String>
+    suspend fun deleteSpend(spend: RemoteSpend): DataResult<String>
 }

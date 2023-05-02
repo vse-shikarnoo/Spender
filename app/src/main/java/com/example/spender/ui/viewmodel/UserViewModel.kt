@@ -1,6 +1,9 @@
 package com.example.spender.ui.viewmodel
 
 import android.app.Application
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,11 +12,15 @@ import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
 import com.example.spender.domain.repository.UserRepository
+import com.google.common.base.Stopwatch
 import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.sql.Time
+import java.util.Timer
+import java.util.TimerTask
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
@@ -244,6 +251,7 @@ class UserViewModel @Inject constructor(
             )
         }.invokeOnCompletion {
             _addUserOutgoingFriendMsgShow.postValue(true)
+            getUserOutgoingFriends()
         }
     }
 
@@ -269,6 +277,8 @@ class UserViewModel @Inject constructor(
             )
         }.invokeOnCompletion {
             _addUserIncomingFriendMsgShow.postValue(true)
+            getUserFriends()
+            getUserIncomingFriends()
         }
     }
 
@@ -293,6 +303,7 @@ class UserViewModel @Inject constructor(
             )
         }.invokeOnCompletion {
             _removeUserFriendMsgShow.postValue(true)
+            getUserFriends()
         }
     }
 
@@ -318,6 +329,7 @@ class UserViewModel @Inject constructor(
             )
         }.invokeOnCompletion {
             _removeUserOutgoingFriendMsgShow.postValue(true)
+            getUserOutgoingFriends()
         }
     }
 
@@ -343,6 +355,7 @@ class UserViewModel @Inject constructor(
             )
         }.invokeOnCompletion {
             _removeUserIncomingFriendMsgShow.postValue(true)
+            getUserIncomingFriends()
         }
     }
 

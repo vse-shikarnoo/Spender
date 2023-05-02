@@ -278,11 +278,6 @@ fun SendFriendRequestDialog(
     viewModelResultHandler(
         LocalContext.current,
         addOutgoingFriend,
-        onSuccess = {
-            userViewModel.getUserOutgoingFriends()
-            userViewModel.getUserIncomingFriends()
-            userViewModel.getUserFriends()
-        },
         restMsgShowState = { userViewModel.doNotShowAddUserOutgoingFriendMsg() },
         msgShow = showMsg.value ?: false
     )
@@ -350,17 +345,12 @@ fun IncomingFriendsList(
     viewModelResultHandler(
         LocalContext.current,
         removeUserIncomingFriend,
-        onSuccess = { userViewModel.getUserIncomingFriends() },
         restMsgShowState = { userViewModel.doNotShowRemoveUserIncomingFriendMsg() },
         msgShow = removeUserIncomingFriendMsgShow.value ?: false
     )
     viewModelResultHandler(
         LocalContext.current,
         addUserIncomingFriend,
-        onSuccess = {
-            userViewModel.getUserFriends()
-            userViewModel.getUserIncomingFriends()
-        },
         restMsgShowState = { userViewModel.doNotShowAddUserIncomingFriendMsg() },
         msgShow = addUserIncomingFriendMsgShow.value ?: false
     )
@@ -451,7 +441,6 @@ fun OutgoingFriendsList(
     viewModelResultHandler(
         LocalContext.current,
         removeUserOutgoingFriend,
-        onSuccess = { userViewModel.getUserOutgoingFriends() },
         restMsgShowState = { userViewModel.doNotShowRemoveUserOutgoingFriendMsg() },
         msgShow = removeUserOutgoingFriendMsgShow.value ?: false
     )
@@ -531,7 +520,6 @@ fun FriendsList(
     viewModelResultHandler(
         LocalContext.current,
         removeUserFriend,
-        onSuccess = { userViewModel.getUserFriends() },
         restMsgShowState = { userViewModel.doNotShowRemoveUserFriendMsg() },
         msgShow = removeUserFriendMsgShow.value ?: false
     )

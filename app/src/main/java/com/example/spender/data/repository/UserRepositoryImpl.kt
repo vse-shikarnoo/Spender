@@ -68,44 +68,44 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateUserName(newName: UserName): DataResult<String> {
-        return remoteUserDaoImplServer.updateUserName(newName)
+        return remoteUserDaoImplCache.updateUserName(newName)
     }
 
     override suspend fun updateUserAge(newAge: Int): DataResult<String> {
-        return remoteUserDaoImplServer.updateUserAge(newAge)
+        return remoteUserDaoImplCache.updateUserAge(newAge)
     }
 
     override suspend fun updateUserNickname(
         newNickname: String
     ): DataResult<String> {
-        return remoteUserDaoImplServer.updateUserNickname(newNickname)
+        return remoteUserDaoImplCache.updateUserNickname(newNickname)
     }
 
     override suspend fun addUserIncomingFriend(
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImplServer.addUserIncomingFriend(friend)
+        return remoteUserDaoImplCache.addUserIncomingFriend(friend)
     }
 
     override suspend fun addUserOutgoingFriend(
         nickname: String
     ): DataResult<String> {
-        return remoteUserDaoImplServer.addUserOutgoingFriend(nickname)
+        return remoteUserDaoImplCache.addUserOutgoingFriend(nickname)
     }
 
     override suspend fun removeUserFriend(friend: Friend): DataResult<String> {
-        return remoteUserDaoImplServer.removeUserFriend(friend)
+        return remoteUserDaoImplCache.removeUserFriend(friend)
     }
 
     override suspend fun removeUserOutgoingFriend(
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImplServer.removeUserOutgoingFriend(friend)
+        return remoteUserDaoImplCache.removeUserOutgoingFriend(friend)
     }
 
     override suspend fun removeUserIncomingFriend(
         friend: Friend
     ): DataResult<String> {
-        return remoteUserDaoImplServer.removeUserIncomingFriend(friend)
+        return remoteUserDaoImplCache.removeUserIncomingFriend(friend)
     }
 }

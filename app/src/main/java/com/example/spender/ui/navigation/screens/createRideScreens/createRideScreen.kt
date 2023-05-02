@@ -126,8 +126,7 @@ fun CreateRideContent(
                 keyboardType = KeyboardType.Text
             )
         }
-        if (friendsList.isNotEmpty())
-            AddFriendsList(userViewModel, tripViewModel, tripName, navigator, friendsList)
+        AddFriendsList(userViewModel, tripViewModel, tripName, navigator, friendsList)
     }
 }
 
@@ -139,7 +138,10 @@ fun AddFriendsList(
     navigator: DestinationsNavigator,
     friendsList: List<Friend>
 ) {
-    var addList by remember { mutableStateOf(List(friendsList.size) {false}) }
+    var addList by if (friendsList.isNotEmpty())
+        remember { mutableStateOf(List(friendsList.size) {false}) }
+    else
+        remember { mutableStateOf(List(0) {false}) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -185,7 +187,7 @@ fun AddFriendsList(
                                 onCheckedChange = { add ->
                                     val mutableList = addList.toMutableList()
                                     mutableList[friendsList.indexOf(friend)] = add
-                                    addList = mutableList
+                                    addList = mutableList.toList()
                                 },
                                 colors = CheckboxDefaults.colors(
                                     uncheckedColor = GreenMain,
@@ -244,7 +246,6 @@ fun CreateTripButton(
         createTripResult,
         onSuccess = {
             if (createTripMsgShow.value == true) {
-                tripViewModel.getAdminTrips()
                 navigator.navigate(BalanceScreenDestination)
             }
         },

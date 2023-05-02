@@ -4,6 +4,8 @@ import android.app.Application
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
+import com.example.spender.data.messages.exceptions.FirebaseNicknameException
+import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.UserName
@@ -105,5 +107,30 @@ class SharedFunctions(
                 docRef = friendDocRef
             )
         )
+    }
+
+    suspend fun checkNickname(
+        nickname: String,
+        source: Source
+    ): DataResult<Boolean> {
+        if (nickname.length < 6) {
+            return DataErrorHandler.handle(FirebaseNicknameLengthException())
+        }
+        return try {
+            val checkNicknameQuerySnapshot = remoteDataSource.db.collection(
+                appContext.getString(
+                    R.string.collection_name_users
+                )
+            ).whereEqualTo(
+                appContext.getString(R.string.collection_users_document_field_nickname),
+                nickname
+            ).get(source).await()
+            if (!checkNicknameQuerySnapshot.isEmpty) {
+                DataErrorHandler.handle(FirebaseNicknameException())
+            }
+            DataResult.Success(true)
+        } catch (e: Exception) {
+            DataErrorHandler.handle(e)
+        }
     }
 }

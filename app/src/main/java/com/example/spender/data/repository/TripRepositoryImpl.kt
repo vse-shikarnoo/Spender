@@ -24,7 +24,7 @@ class TripRepositoryImpl @Inject constructor(
         name: String,
         members: List<Friend>
     ): DataResult<String> {
-        return remoteTripDaoImplServer.createTrip(
+        return remoteTripDaoImplCache.createTrip(
             name,
             members
         )

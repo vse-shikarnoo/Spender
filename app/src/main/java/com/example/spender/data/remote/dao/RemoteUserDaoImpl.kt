@@ -247,7 +247,7 @@ class RemoteUserDaoImpl @Inject constructor(
                 FieldValue.arrayRemove(userDocRef)
             )
 
-            batch.commit().await()
+            batch.commit()
             DataResult.Success(FirebaseSuccessMessages.USER_INCOMING_FRIEND_ADDED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -315,7 +315,7 @@ class RemoteUserDaoImpl @Inject constructor(
                 FieldValue.arrayUnion(userDocRef)
             )
 
-            batch.commit().await()
+            batch.commit()
             DataResult.Success(FirebaseSuccessMessages.USER_OUTGOING_FRIEND_ADDED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -420,7 +420,7 @@ class RemoteUserDaoImpl @Inject constructor(
                 FieldValue.arrayRemove(userDocRef)
             )
 
-            batch.commit().await()
+            batch.commit()
             DataResult.Success(FirebaseSuccessMessages.USER_FRIEND_REMOVED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -454,7 +454,7 @@ class RemoteUserDaoImpl @Inject constructor(
                 FieldValue.arrayRemove(userDocRef)
             )
 
-            batch.commit().await()
+            batch.commit()
             DataResult.Success(FirebaseSuccessMessages.USER_OUTGOING_FRIEND_REMOVED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -488,7 +488,7 @@ class RemoteUserDaoImpl @Inject constructor(
                 FieldValue.arrayRemove(userDocRef)
             )
 
-            batch.commit().await()
+            batch.commit()
             DataResult.Success(FirebaseSuccessMessages.USER_INCOMING_FRIEND_REMOVED)
         } catch (e: Exception) {
             DataErrorHandler.handle(e)
@@ -498,24 +498,6 @@ class RemoteUserDaoImpl @Inject constructor(
     override suspend fun checkNickname(
         nickname: String
     ): DataResult<Boolean> {
-        if (nickname.length < 6) {
-            return DataErrorHandler.handle(FirebaseNicknameLengthException())
-        }
-        return try {
-            val checkNicknameQuerySnapshot = remoteDataSource.db.collection(
-                appContext.getString(
-                    R.string.collection_name_users
-                )
-            ).whereEqualTo(
-                appContext.getString(R.string.collection_users_document_field_nickname),
-                nickname
-            ).get(source).await()
-            if (!checkNicknameQuerySnapshot.isEmpty) {
-                DataErrorHandler.handle(FirebaseNicknameException())
-            }
-            DataResult.Success(true)
-        } catch (e: Exception) {
-            DataErrorHandler.handle(e)
-        }
+        return sharedFunctions.checkNickname(nickname, source)
     }
 }

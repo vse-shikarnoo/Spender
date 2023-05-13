@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
 import com.example.spender.domain.remotemodel.LocalTrip
@@ -69,7 +70,7 @@ fun SpendingsScreen(
             FloatingActionButton(
                 containerColor = GreenMain,
                 shape = CircleShape,
-                onClick = { navigator.navigate(AddSpendingScreenDestination) }
+                onClick = { navigator.navigate(AddSpendingScreenDestination(trip)) }
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Spend")
             }
@@ -97,11 +98,13 @@ fun SpendingsScreenTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(16.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
-        Text(
-            text = "${trip.name} by ${trip.creator.nickname}"
+        AutoResizedText(
+            text = "${trip.name} by ${trip.creator.nickname}",
+            color = GreenMain,
+            style = MaterialTheme.typography.headlineMedium
         )
     }
 }
@@ -120,7 +123,10 @@ fun SpendingsScreenContent(
         LocalContext.current,
         spends,
         onSuccess = {
-            spendsList = it
+            if (spendViewModel.getSpendsDataUpdated.value == true) {
+                spendsList = it
+                spendViewModel.getSpendsDataUpdate()
+            }
         }
     )
 
@@ -129,11 +135,7 @@ fun SpendingsScreenContent(
             .fillMaxWidth()
             .padding(paddingValues)
     ) {
-        Text(
-            text = "Spends",
-        )
-        Divider()
-
+        SpendingsListHeader()
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -141,7 +143,7 @@ fun SpendingsScreenContent(
             modifier = Modifier.fillMaxSize(),
         ) {
             if (spendsList.isEmpty()) {
-                item { EmptyListItem("No trips") }
+                item { EmptyListItem("No spends") }
                 return@LazyColumn
             }
             if (spendsList.size <= 3) {
@@ -172,6 +174,26 @@ fun SpendingsScreenContent(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun SpendingsListHeader() {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        AutoResizedText(
+            text = "Spends",
+            color = GreenMain,
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Divider(
+            color = GreenMain,
+            thickness = 1.dp
+        )
     }
 }
 

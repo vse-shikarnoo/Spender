@@ -10,7 +10,7 @@ data class Friend(
     val docRef: DocumentReference
 )
 
-fun Friend.toLocalTrip(): LocalFriend {
+fun Friend.toLocalFriend(): LocalFriend {
     return LocalFriend(
         this.name,
         this.nickname,
@@ -25,7 +25,7 @@ data class LocalFriend(
     val docRefPath: String
 )
 
-fun LocalFriend.toTrip(): Friend {
+fun LocalFriend.toFriend(): Friend {
     return Friend(
         this.name,
         this.nickname,

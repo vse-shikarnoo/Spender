@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.repository.SpendRepository
@@ -32,7 +33,7 @@ class SpendViewModel @Inject constructor(
     private val _createSpendMsgShow = MutableLiveData<Boolean>()
     val createSpendMsgShow: LiveData<Boolean> = _createSpendMsgShow
 
-    fun createSpend(trip: Trip, spend: Spend) {
+    fun createSpend(trip: Trip, spend: LocalSpend) {
         viewModelScope.launch(Dispatchers.IO) {
             _createSpendDataResult.postValue(
                 repository.get().createSpend(trip, spend)
@@ -52,6 +53,8 @@ class SpendViewModel @Inject constructor(
 
     private val _getSpendsDataResult = MutableLiveData<DataResult<List<RemoteSpend>>>()
     val getSpendsDataResult: LiveData<DataResult<List<RemoteSpend>>> = _getSpendsDataResult
+    private val _getSpendsDataUpdated = MutableLiveData<Boolean>(true)
+    val getSpendsDataUpdated: LiveData<Boolean> = _getSpendsDataUpdated
 
     fun getSpends(trip: Trip) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -59,6 +62,7 @@ class SpendViewModel @Inject constructor(
                 repository.get().getSpends(trip, Source.CACHE)
             )
         }.invokeOnCompletion {
+            _getSpendsDataUpdated.postValue(true)
             if (InternetChecker.check(appContext)) {
                 viewModelScope.launch(Dispatchers.IO) {
                     _getSpendsDataResult.postValue(
@@ -67,6 +71,10 @@ class SpendViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun getSpendsDataUpdate() {
+        _getSpendsDataUpdated.postValue(false)
     }
 
     /*

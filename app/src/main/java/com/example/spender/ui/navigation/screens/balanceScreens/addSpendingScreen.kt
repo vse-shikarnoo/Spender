@@ -1,8 +1,6 @@
 package com.example.spender.ui.navigation.screens.balanceScreens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,19 +12,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,28 +39,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.spender.R
-import com.example.spender.domain.remotemodel.Trip
-import com.example.spender.domain.remotemodel.spend.Spend
+import com.example.spender.domain.remotemodel.LocalTrip
+import com.example.spender.domain.remotemodel.spend.LocalSpend
+import com.example.spender.domain.remotemodel.spendmember.LocalSpendMember
 import com.example.spender.domain.remotemodel.toTrip
 import com.example.spender.domain.remotemodel.user.Friend
-import com.example.spender.ui.navigation.screens.destinations.AddSpendingScreenDestination
+import com.example.spender.domain.remotemodel.user.LocalFriend
+import com.example.spender.domain.remotemodel.user.toFriend
+import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.navigation.screens.helperfunctions.EmptyListItem
-import com.example.spender.ui.navigation.screens.helperfunctions.FriendCard
 import com.example.spender.ui.navigation.screens.helperfunctions.OverflowListItem
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
-import com.example.spender.ui.navigation.screens.profileScreens.FriendsList
-import com.example.spender.ui.navigation.screens.profileScreens.OutgoingFriendsListItem
 import com.example.spender.ui.theme.GreenLightBackground
 import com.example.spender.ui.theme.GreenMain
 import com.example.spender.ui.viewmodel.SpendViewModel
-import com.example.spender.ui.viewmodel.TripViewModel
 import com.example.spender.ui.viewmodel.UserViewModel
 import com.google.firebase.firestore.GeoPoint
 import com.ramcosta.composedestinations.annotation.Destination
@@ -73,112 +66,165 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun AddSpendingScreen(
     navigator: DestinationsNavigator,
     spendViewModel: SpendViewModel,
-    userViewModel: UserViewModel
+    trip: LocalTrip
 ) {
     Scaffold(
-        topBar = { AddSpendingScreenTopBar() },
+        topBar = { AddSpendingScreenTopBar(navigator, trip, spendViewModel) },
     ) {
-        AddSpendingScreenTopBarContent(
+        AddSpendingScreenContent(
             paddingValues = it,
             navigator = navigator,
             spendViewModel = spendViewModel,
-            userViewModel = userViewModel,
+            trip = trip
         )
     }
-    LaunchedEffect(
-        key1 = true,
-        block = {
-            userViewModel.getUserFriends()
-        }
-    )
 }
 
 @Composable
-fun AddSpendingScreenTopBar() {
+fun AddSpendingScreenTopBar(
+    navigator: DestinationsNavigator,
+    trip: LocalTrip,
+    spendViewModel: SpendViewModel,
+) {
+    val testSpend = LocalSpend(
+        name = "ABOBA",
+        category = "ABOBA",
+        splitMode = "ABOBA",
+        amount = 100.0,
+        geoPoint = GeoPoint(0.0, 0.0),
+        members = buildList {
+            trip.members.forEach { friend ->
+                this@buildList.add(
+                    LocalSpendMember(
+                        friend = friend.toFriend(),
+                        payment = 0.0,
+                        emptyList()
+                    )
+                )
+            }
+        }
+    )
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Icon(
-            imageVector = Icons.Outlined.Check,
-            contentDescription = "Add spending",
-        )
+        IconButton(
+            onClick = {
+                spendViewModel.createSpend(trip.toTrip(), testSpend)
+                navigator.popBackStack()
+            },
+        ) {
+            Icon(
+                modifier = Modifier.size(64.dp),
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Go back",
+                tint = GreenMain
+            )
+        }
+        IconButton(
+            onClick = {
+                spendViewModel.createSpend(trip.toTrip(), testSpend)
+                navigator.popBackStack()
+            },
+        ) {
+            Icon(
+                modifier = Modifier.size(64.dp),
+                imageVector = Icons.Filled.Check,
+                contentDescription = "Add spending",
+                tint = GreenMain
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddSpendingScreenTopBarContent(
+fun AddSpendingScreenContent(
     paddingValues: PaddingValues,
     navigator: DestinationsNavigator,
     spendViewModel: SpendViewModel,
-    userViewModel: UserViewModel
+    trip: LocalTrip
 ) {
     var splitEqualChecked by remember { mutableStateOf(false) }
     var totalSpend by remember { mutableStateOf("") }
-//    if (splitEqualChecked) {
-//        TODO()
-//    } else {
-//        TODO()
-//    }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(paddingValues)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
     ) {
         Row(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            Text(
-                modifier = Modifier.weight(0.75f),
-                text = "total spend"
-            )
-            TextField(
-                modifier = Modifier.weight(0.25f),
-                value = totalSpend,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                onValueChange = {
-                    totalSpend = if (it.isEmpty()){
-                        it
-                    } else {
-                        when (it.toDoubleOrNull()) {
-                            null -> totalSpend //old value
-                            else -> it   //new value
+            Box(
+                modifier = Modifier.weight(0.5f),
+                contentAlignment = Alignment.Center
+            ) {
+                AutoResizedText(
+                    text = "Total spend",
+                    color = GreenMain,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+                EditTextField(
+                    text = totalSpend,
+                    onTextChanged = {
+                        totalSpend = if (it.isEmpty()) {
+                            it
+                        } else {
+                            when (it.toDoubleOrNull()) {
+                                null -> totalSpend //old value
+                                else -> it   //new value
+                            }
                         }
-                    }
-                },
-                placeholder = {
-                    Text(text = "Amount")
-                },
-            )
+                    },
+                    label = { Text(text = "Amount") },
+                    keyboardType = KeyboardType.Number,
+                    fieldNeedToBeHidden = false
+                )
+            }
         }
-        Row {
-            Text(
-                modifier = Modifier.weight(0.75f),
-                text = "split equally"
-            )
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Box(
+                modifier = Modifier.weight(0.5f),
+                contentAlignment = Alignment.Center
+            ) {
+                AutoResizedText(
+                    text = "Split equally",
+                    color = GreenMain,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
             Checkbox(
-                modifier = Modifier.weight(0.25f),
+                modifier = Modifier.weight(0.5f),
                 checked = splitEqualChecked,
                 onCheckedChange = {
                     splitEqualChecked = it
                 }
             )
         }
-        FriendsListSpend(userViewModel = userViewModel)
+        FriendsListSpend(friendsLst = buildList {
+            trip.members.forEach { friend ->
+                this@buildList.add(friend.toFriend())
+            }
+        })
     }
 }
 
 @Composable
 fun FriendsListSpend(
-    userViewModel: UserViewModel,
+    friendsLst: List<Friend>
 ) {
-    val friends = userViewModel.getUserFriendsDataResult.observeAsState()
-    var friendsLst by remember { mutableStateOf(listOf<Friend>()) }
-    viewModelResultHandler(LocalContext.current, friends, { friendsLst = it })
-
     var showMore by remember { mutableStateOf(false) }
 
     LazyColumn(
@@ -194,17 +240,17 @@ fun FriendsListSpend(
         }
         if (friendsLst.size <= 3) {
             items(friendsLst) { friend ->
-                FriendsListItemSpend(friend = friend, userViewModel = userViewModel)
+                FriendsListItemSpend(friend = friend)
             }
             return@LazyColumn
         }
         if (!showMore) {
             items(friendsLst.subList(0, 3)) { friend ->
-                FriendsListItemSpend(friend = friend, userViewModel = userViewModel)
+                FriendsListItemSpend(friend = friend)
             }
         } else {
             items(friendsLst) { friend ->
-                FriendsListItemSpend(friend = friend, userViewModel = userViewModel)
+                FriendsListItemSpend(friend = friend)
             }
         }
         item {
@@ -226,7 +272,6 @@ fun FriendsListSpend(
 @Composable
 fun FriendsListItemSpend(
     friend: Friend,
-    userViewModel: UserViewModel
 ) {
     var spendAmount by remember { mutableStateOf("") }
     Card(
@@ -244,28 +289,34 @@ fun FriendsListItemSpend(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                modifier = Modifier.weight(0.75f),
-                text = friend.nickname
-            )
-            TextField(
-                modifier = Modifier.weight(0.25f),
-                value = spendAmount,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                onValueChange = {
-                    spendAmount = if (it.isEmpty()){
-                        it
-                    } else {
-                        when (it.toDoubleOrNull()) {
-                            null -> spendAmount //old value
-                            else -> it   //new value
+            Box(
+                modifier = Modifier.weight(0.5f),
+                contentAlignment = Alignment.Center
+            ) {
+                AutoResizedText(
+                    text = friend.nickname,
+                    color = GreenMain,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+                EditTextField(
+                    text = spendAmount,
+                    onTextChanged = {
+                        spendAmount = if (it.isEmpty()) {
+                            it
+                        } else {
+                            when (it.toDoubleOrNull()) {
+                                null -> spendAmount //old value
+                                else -> it   //new value
+                            }
                         }
-                    }
-                },
-                placeholder = {
-                    Text(text = "Amount")
-                },
-            )
+                    },
+                    label = { Text(text = "Amount") },
+                    keyboardType = KeyboardType.Number,
+                    fieldNeedToBeHidden = false
+                )
+            }
         }
     }
 }

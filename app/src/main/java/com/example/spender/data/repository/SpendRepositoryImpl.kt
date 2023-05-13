@@ -4,6 +4,7 @@ import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.dao.RemoteSpendDaoImpl
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
@@ -24,7 +25,7 @@ class SpendRepositoryImpl @Inject constructor(
 
     override suspend fun createSpend(
         trip: Trip,
-        spend: Spend
+        spend: LocalSpend
     ): DataResult<String> {
         return remoteSpendDaoImplServer.createSpend(trip, spend)
     }

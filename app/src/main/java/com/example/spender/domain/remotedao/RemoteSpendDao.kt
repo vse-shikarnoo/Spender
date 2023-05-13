@@ -2,6 +2,7 @@ package com.example.spender.domain.remotedao
 
 import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.remotemodel.spendmember.DebtToUser
@@ -13,7 +14,7 @@ import com.google.firebase.firestore.Source
 interface RemoteSpendDao {
     var source: Source
 
-    suspend fun createSpend(trip: Trip, spend: Spend): DataResult<String>
+    suspend fun createSpend(trip: Trip, spend: LocalSpend): DataResult<String>
     suspend fun getSpends(trip: Trip): DataResult<List<RemoteSpend>>
     suspend fun assembleSpend(spendDocRef: DocumentReference): DataResult<RemoteSpend>
     suspend fun getSpendName(spendDocRef: DocumentReference): DataResult<String>

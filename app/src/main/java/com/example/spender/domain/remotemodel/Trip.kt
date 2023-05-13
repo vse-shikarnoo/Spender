@@ -2,8 +2,8 @@ package com.example.spender.domain.remotemodel
 
 import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.remotemodel.user.LocalFriend
-import com.example.spender.domain.remotemodel.user.toLocalTrip
-import com.example.spender.domain.remotemodel.user.toTrip
+import com.example.spender.domain.remotemodel.user.toLocalFriend
+import com.example.spender.domain.remotemodel.user.toFriend
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.serialization.Serializable
@@ -19,10 +19,10 @@ data class Trip(
 fun Trip.toLocalTrip(): LocalTrip {
     return LocalTrip(
         this.name,
-        this.creator.toLocalTrip(),
+        this.creator.toLocalFriend(),
         buildList {
             this@toLocalTrip.members.forEach {
-                add(it.toLocalTrip())
+                add(it.toLocalFriend())
             }
         },
         this.docRef.path
@@ -40,10 +40,10 @@ data class LocalTrip(
 fun LocalTrip.toTrip(): Trip {
     return Trip(
         this.name,
-        this.creator.toTrip(),
+        this.creator.toFriend(),
         buildList {
             this@toTrip.members.forEach {
-                add(it.toTrip())
+                add(it.toFriend())
             }
         },
         FirebaseFirestore.getInstance().document(this.docRefPath)

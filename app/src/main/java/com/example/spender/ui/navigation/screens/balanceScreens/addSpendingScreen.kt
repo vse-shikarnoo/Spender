@@ -247,7 +247,7 @@ fun FriendsListItemSpend(
     var spendAmount by remember { mutableStateOf("") }
     if (splitEqual.value) {
         when (totalSpend.value.toDoubleOrNull()) {
-            null -> spendAmount //old value
+            null -> spendAmount = "" //old value
             else -> spendAmount = (totalSpend.value.toDouble() / friendsLstSize).toString()  //new value
         }
     }

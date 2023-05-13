@@ -9,6 +9,7 @@ import com.example.spender.data.messages.exceptions.FirebaseUndefinedException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.remotedao.RemoteSpendDao
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
 import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
@@ -101,6 +102,52 @@ class RemoteSpendDaoImpl @Inject constructor(
                 }
             }
         )
+    }
+
+
+    override suspend fun getAllSpends(): DataResult<List<GoogleMapsSpend>> {
+        return try {
+            val userDocRef = sharedFunctions.getUserDocRef(null)
+            val tripsDocRefs = userDocRef.get(source).await().get(
+                appContext.getString(R.string.collection_users_document_field_trips)
+            ) as ArrayList<DocumentReference>? ?: return DataResult.Success(emptyList())
+
+            val spendsDocRefs = buildList {
+                tripsDocRefs.forEach { trip ->
+                    val spendDocRef = trip.collection(
+                        appContext.getString(R.string.collection_name_spends)
+                    ).get().await().documents.forEach { spendDocSnapshot ->
+                        this.add(spendDocSnapshot.reference)
+                    }
+                }
+            }
+
+            val spends = buildList {
+                spendsDocRefs.forEach {
+                    val tmp = assembleSpend(it)
+                    if (tmp is DataResult.Error) {
+                        return tmp
+                    }
+                    this.add((tmp as DataResult.Success).data)
+                }
+            }
+
+            val googleMapsSpends = buildList {
+                spends.forEach { spend ->
+                    this.add(
+                        GoogleMapsSpend(
+                            spend.name,
+                            spend.geoPoint.latitude,
+                            spend.geoPoint.longitude,
+                        )
+                    )
+                }
+            }
+
+            return DataResult.Success(googleMapsSpends)
+        } catch (e: FirebaseUndefinedException) {
+            DataErrorHandler.handle(e)
+        }
     }
 
     override suspend fun assembleSpend(spendDocRef: DocumentReference): DataResult<RemoteSpend> {

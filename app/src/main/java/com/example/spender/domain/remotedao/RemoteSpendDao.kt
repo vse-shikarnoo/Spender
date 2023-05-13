@@ -2,6 +2,7 @@ package com.example.spender.domain.remotedao
 
 import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
 import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
@@ -16,6 +17,7 @@ interface RemoteSpendDao {
 
     suspend fun createSpend(trip: Trip, spend: LocalSpend): DataResult<String>
     suspend fun getSpends(trip: Trip): DataResult<List<RemoteSpend>>
+    suspend fun getAllSpends(): DataResult<List<GoogleMapsSpend>>
     suspend fun assembleSpend(spendDocRef: DocumentReference): DataResult<RemoteSpend>
     suspend fun getSpendName(spendDocRef: DocumentReference): DataResult<String>
     suspend fun getSpendCategory(spendDocRef: DocumentReference): DataResult<String>

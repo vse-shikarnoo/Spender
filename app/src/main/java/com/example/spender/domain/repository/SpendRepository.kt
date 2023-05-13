@@ -2,6 +2,7 @@ package com.example.spender.domain.repository
 
 import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
 import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
@@ -13,6 +14,7 @@ import com.google.firebase.firestore.Source
 interface SpendRepository {
     suspend fun createSpend(trip: Trip, spend: LocalSpend): DataResult<String>
     suspend fun getSpends(trip: Trip, source: Source): DataResult<List<RemoteSpend>>
+    suspend fun getAllSpends(source: Source): DataResult<List<GoogleMapsSpend>>
     suspend fun updateSpend(
         oldRemoteSpend: RemoteSpend,
         newRemoteSpend: RemoteSpend

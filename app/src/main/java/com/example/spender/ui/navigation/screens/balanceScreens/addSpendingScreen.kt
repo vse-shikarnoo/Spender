@@ -45,6 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.spender.domain.remotemodel.LocalTrip
 import com.example.spender.domain.remotemodel.spend.LocalSpend
+import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.remotemodel.spendmember.LocalSpendMember
 import com.example.spender.domain.remotemodel.toTrip
 import com.example.spender.domain.remotemodel.user.Friend
@@ -61,6 +62,12 @@ import com.example.spender.ui.viewmodel.UserViewModel
 import com.google.firebase.firestore.GeoPoint
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+object SpendAssemble {
+    var name = "name"
+    var longtitude = 0.0
+    var latitude = 0.0
+}
 
 @Destination
 @Composable
@@ -82,21 +89,6 @@ fun AddSpendingScreenTopBar(
     trip: LocalTrip,
     spendViewModel: SpendViewModel,
 ) {
-    val testSpend = LocalSpend(name = "ABOBA",
-        category = "ABOBA",
-        splitMode = "ABOBA",
-        amount = 100.0,
-        geoPoint = GeoPoint(0.0, 0.0),
-        members = buildList {
-            trip.members.forEach { friend ->
-                this@buildList.add(
-                    LocalSpendMember(
-                        friend = friend.toFriend(), payment = 0.0, emptyList()
-                    )
-                )
-            }
-        })
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -104,7 +96,6 @@ fun AddSpendingScreenTopBar(
     ) {
         IconButton(
             onClick = {
-                spendViewModel.createSpend(trip.toTrip(), testSpend)
                 navigator.popBackStack()
             },
         ) {
@@ -117,7 +108,24 @@ fun AddSpendingScreenTopBar(
         }
         IconButton(
             onClick = {
-                spendViewModel.createSpend(trip.toTrip(), testSpend)
+                spendViewModel.createSpend(
+                    trip.toTrip(),
+                    LocalSpend(
+                        name = SpendAssemble.name,
+                        category = "ABOBA",
+                        splitMode = "ABOBA",
+                        amount = 100.0,
+                        geoPoint = GeoPoint(SpendAssemble.latitude, SpendAssemble.longtitude),
+                        members = buildList {
+                            trip.members.forEach { friend ->
+                                this@buildList.add(
+                                    LocalSpendMember(
+                                        friend = friend.toFriend(), payment = 0.0, emptyList()
+                                    )
+                                )
+                            }
+                        })
+                )
                 navigator.popBackStack()
             },
         ) {
@@ -139,8 +147,11 @@ fun AddSpendingScreenContent(
     spendViewModel: SpendViewModel,
     trip: LocalTrip
 ) {
-    var splitEqualChecked = remember { mutableStateOf(false) }
-    var totalSpend = remember { mutableStateOf("") }
+    val splitEqualChecked = remember { mutableStateOf(false) }
+    val totalSpend = remember { mutableStateOf("") }
+    val spendName = remember { mutableStateOf("") }
+    val latitude = remember { mutableStateOf("") }
+    val longtitude = remember { mutableStateOf("") }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -148,6 +159,101 @@ fun AddSpendingScreenContent(
             .fillMaxSize()
             .padding(paddingValues)
     ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Box(
+                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
+            ) {
+                AutoResizedText(
+                    text = "Spend Name",
+                    color = GreenMain,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+                EditTextField(
+                    text = spendName.value,
+                    onTextChanged = {
+                        spendName.value = it
+                        SpendAssemble.name = it
+                    },
+                    label = { Text(text = "Name") },
+                    keyboardType = KeyboardType.Number,
+                    fieldNeedToBeHidden = false
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Box(
+                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
+            ) {
+                AutoResizedText(
+                    text = "Широта",
+                    color = GreenMain,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+                EditTextField(
+                    text = latitude.value,
+                    onTextChanged = {
+                        latitude.value = if (it.isEmpty()) {
+                            it
+                        } else {
+                            when (it.toDoubleOrNull()) {
+                                null -> latitude.value //old value
+                                else -> it   //new value
+                            }
+                        }
+                        SpendAssemble.latitude = latitude.value.toDouble()
+                    },
+                    label = { Text(text = "Широта") },
+                    keyboardType = KeyboardType.Number,
+                    fieldNeedToBeHidden = false
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Box(
+                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
+            ) {
+                AutoResizedText(
+                    text = "Долгота",
+                    color = GreenMain,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+                EditTextField(
+                    text = longtitude.value,
+                    onTextChanged = {
+                        longtitude.value = if (it.isEmpty()) {
+                            it
+                        } else {
+                            when (it.toDoubleOrNull()) {
+                                null -> longtitude.value //old value
+                                else -> it   //new value
+                            }
+                        }
+                        SpendAssemble.latitude = longtitude.value.toDouble()
+                    },
+                    label = { Text(text = "Долгота") },
+                    keyboardType = KeyboardType.Number,
+                    fieldNeedToBeHidden = false
+                )
+            }
+        }
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -248,7 +354,8 @@ fun FriendsListItemSpend(
     if (splitEqual.value) {
         when (totalSpend.value.toDoubleOrNull()) {
             null -> spendAmount //old value
-            else -> spendAmount = (totalSpend.value.toDouble() / friendsLstSize).toString()  //new value
+            else -> spendAmount =
+                (totalSpend.value.toDouble() / friendsLstSize).toString()  //new value
         }
     }
 

@@ -256,7 +256,8 @@ fun SendFriendRequestDialog(
                     text = friendsNickname,
                     onTextChanged = { friendsNickname = it },
                     label = { Text("Friend's nickname") },
-                    keyboardType = KeyboardType.Text
+                    keyboardType = KeyboardType.Text,
+                    false,
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),

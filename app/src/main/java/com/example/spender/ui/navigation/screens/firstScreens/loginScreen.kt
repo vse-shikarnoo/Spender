@@ -7,6 +7,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -17,6 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
@@ -100,11 +104,13 @@ fun LoginScreenContent(
                 currentValue = email,
                 keyboardType = KeyboardType.Email,
                 onValueChange = { email = it },
+                false,
             )
             LoginOutlinedTextField(
                 currentValue = password,
                 keyboardType = KeyboardType.Password,
                 onValueChange = { password = it },
+                true,
             )
             LoginButton(navigator, authViewModel, email, password)
         }
@@ -155,9 +161,12 @@ fun LoginOutlinedTextField(
     currentValue: String,
     keyboardType: KeyboardType,
     onValueChange: (String) -> Unit,
+    fieldNeedToBeHidden: Boolean,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    var passwordVisible by remember { mutableStateOf(false) }
+
     OutlinedTextField(
         value = currentValue,
         label = {
@@ -177,5 +186,20 @@ fun LoginOutlinedTextField(
         ),
         colors = spenderTextFieldColors(),
         singleLine = true,
+        visualTransformation = if (!fieldNeedToBeHidden || passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            val image = if (passwordVisible)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            // Please provide localized description for accessibility services
+            val description = if (passwordVisible) "Hide password" else "Show password"
+
+            if (fieldNeedToBeHidden) {
+                IconButton(onClick = {passwordVisible = !passwordVisible}){
+                    Icon(imageVector  = image, description)
+                }
+            }
+        },
     )
 }

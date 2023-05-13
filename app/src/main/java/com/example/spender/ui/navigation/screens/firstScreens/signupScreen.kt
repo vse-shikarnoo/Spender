@@ -9,6 +9,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -22,6 +24,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
@@ -112,7 +116,8 @@ fun SignUpContent(
                 text = nickname,
                 onTextChanged = { nickname = it },
                 label = { Text(text = "Nickname") },
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Text,
+                false,
             )
         }
         androidx.compose.material3.Divider(
@@ -126,13 +131,15 @@ fun SignUpContent(
                 text = email,
                 onTextChanged = { email = it },
                 label = { Text(text = "Email") },
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Email,
+                false,
             )
             EditTextField(
                 text = password,
                 onTextChanged = { password = it },
                 label = { Text(text = "Password") },
-                keyboardType = KeyboardType.Password
+                keyboardType = KeyboardType.Password,
+                true,
             )
         }
         SignUpButton(email, password, nickname, authViewModel, navigator)
@@ -183,10 +190,13 @@ fun EditTextField(
     text: String,
     onTextChanged: (String) -> Unit,
     label: @Composable () -> Unit,
-    keyboardType: KeyboardType
+    keyboardType: KeyboardType,
+    fieldNeedToBeHidden: Boolean,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    var passwordVisible by remember { mutableStateOf(true) }
+
     OutlinedTextField(
         value = text,
         label = label,
@@ -201,5 +211,19 @@ fun EditTextField(
         ),
         colors = spenderTextFieldColors(),
         singleLine = true,
+        visualTransformation = if (!fieldNeedToBeHidden || passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            val image = if (passwordVisible)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            // Please provide localized description for accessibility services
+            val description = if (passwordVisible) "Hide password" else "Show password"
+            if (fieldNeedToBeHidden){
+                IconButton(onClick = {passwordVisible = !passwordVisible}){
+                    Icon(imageVector  = image, description)
+                }
+            }
+        }
     )
 }

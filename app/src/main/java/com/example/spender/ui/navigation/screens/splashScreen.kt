@@ -14,21 +14,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.ui.navigation.FirstNavGraph
-import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.WhiteBackground
 import com.example.spender.ui.viewmodel.AuthViewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@FirstNavGraph(start = true)
+@RootNavGraph(start = true)
 @Destination
 @Composable
 fun SplashScreen(
@@ -45,10 +46,11 @@ fun SplashScreen(
     )
 
     viewModelResultHandler(
+        LocalContext.current,
         currentUserResult,
         onSuccess = {
             navigator.popBackStack()
-            navigator.navigate(BottomBarScreenDestination)
+            navigator.navigate(BalanceScreenDestination)
         },
         onError = {
             navigator.popBackStack()

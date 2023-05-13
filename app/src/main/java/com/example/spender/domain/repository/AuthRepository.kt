@@ -10,5 +10,4 @@ interface AuthRepository {
     suspend fun verifyEmail(): DataResult<String>
     suspend fun isEmailVerified(): DataResult<Boolean>
     suspend fun getCurrentUser(): DataResult<FirebaseUser>
-    suspend fun checkNickname(nickname: String): DataResult<Boolean>
 }

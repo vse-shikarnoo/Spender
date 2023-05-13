@@ -36,8 +36,4 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getCurrentUser(): DataResult<FirebaseUser> {
         return remoteAuthDaoImpl.getCurrentUser()
     }
-
-    override suspend fun checkNickname(nickname: String): DataResult<Boolean> {
-        return remoteAuthDaoImpl.checkNickname(nickname)
-    }
 }

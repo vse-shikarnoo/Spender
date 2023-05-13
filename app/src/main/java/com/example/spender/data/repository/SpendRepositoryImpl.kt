@@ -1,9 +1,13 @@
 package com.example.spender.data.repository
 
 import com.example.spender.data.DataResult
+import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.dao.RemoteSpendDaoImpl
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.spend.SpendMember
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.LocalSpend
+import com.example.spender.domain.remotemodel.spend.RemoteSpend
+import com.example.spender.domain.remotemodel.spend.Spend
+import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.example.spender.domain.repository.SpendRepository
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
@@ -21,22 +25,83 @@ class SpendRepositoryImpl @Inject constructor(
 
     override suspend fun createSpend(
         trip: Trip,
-        name: String,
-        category: String,
-        splitMode: Int,
-        amount: Double,
-        geoPoint: GeoPoint,
-        members: List<SpendMember>
+        spend: LocalSpend
     ): DataResult<String> {
-        return remoteSpendDaoImplServer.createSpend(
-            trip,
-            name,
-            category,
-            splitMode,
-            amount,
-            geoPoint,
-            members
-        )
+        return remoteSpendDaoImplServer.createSpend(trip, spend)
+    }
+
+    override suspend fun getSpends(trip: Trip, source: Source): DataResult<List<RemoteSpend>> {
+        return if (source == Source.CACHE) {
+            remoteSpendDaoImplCache.getSpends(trip)
+        } else {
+            remoteSpendDaoImplServer.getSpends(trip)
+        }
+    }
+
+    override suspend fun updateSpend(
+        oldRemoteSpend: RemoteSpend,
+        newRemoteSpend: RemoteSpend
+    ): DataResult<String> {
+        if (oldRemoteSpend.name != newRemoteSpend.name) {
+            val result = remoteSpendDaoImplServer.updateSpendName(
+                newRemoteSpend.docRef,
+                newRemoteSpend.name
+            )
+            if (result is DataResult.Error) return result
+        }
+        if (oldRemoteSpend.category != newRemoteSpend.category) {
+            val result =
+                remoteSpendDaoImplServer.updateSpendCategory(
+                    newRemoteSpend.docRef,
+                    newRemoteSpend.category
+                )
+            if (result is DataResult.Error) return result
+        }
+        if (oldRemoteSpend.splitMode != newRemoteSpend.splitMode) {
+            val result =
+                remoteSpendDaoImplServer.updateSpendSplitMode(
+                    newRemoteSpend.docRef,
+                    newRemoteSpend.splitMode
+                )
+            if (result is DataResult.Error) return result
+        }
+        if (oldRemoteSpend.amount != newRemoteSpend.amount) {
+            val result = remoteSpendDaoImplServer.updateSpendAmount(
+                newRemoteSpend.docRef,
+                newRemoteSpend.amount
+            )
+            if (result is DataResult.Error) return result
+        }
+        if (oldRemoteSpend.geoPoint != newRemoteSpend.geoPoint) {
+            val result =
+                remoteSpendDaoImplServer.updateSpendGeoPoint(
+                    newRemoteSpend.docRef,
+                    newRemoteSpend.geoPoint
+                )
+            if (result is DataResult.Error) return result
+        }
+
+        val delLst = buildList {
+            oldRemoteSpend.members.forEach { member ->
+                if (!newRemoteSpend.members.contains(member)) this.add(member)
+            }
+        }
+        if (delLst.isNotEmpty()) {
+            val result = remoteSpendDaoImplServer.deleteSpendMembers(delLst)
+            if (result is DataResult.Error) return result
+        }
+
+        val addLst = buildList {
+            newRemoteSpend.members.forEach { member ->
+                if (!oldRemoteSpend.members.contains(member)) this.add(member)
+            }
+        }
+        if (addLst.isNotEmpty()) {
+            val result = remoteSpendDaoImplServer.addSpendMembers(newRemoteSpend.docRef, addLst)
+            if (result is DataResult.Error) return result
+        }
+
+        return DataResult.Success(FirebaseSuccessMessages.SPEND_UPDATED)
     }
 
     override suspend fun updateSpendName(
@@ -55,7 +120,7 @@ class SpendRepositoryImpl @Inject constructor(
 
     override suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,
-        newSplitMode: Int
+        newSplitMode: String
     ): DataResult<String> {
         return remoteSpendDaoImplServer.updateSpendSplitMode(spendDocRef, newSplitMode)
     }
@@ -76,19 +141,18 @@ class SpendRepositoryImpl @Inject constructor(
 
     override suspend fun addSpendMembers(
         spendDocRef: DocumentReference,
-        newMembers: List<SpendMember>
+        newMembers: List<RemoteSpendMember>
     ): DataResult<String> {
         return remoteSpendDaoImplServer.addSpendMembers(spendDocRef, newMembers)
     }
 
     override suspend fun deleteSpendMembers(
-        spendDocRef: DocumentReference,
-        members: List<SpendMember>
+        members: List<RemoteSpendMember>
     ): DataResult<String> {
-        return remoteSpendDaoImplServer.deleteSpendMembers(spendDocRef, members)
+        return remoteSpendDaoImplServer.deleteSpendMembers(members)
     }
 
-    override suspend fun deleteSpend(trip: Trip): DataResult<String> {
-        return remoteSpendDaoImplServer.deleteSpend(trip)
+    override suspend fun deleteSpend(spend: RemoteSpend): DataResult<String> {
+        return remoteSpendDaoImplServer.deleteSpend(spend)
     }
 }

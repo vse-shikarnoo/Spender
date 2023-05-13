@@ -1,7 +1,6 @@
 package com.example.spender.ui.navigation.screens.firstScreens
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -10,6 +9,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,11 +24,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.ui.navigation.FirstNavGraph
-import com.example.spender.ui.navigation.screens.destinations.BottomBarScreenDestination
+import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.destinations.FirstScreenDestination
 import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
 import com.example.spender.ui.theme.GreenLight
@@ -37,7 +39,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@FirstNavGraph
 @Destination
 @Composable
 fun SignUpScreen(
@@ -115,7 +116,8 @@ fun SignUpContent(
                 text = nickname,
                 onTextChanged = { nickname = it },
                 label = { Text(text = "Nickname") },
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Text,
+                false,
             )
         }
         androidx.compose.material3.Divider(
@@ -129,13 +131,15 @@ fun SignUpContent(
                 text = email,
                 onTextChanged = { email = it },
                 label = { Text(text = "Email") },
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Email,
+                false,
             )
             EditTextField(
                 text = password,
                 onTextChanged = { password = it },
                 label = { Text(text = "Password") },
-                keyboardType = KeyboardType.Password
+                keyboardType = KeyboardType.Password,
+                true,
             )
         }
         SignUpButton(email, password, nickname, authViewModel, navigator)
@@ -150,8 +154,8 @@ fun SignUpButton(
     authViewModel: AuthViewModel,
     navigator: DestinationsNavigator
 ) {
-    var error by remember { mutableStateOf("") }
     val signUpResult = authViewModel.signUpDataResult.observeAsState()
+    val signUpMsgShow = authViewModel.signUpMsgShow.observeAsState()
 
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         androidx.compose.material3.Button(
@@ -167,17 +171,16 @@ fun SignUpButton(
         }
     }
     viewModelResultHandler(
+        LocalContext.current,
         signUpResult,
         onSuccess = {
             authViewModel.signUp(email, password, nickname)
-            navigator.navigate(BottomBarScreenDestination)
+            navigator.navigate(BalanceScreenDestination)
         },
-        onError = { newError ->
-            if (error != newError) {
-                Toast.makeText(LocalContext.current, newError, Toast.LENGTH_LONG).show()
-            }
-            error = newError
-        }
+        restMsgShowState = {
+            authViewModel.doNotShowSignUpMsg()
+        },
+        msgShow = signUpMsgShow.value ?: false
     )
 }
 
@@ -187,10 +190,13 @@ fun EditTextField(
     text: String,
     onTextChanged: (String) -> Unit,
     label: @Composable () -> Unit,
-    keyboardType: KeyboardType
+    keyboardType: KeyboardType,
+    fieldNeedToBeHidden: Boolean,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    var passwordVisible by remember { mutableStateOf(true) }
+
     OutlinedTextField(
         value = text,
         label = label,
@@ -205,5 +211,19 @@ fun EditTextField(
         ),
         colors = spenderTextFieldColors(),
         singleLine = true,
+        visualTransformation = if (!fieldNeedToBeHidden || passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            val image = if (passwordVisible)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            // Please provide localized description for accessibility services
+            val description = if (passwordVisible) "Hide password" else "Show password"
+            if (fieldNeedToBeHidden){
+                IconButton(onClick = {passwordVisible = !passwordVisible}){
+                    Icon(imageVector  = image, description)
+                }
+            }
+        }
     )
 }

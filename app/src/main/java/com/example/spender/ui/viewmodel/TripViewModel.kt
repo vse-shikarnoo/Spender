@@ -1,14 +1,15 @@
 package com.example.spender.ui.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.spend.Spend
-import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.domain.repository.TripRepository
+import com.google.firebase.firestore.Source
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -16,113 +17,174 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TripViewModel @Inject constructor(
-    private val repository: dagger.Lazy<TripRepository>
+    private val repository: dagger.Lazy<TripRepository>,
+    private val appContext: Application
 ) : ViewModel() {
+
+    /*
+     * Create trip
+     */
+
     private val _createTripDataResult = MutableLiveData<DataResult<String>>()
     val createTripDataResult: LiveData<DataResult<String>> =
         _createTripDataResult
+    private val _createTripMsgShow = MutableLiveData<Boolean>()
+    val createTripMsgShow: LiveData<Boolean> = _createTripMsgShow
 
     fun createTrip(name: String, members: List<Friend>) {
         viewModelScope.launch(Dispatchers.IO) {
             _createTripDataResult.postValue(
                 repository.get().createTrip(name, members)
             )
+        }.invokeOnCompletion {
+            _createTripMsgShow.postValue(true)
+            getAdminTrips()
         }
     }
+
+    fun doNotShowCreateTripMsg() {
+        _createTripMsgShow.postValue(false)
+    }
+
+    /*
+     * Get admin trips
+     */
+
+    private val _getAdminTripsDataResult =
+        MutableLiveData<DataResult<List<Trip>>>()
+    val getAdminTripsDataResult: LiveData<DataResult<List<Trip>>> =
+        _getAdminTripsDataResult
+
+    fun getAdminTrips() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getAdminTripsDataResult.postValue(
+                repository.get().getAdminTrips(Source.CACHE)
+            )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getAdminTripsDataResult.postValue(
+                        repository.get().getAdminTrips(Source.SERVER)
+                    )
+                }
+            }
+        }
+    }
+
+    /*
+     * Get passenger trips
+     */
+
+    private val _getPassengerTripsDataResult =
+        MutableLiveData<DataResult<List<Trip>>>()
+    val getPassengerTripsDataResult: LiveData<DataResult<List<Trip>>> =
+        _getPassengerTripsDataResult
+
+    fun getPassengerTrips() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getPassengerTripsDataResult.postValue(
+                repository.get().getPassengerTrips(Source.CACHE)
+            )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getPassengerTripsDataResult.postValue(
+                        repository.get().getPassengerTrips(Source.SERVER)
+                    )
+                }
+            }
+        }
+    }
+
+    /*
+     * Update trip
+     */
 
     private val _updateTripNameDataResult = MutableLiveData<DataResult<String>>()
     val updateTripNameDataResult: LiveData<DataResult<String>> =
         _updateTripNameDataResult
+    private val _updateTripMsgShow = MutableLiveData<Boolean>()
+    val updateTripMsgShow: LiveData<Boolean> = _updateTripMsgShow
 
     fun updateTripName(trip: Trip, newName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _updateTripNameDataResult.postValue(
                 repository.get().updateTripName(trip, newName)
             )
+        }.invokeOnCompletion {
+            _updateTripMsgShow.postValue(true)
         }
     }
 
-    private val _addTripMemberDataResult = MutableLiveData<DataResult<String>>()
-    val addTripMemberDataResult: LiveData<DataResult<String>> =
-        _addTripMemberDataResult
-
-    fun addTripMember(trip: Trip, newMember: Friend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _addTripMemberDataResult.postValue(
-                repository.get().addTripMember(trip, newMember)
-            )
-        }
+    fun doNotShowUpdateTripMsg() {
+        _updateTripMsgShow.postValue(false)
     }
+
+    /*
+     * Add trip members
+     */
 
     private val _addTripMembersDataResult = MutableLiveData<DataResult<String>>()
     val addTripMembersDataResult: LiveData<DataResult<String>> =
         _addTripMembersDataResult
+    private val _addTripMembersMsgShow = MutableLiveData<Boolean>()
+    val addTripMembersMsgShow: LiveData<Boolean> = _addTripMembersMsgShow
 
     fun addTripMembers(trip: Trip, newMembers: List<Friend>) {
         viewModelScope.launch(Dispatchers.IO) {
             _addTripMembersDataResult.postValue(
                 repository.get().addTripMembers(trip, newMembers)
             )
+        }.invokeOnCompletion {
+            _addTripMembersMsgShow.postValue(true)
         }
     }
 
-    private val _addTripSpendDataResult = MutableLiveData<DataResult<String>>()
-    val addTripSpendDataResult: LiveData<DataResult<String>> =
-        _addTripSpendDataResult
-
-    fun addTripSpend(trip: Trip, spend: Spend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _addTripSpendDataResult.postValue(
-                repository.get().addTripSpend(trip, spend)
-            )
-        }
+    fun doNotShowAddTripMembersMsg() {
+        _addTripMembersMsgShow.postValue(false)
     }
 
-    private val _removeTripMemberDataResult = MutableLiveData<DataResult<String>>()
-    val removeTripMemberDataResult: LiveData<DataResult<String>> =
-        _removeTripMemberDataResult
-
-    fun removeTripMember(trip: Trip, member: Friend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _removeTripMemberDataResult.postValue(
-                repository.get().removeTripMember(trip, member)
-            )
-        }
-    }
+    /*
+     * Remove trip members
+     */
 
     private val _removeTripMembersDataResult = MutableLiveData<DataResult<String>>()
     val removeTripMembersDataResult: LiveData<DataResult<String>> =
         _removeTripMembersDataResult
+    private val _removeTripMembersMsgShow = MutableLiveData<Boolean>()
+    val removeTripMembersMsgShow: LiveData<Boolean> = _removeTripMembersMsgShow
 
     fun removeTripMembers(trip: Trip, members: List<Friend>) {
         viewModelScope.launch(Dispatchers.IO) {
             _removeTripMembersDataResult.postValue(
                 repository.get().removeTripMembers(trip, members)
             )
+        }.invokeOnCompletion {
+            _removeTripMembersMsgShow.postValue(true)
         }
     }
 
-    private val _removeTripSpendDataResult = MutableLiveData<DataResult<String>>()
-    val removeTripSpendDataResult: LiveData<DataResult<String>> =
-        _removeTripSpendDataResult
-
-    fun removeTripSpend(spend: Spend) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _removeTripSpendDataResult.postValue(
-                repository.get().removeTripSpend(spend)
-            )
-        }
+    fun doNotShowRemoveTripMembersMsg() {
+        _removeTripMembersMsgShow.postValue(false)
     }
+
+    /*
+     * Delete trip
+     */
 
     private val _deleteTripDataResult = MutableLiveData<DataResult<String>>()
     val deleteTripDataResult: LiveData<DataResult<String>> =
         _deleteTripDataResult
+    private val _deleteTripMsgShow = MutableLiveData<Boolean>()
+    val deleteTripMsgShow: LiveData<Boolean> = _deleteTripMsgShow
 
     fun deleteTrip(trip: Trip) {
         viewModelScope.launch(Dispatchers.IO) {
             _deleteTripDataResult.postValue(
                 repository.get().deleteTrip(trip)
             )
+        }.invokeOnCompletion {
+            _deleteTripMsgShow.postValue(true)
         }
     }
 }

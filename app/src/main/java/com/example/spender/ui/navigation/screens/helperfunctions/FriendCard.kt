@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.domain.model.user.Friend
+import com.example.spender.domain.remotemodel.user.Friend
 import com.example.spender.ui.theme.GreenLightBackground
 import com.example.spender.ui.theme.GreenMain
 
@@ -33,6 +33,7 @@ fun FriendCard(
     button: @Composable () -> Unit,
 ) {
     Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )

@@ -10,6 +10,8 @@ plugins {
     id 'dagger.hilt.android.plugin'
 
     id 'kotlin-kapt'
+
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 android {
@@ -108,4 +110,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx'
     // Firebase Auth (Email + Password) (Phone)
     implementation 'com.google.firebase:firebase-auth-ktx'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+
+    implementation "androidx.compose.material:material-icons-extended:1.4.2"
 }

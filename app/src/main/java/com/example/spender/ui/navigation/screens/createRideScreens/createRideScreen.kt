@@ -123,7 +123,8 @@ fun CreateRideContent(
                 text = tripName,
                 onTextChanged = { newName -> tripName = newName },
                 label = { Text(text = "Trip title") },
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Text,
+                false,
             )
         }
         AddFriendsList(userViewModel, tripViewModel, tripName, navigator, friendsList)

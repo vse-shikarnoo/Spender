@@ -21,6 +21,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -94,15 +95,16 @@ fun AddSpendingScreen(
 
 @Composable
 fun AddSpendingScreenTopBar() {
-    Image(
-        painter = painterResource(id = ),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .size(80.dp)
-            .clip(CircleShape)
-            .border(2.dp, GreenMain, CircleShape),
-        contentDescription = null,
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Check,
+            contentDescription = "Add spending",
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

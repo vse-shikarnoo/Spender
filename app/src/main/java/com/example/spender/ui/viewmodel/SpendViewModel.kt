@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spender.data.DataResult
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
 import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
@@ -101,5 +102,28 @@ class SpendViewModel @Inject constructor(
 
     fun doNotShowUpdateSpendMsg() {
         _updateSpendMsgShow.postValue(false)
+    }
+
+    /*
+     * Get all spends
+     */
+
+    private val _getAllSpendsDataResult = MutableLiveData<DataResult<List<GoogleMapsSpend>>>()
+    val getAllSpendsDataResult: LiveData<DataResult<List<GoogleMapsSpend>>> = _getAllSpendsDataResult
+
+    fun getAllSpends() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _getAllSpendsDataResult.postValue(
+                repository.get().getAllSpends(Source.CACHE)
+            )
+        }.invokeOnCompletion {
+            if (InternetChecker.check(appContext)) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _getAllSpendsDataResult.postValue(
+                        repository.get().getAllSpends(Source.SERVER)
+                    )
+                }
+            }
+        }
     }
 }

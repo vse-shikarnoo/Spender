@@ -4,6 +4,7 @@ import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
 import com.example.spender.data.remote.dao.RemoteSpendDaoImpl
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
 import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
 import com.example.spender.domain.remotemodel.spend.Spend
@@ -35,6 +36,15 @@ class SpendRepositoryImpl @Inject constructor(
             remoteSpendDaoImplCache.getSpends(trip)
         } else {
             remoteSpendDaoImplServer.getSpends(trip)
+        }
+    }
+
+
+    override suspend fun getAllSpends(source: Source): DataResult<List<GoogleMapsSpend>> {
+        return if (source == Source.CACHE) {
+            remoteSpendDaoImplCache.getAllSpends()
+        } else {
+            remoteSpendDaoImplServer.getAllSpends()
         }
     }
 

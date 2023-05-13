@@ -4,6 +4,7 @@ import com.example.spender.domain.remotemodel.spendmember.LocalSpendMember
 import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.example.spender.domain.remotemodel.spendmember.toLocalSpendMember
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.serialization.Serializable
 
 data class Spend(
     val name: String,
@@ -36,4 +37,10 @@ data class LocalSpend(
     val amount: Double,
     val geoPoint: GeoPoint,
     val members: List<LocalSpendMember>
+)
+
+data class GoogleMapsSpend(
+    val name: String,
+    val latitude: Double,
+    val longitude: Double
 )

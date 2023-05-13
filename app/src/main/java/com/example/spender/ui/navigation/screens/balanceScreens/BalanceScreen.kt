@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isUnspecified
 import com.example.spender.R
 import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.toLocalTrip
 import com.example.spender.ui.navigation.BottomBar
 import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.screens.destinations.SpendingsScreenDestination
@@ -332,7 +333,7 @@ fun AutoResizedText(
 @Composable
 fun TripCard(trip: Trip, navigator: DestinationsNavigator) {
     Card(
-        onClick = { navigator.navigate(SpendingsScreenDestination) },
+        onClick = { navigator.navigate(SpendingsScreenDestination(trip.toLocalTrip())) },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )

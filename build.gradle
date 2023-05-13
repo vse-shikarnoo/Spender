@@ -21,6 +21,8 @@ plugins {
 
     // Navigation Destinations requires higher kotlin version for convenience
     id 'org.jetbrains.kotlin.android' version '1.7.0' apply false
+
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0' apply false
 }
 
 task clean(type: Delete) {

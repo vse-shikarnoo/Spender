@@ -9,3 +9,17 @@ data class RemoteSpendMember(
     val debt: List<DebtToUser>,
     val docRef: DocumentReference
 )
+
+fun RemoteSpendMember.toLocalSpendMember(): LocalSpendMember {
+    return LocalSpendMember(
+        this.friend,
+        this.payment,
+        this.debt,
+    )
+}
+
+data class LocalSpendMember(
+    val friend: Friend, // DocumentReference
+    val payment: Double,
+    val debt: List<DebtToUser>,
+)

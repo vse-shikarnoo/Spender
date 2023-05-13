@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -64,18 +65,13 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun AddSpendingScreen(
-    navigator: DestinationsNavigator,
-    spendViewModel: SpendViewModel,
-    trip: LocalTrip
+    navigator: DestinationsNavigator, spendViewModel: SpendViewModel, trip: LocalTrip
 ) {
     Scaffold(
         topBar = { AddSpendingScreenTopBar(navigator, trip, spendViewModel) },
     ) {
         AddSpendingScreenContent(
-            paddingValues = it,
-            navigator = navigator,
-            spendViewModel = spendViewModel,
-            trip = trip
+            paddingValues = it, navigator = navigator, spendViewModel = spendViewModel, trip = trip
         )
     }
 }
@@ -86,8 +82,7 @@ fun AddSpendingScreenTopBar(
     trip: LocalTrip,
     spendViewModel: SpendViewModel,
 ) {
-    val testSpend = LocalSpend(
-        name = "ABOBA",
+    val testSpend = LocalSpend(name = "ABOBA",
         category = "ABOBA",
         splitMode = "ABOBA",
         amount = 100.0,
@@ -96,14 +91,11 @@ fun AddSpendingScreenTopBar(
             trip.members.forEach { friend ->
                 this@buildList.add(
                     LocalSpendMember(
-                        friend = friend.toFriend(),
-                        payment = 0.0,
-                        emptyList()
+                        friend = friend.toFriend(), payment = 0.0, emptyList()
                     )
                 )
             }
-        }
-    )
+        })
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -147,8 +139,8 @@ fun AddSpendingScreenContent(
     spendViewModel: SpendViewModel,
     trip: LocalTrip
 ) {
-    var splitEqualChecked by remember { mutableStateOf(false) }
-    var totalSpend by remember { mutableStateOf("") }
+    var splitEqualChecked = remember { mutableStateOf(false) }
+    var totalSpend = remember { mutableStateOf("") }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -162,8 +154,7 @@ fun AddSpendingScreenContent(
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             Box(
-                modifier = Modifier.weight(0.5f),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
             ) {
                 AutoResizedText(
                     text = "Total spend",
@@ -173,13 +164,13 @@ fun AddSpendingScreenContent(
             }
             Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
                 EditTextField(
-                    text = totalSpend,
+                    text = totalSpend.value,
                     onTextChanged = {
-                        totalSpend = if (it.isEmpty()) {
+                        totalSpend.value = if (it.isEmpty()) {
                             it
                         } else {
                             when (it.toDoubleOrNull()) {
-                                null -> totalSpend //old value
+                                null -> totalSpend.value //old value
                                 else -> it   //new value
                             }
                         }
@@ -196,8 +187,7 @@ fun AddSpendingScreenContent(
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             Box(
-                modifier = Modifier.weight(0.5f),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
             ) {
                 AutoResizedText(
                     text = "Split equally",
@@ -205,28 +195,30 @@ fun AddSpendingScreenContent(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-            Checkbox(
-                modifier = Modifier.weight(0.5f),
-                checked = splitEqualChecked,
+            Checkbox(modifier = Modifier.weight(0.5f),
+                checked = splitEqualChecked.value,
                 onCheckedChange = {
-                    splitEqualChecked = it
-                }
-            )
+                    splitEqualChecked.value = it
+                })
         }
-        FriendsListSpend(friendsLst = buildList {
-            trip.members.forEach { friend ->
-                this@buildList.add(friend.toFriend())
-            }
-        })
+        FriendsListSpend(
+            friendsLst = buildList {
+                trip.members.forEach { friend ->
+                    this@buildList.add(friend.toFriend())
+                }
+            },
+            splitEqualChecked,
+            totalSpend,
+        )
     }
 }
 
 @Composable
 fun FriendsListSpend(
-    friendsLst: List<Friend>
+    friendsLst: List<Friend>,
+    splitEqual: State<Boolean>,
+    totalSpend: State<String>,
 ) {
-    var showMore by remember { mutableStateOf(false) }
-
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -238,32 +230,8 @@ fun FriendsListSpend(
             item { EmptyListItem(text = "No outgoing friends") }
             return@LazyColumn
         }
-        if (friendsLst.size <= 3) {
-            items(friendsLst) { friend ->
-                FriendsListItemSpend(friend = friend)
-            }
-            return@LazyColumn
-        }
-        if (!showMore) {
-            items(friendsLst.subList(0, 3)) { friend ->
-                FriendsListItemSpend(friend = friend)
-            }
-        } else {
-            items(friendsLst) { friend ->
-                FriendsListItemSpend(friend = friend)
-            }
-        }
-        item {
-            OverflowListItem(
-                text = {
-                    if (!showMore) {
-                        "Show more"
-                    } else {
-                        "Show less"
-                    }
-                },
-                onClick = { showMore = !showMore }
-            )
+        items(friendsLst) { friend ->
+            FriendsListItemSpend(friend = friend, friendsLst.size, splitEqual, totalSpend)
         }
     }
 }
@@ -272,11 +240,20 @@ fun FriendsListSpend(
 @Composable
 fun FriendsListItemSpend(
     friend: Friend,
+    friendsLstSize: Int,
+    splitEqual: State<Boolean>,
+    totalSpend: State<String>,
 ) {
     var spendAmount by remember { mutableStateOf("") }
+    if (splitEqual.value) {
+        when (totalSpend.value.toDoubleOrNull()) {
+            null -> spendAmount //old value
+            else -> spendAmount = (totalSpend.value.toDouble() / friendsLstSize).toString()  //new value
+        }
+    }
+
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        elevation = CardDefaults.cardElevation(
+        modifier = Modifier.padding(horizontal = 16.dp), elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )
     ) {
@@ -290,8 +267,7 @@ fun FriendsListItemSpend(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.weight(0.5f),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
             ) {
                 AutoResizedText(
                     text = friend.nickname,
@@ -303,14 +279,15 @@ fun FriendsListItemSpend(
                 EditTextField(
                     text = spendAmount,
                     onTextChanged = {
-                        spendAmount = if (it.isEmpty()) {
-                            it
-                        } else {
-                            when (it.toDoubleOrNull()) {
-                                null -> spendAmount //old value
-                                else -> it   //new value
+                        spendAmount =
+                            if (it.isEmpty()) {
+                                it
+                            } else {
+                                when (it.toDoubleOrNull()) {
+                                    null -> spendAmount //old value
+                                    else -> it   //new value
+                                }
                             }
-                        }
                     },
                     label = { Text(text = "Amount") },
                     keyboardType = KeyboardType.Number,

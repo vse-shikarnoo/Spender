@@ -1,6 +1,7 @@
 package com.example.spender.ui.navigation.screens.balanceScreens
 
-import androidx.compose.foundation.background
+import android.content.pm.PackageManager
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,62 +13,42 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import com.example.spender.domain.remotemodel.LocalTrip
-import com.example.spender.domain.remotemodel.spend.LocalSpend
-import com.example.spender.domain.remotemodel.spend.Spend
-import com.example.spender.domain.remotemodel.spendmember.LocalSpendMember
 import com.example.spender.domain.remotemodel.toTrip
 import com.example.spender.domain.remotemodel.user.Friend
-import com.example.spender.domain.remotemodel.user.LocalFriend
 import com.example.spender.domain.remotemodel.user.toFriend
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.navigation.screens.helperfunctions.EmptyListItem
-import com.example.spender.ui.navigation.screens.helperfunctions.OverflowListItem
-import com.example.spender.ui.navigation.screens.helperfunctions.viewModelResultHandler
-import com.example.spender.ui.theme.GreenLightBackground
 import com.example.spender.ui.theme.GreenMain
 import com.example.spender.ui.viewmodel.SpendViewModel
-import com.example.spender.ui.viewmodel.UserViewModel
-import com.google.firebase.firestore.GeoPoint
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.LocationServices
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-
-object SpendAssemble {
-    var name = "name"
-    var longtitude = 0.0
-    var latitude = 0.0
-}
 
 @Destination
 @Composable
@@ -77,10 +58,9 @@ fun AddSpendingScreen(
     Scaffold(
         topBar = { AddSpendingScreenTopBar(navigator, trip, spendViewModel) },
     ) {
-        AddSpendingScreenContent(
-            paddingValues = it, navigator = navigator, spendViewModel = spendViewModel, trip = trip
-        )
+        AddSpendingScreenContent(it, navigator, spendViewModel, trip)
     }
+    LaunchedEffect(key1 = true, block = { SpendAssemble.getInstance().initializeNewAssemble(trip) })
 }
 
 @Composable
@@ -89,16 +69,13 @@ fun AddSpendingScreenTopBar(
     trip: LocalTrip,
     spendViewModel: SpendViewModel,
 ) {
+    val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        IconButton(
-            onClick = {
-                navigator.popBackStack()
-            },
-        ) {
+        IconButton(onClick = { navigator.popBackStack() }) {
             Icon(
                 modifier = Modifier.size(64.dp),
                 imageVector = Icons.Filled.ArrowBack,
@@ -108,25 +85,19 @@ fun AddSpendingScreenTopBar(
         }
         IconButton(
             onClick = {
-                spendViewModel.createSpend(
-                    trip.toTrip(),
-                    LocalSpend(
-                        name = SpendAssemble.name,
-                        category = "ABOBA",
-                        splitMode = "ABOBA",
-                        amount = 100.0,
-                        geoPoint = GeoPoint(SpendAssemble.latitude, SpendAssemble.longtitude),
-                        members = buildList {
-                            trip.members.forEach { friend ->
-                                this@buildList.add(
-                                    LocalSpendMember(
-                                        friend = friend.toFriend(), payment = 0.0, emptyList()
-                                    )
-                                )
-                            }
-                        })
-                )
-                navigator.popBackStack()
+                if (SpendAssemble.getInstance().checkIfFieldsAreInitialized()) {
+                    spendViewModel.createSpend(
+                        trip.toTrip(),
+                        SpendAssemble.getInstance().toLocalSpend(trip)
+                    )
+                    navigator.popBackStack()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Please fill all fields",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             },
         ) {
             Icon(
@@ -139,19 +110,45 @@ fun AddSpendingScreenTopBar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddSpendingScreenContentField(
+    text: String,
+    editField: @Composable () -> Unit
+) {
+    Row(
+        modifier = Modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly,
+    ) {
+        Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+            AutoResizedText(
+                text = text,
+                color = GreenMain,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+            editField()
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AddSpendingScreenContent(
     paddingValues: PaddingValues,
     navigator: DestinationsNavigator,
     spendViewModel: SpendViewModel,
-    trip: LocalTrip
+    trip: LocalTrip,
 ) {
+    val context = LocalContext.current
     val splitEqualChecked = remember { mutableStateOf(false) }
-    val totalSpend = remember { mutableStateOf("") }
-    val spendName = remember { mutableStateOf("") }
-    val latitude = remember { mutableStateOf("") }
-    val longtitude = remember { mutableStateOf("") }
+    val geoChecked = remember { mutableStateOf(false) }
+    val geoPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    splitEqualChecked.value =
+        SpendAssemble.getInstance().splitMode != SpendAssemble.Companion.SplitMode.Custom
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -159,153 +156,80 @@ fun AddSpendingScreenContent(
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Box(
-                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
-            ) {
-                AutoResizedText(
-                    text = "Spend Name",
-                    color = GreenMain,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-                EditTextField(
-                    text = spendName.value,
-                    onTextChanged = {
-                        spendName.value = it
-                        SpendAssemble.name = it
-                    },
-                    label = { Text(text = "Name") },
-                    keyboardType = KeyboardType.Number,
-                    fieldNeedToBeHidden = false
-                )
-            }
+        AddSpendingScreenContentField(text = "Spend Name") {
+            EditTextField(
+                text = SpendAssemble.getInstance().name,
+                onTextChanged = {
+                    SpendAssemble.getInstance().name = it
+                },
+                label = { Text(text = "Name") },
+                keyboardType = KeyboardType.Number,
+                fieldNeedToBeHidden = false
+            )
         }
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Box(
-                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
-            ) {
-                AutoResizedText(
-                    text = "Широта",
-                    color = GreenMain,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-                EditTextField(
-                    text = latitude.value,
-                    onTextChanged = {
-                        latitude.value = if (it.isEmpty()) {
-                            it
-                        } else {
-                            when (it.toDoubleOrNull()) {
-                                null -> latitude.value //old value
-                                else -> it   //new value
-                            }
+        AddSpendingScreenContentField(text = "Total spend") {
+            EditTextField(
+                text = SpendAssemble.getInstance().totalSpend,
+                onTextChanged = {
+                    SpendAssemble.getInstance().totalSpend = if (it.isEmpty()) {
+                        it
+                    } else {
+                        when (it.toDoubleOrNull()) {
+                            null -> SpendAssemble.getInstance().totalSpend //old value
+                            else -> it   //new value
                         }
-                        SpendAssemble.latitude = latitude.value.toDouble()
-                    },
-                    label = { Text(text = "Широта") },
-                    keyboardType = KeyboardType.Number,
-                    fieldNeedToBeHidden = false
-                )
-            }
+                    }
+                },
+                label = { Text(text = "Amount") },
+                keyboardType = KeyboardType.Number,
+                fieldNeedToBeHidden = false
+            )
         }
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Box(
-                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
-            ) {
-                AutoResizedText(
-                    text = "Долгота",
-                    color = GreenMain,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-                EditTextField(
-                    text = longtitude.value,
-                    onTextChanged = {
-                        longtitude.value = if (it.isEmpty()) {
-                            it
-                        } else {
-                            when (it.toDoubleOrNull()) {
-                                null -> longtitude.value //old value
-                                else -> it   //new value
-                            }
-                        }
-                        SpendAssemble.latitude = longtitude.value.toDouble()
-                    },
-                    label = { Text(text = "Долгота") },
-                    keyboardType = KeyboardType.Number,
-                    fieldNeedToBeHidden = false
-                )
-            }
-        }
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Box(
-                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
-            ) {
-                AutoResizedText(
-                    text = "Total spend",
-                    color = GreenMain,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-                EditTextField(
-                    text = totalSpend.value,
-                    onTextChanged = {
-                        totalSpend.value = if (it.isEmpty()) {
-                            it
-                        } else {
-                            when (it.toDoubleOrNull()) {
-                                null -> totalSpend.value //old value
-                                else -> it   //new value
-                            }
-                        }
-                    },
-                    label = { Text(text = "Amount") },
-                    keyboardType = KeyboardType.Number,
-                    fieldNeedToBeHidden = false
-                )
-            }
-        }
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Box(
-                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
-            ) {
-                AutoResizedText(
-                    text = "Split equally",
-                    color = GreenMain,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Checkbox(modifier = Modifier.weight(0.5f),
+        AddSpendingScreenContentField(text = "Split equally") {
+            Checkbox(
                 checked = splitEqualChecked.value,
                 onCheckedChange = {
-                    splitEqualChecked.value = it
-                })
+                    if (SpendAssemble.getInstance().totalSpend.isNotEmpty()) {
+                        splitEqualChecked.value = it
+                        if (it) {
+                            SpendAssemble.getInstance().splitMode =
+                                SpendAssemble.Companion.SplitMode.Equal
+                        } else {
+                            SpendAssemble.getInstance().splitMode =
+                                SpendAssemble.Companion.SplitMode.Custom
+                        }
+                    }
+                }
+            )
+        }
+        AddSpendingScreenContentField(text = "Include geo") {
+            Checkbox(
+                checked = geoChecked.value,
+                onCheckedChange = {
+                    geoChecked.value = it
+                    if (!geoPermissionState.status.isGranted) {
+                        geoPermissionState.launchPermissionRequest()
+                        geoChecked.value = false
+                    } else {
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED &&
+                            ActivityCompat.checkSelfPermission(
+                                context,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            return@Checkbox
+                        }
+                        LocationServices.getFusedLocationProviderClient(context)
+                            .lastLocation.addOnSuccessListener { location ->
+                                SpendAssemble.getInstance().latitude = location.latitude
+                                SpendAssemble.getInstance().longitude = location.longitude
+                            }
+                    }
+                }
+            )
         }
         FriendsListSpend(
             friendsLst = buildList {
@@ -313,8 +237,6 @@ fun AddSpendingScreenContent(
                     this@buildList.add(friend.toFriend())
                 }
             },
-            splitEqualChecked,
-            totalSpend,
         )
     }
 }
@@ -322,8 +244,6 @@ fun AddSpendingScreenContent(
 @Composable
 fun FriendsListSpend(
     friendsLst: List<Friend>,
-    splitEqual: State<Boolean>,
-    totalSpend: State<String>,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -333,74 +253,53 @@ fun FriendsListSpend(
             .fillMaxSize()
     ) {
         if (friendsLst.isEmpty()) {
-            item { EmptyListItem(text = "No outgoing friends") }
+            item { EmptyListItem(text = "No friends") }
             return@LazyColumn
         }
         items(friendsLst) { friend ->
-            FriendsListItemSpend(friend = friend, friendsLst.size, splitEqual, totalSpend)
+            FriendsListItemSpend(friend = friend)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsListItemSpend(
     friend: Friend,
-    friendsLstSize: Int,
-    splitEqual: State<Boolean>,
-    totalSpend: State<String>,
 ) {
-    var spendAmount by remember { mutableStateOf("") }
-    if (splitEqual.value) {
-        when (totalSpend.value.toDoubleOrNull()) {
-            null -> spendAmount //old value
-            else -> spendAmount =
-                (totalSpend.value.toDouble() / friendsLstSize).toString()  //new value
-        }
-    }
-
+    val payment = remember { mutableStateOf("0") }
+    payment.value = SpendAssemble.getInstance().getEqualPayment()
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp), elevation = CardDefaults.cardElevation(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
-        )
+        ),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(GreenLightBackground)
-                .clip(MaterialTheme.shapes.large)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center
-            ) {
-                AutoResizedText(
-                    text = friend.nickname,
-                    color = GreenMain,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            Box(modifier = Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-                EditTextField(
-                    text = spendAmount,
-                    onTextChanged = {
-                        spendAmount =
-                            if (it.isEmpty()) {
-                                it
-                            } else {
-                                when (it.toDoubleOrNull()) {
-                                    null -> spendAmount //old value
-                                    else -> it   //new value
-                                }
+        AddSpendingScreenContentField(text = friend.nickname) {
+            EditTextField(
+                text = if (payment.value == "0") "" else payment.value,
+                onTextChanged = {
+                    SpendAssemble.getInstance().resetEqualSplitModeOnUserInput()
+
+                    payment.value = if (it.isEmpty()) {
+                        "0"
+                    } else {
+                        when (it.toDoubleOrNull()) {
+                            null -> { //old value
+                                payment.value
                             }
-                    },
-                    label = { Text(text = "Amount") },
-                    keyboardType = KeyboardType.Number,
-                    fieldNeedToBeHidden = false
-                )
-            }
+
+                            else -> { //new value
+                                it
+                            }
+                        }
+                    }
+                    SpendAssemble.getInstance().members[friend.nickname] = payment.value.toDouble()
+                },
+                label = { Text(text = "Amount") },
+                keyboardType = KeyboardType.Number,
+                fieldNeedToBeHidden = false
+            )
         }
     }
 }

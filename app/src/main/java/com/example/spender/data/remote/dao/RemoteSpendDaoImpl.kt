@@ -12,7 +12,6 @@ import com.example.spender.domain.remotemodel.Trip
 import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
 import com.example.spender.domain.remotemodel.spend.LocalSpend
 import com.example.spender.domain.remotemodel.spend.RemoteSpend
-import com.example.spender.domain.remotemodel.spend.Spend
 import com.example.spender.domain.remotemodel.spendmember.DebtToUser
 import com.example.spender.domain.remotemodel.spendmember.LocalSpendMember
 import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
@@ -134,13 +133,15 @@ class RemoteSpendDaoImpl @Inject constructor(
 
             val googleMapsSpends = buildList {
                 spends.forEach { spend ->
-                    this.add(
-                        GoogleMapsSpend(
-                            spend.name,
-                            spend.geoPoint.latitude,
-                            spend.geoPoint.longitude,
+                    if (spend.geoPoint.latitude != 0.0 && spend.geoPoint.longitude != 0.0) {
+                        this.add(
+                            GoogleMapsSpend(
+                                spend.name,
+                                spend.geoPoint.latitude,
+                                spend.geoPoint.longitude,
+                            )
                         )
-                    )
+                    }
                 }
             }
 

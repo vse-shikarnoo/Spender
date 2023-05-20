@@ -75,9 +75,13 @@ dependencies {
     implementation 'androidx.compose.material:material:1.4.2'
     implementation 'androidx.compose.ui:ui-tooling-preview:1.4.2'
     implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     debugImplementation 'androidx.compose.ui:ui-tooling:1.4.2'
     debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.2'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.2'
+
+    // dynamic permissions
+    implementation "com.google.accompanist:accompanist-permissions:0.31.2-alpha"
 
     //Ui
     implementation 'com.google.android.material:material:1.8.0'

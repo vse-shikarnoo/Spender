@@ -163,7 +163,7 @@ fun AddSpendingScreenContent(
                     SpendAssemble.getInstance().name = it
                 },
                 label = { Text(text = "Name") },
-                keyboardType = KeyboardType.Number,
+                keyboardType = KeyboardType.Text,
                 fieldNeedToBeHidden = false
             )
         }

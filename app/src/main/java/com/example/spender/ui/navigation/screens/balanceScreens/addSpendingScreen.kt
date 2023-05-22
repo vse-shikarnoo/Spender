@@ -206,28 +206,47 @@ fun AddSpendingScreenContent(
             Checkbox(
                 checked = geoChecked.value,
                 onCheckedChange = {
-                    geoChecked.value = it
-                    if (!geoPermissionState.status.isGranted) {
-                        geoPermissionState.launchPermissionRequest()
-                        geoChecked.value = false
-                    } else {
+                    if (it) {
+                        if (!geoPermissionState.status.isGranted) {
+                            geoPermissionState.launchPermissionRequest()
+                            geoChecked.value = geoPermissionState.status.isGranted
+                            if (!geoPermissionState.status.isGranted) {
+                                Toast.makeText(
+                                    context,
+                                    "Please, grant location permission",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                         if (ActivityCompat.checkSelfPermission(
-                                context,
-                                android.Manifest.permission.ACCESS_FINE_LOCATION
-                            ) != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(
                                 context,
                                 android.Manifest.permission.ACCESS_FINE_LOCATION
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
-                            return@Checkbox
+                            geoChecked.value = false
+                            Toast.makeText(
+                                context,
+                                "Please, grant location permission",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            LocationServices.getFusedLocationProviderClient(context)
+                                .lastLocation.addOnSuccessListener { location ->
+                                    if (location != null) {
+                                        SpendAssemble.getInstance().latitude = location.latitude
+                                        SpendAssemble.getInstance().longitude = location.longitude
+                                    } else {
+                                        geoChecked.value = false
+                                        Toast.makeText(
+                                            context,
+                                            "Turn on location services",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
                         }
-                        LocationServices.getFusedLocationProviderClient(context)
-                            .lastLocation.addOnSuccessListener { location ->
-                                SpendAssemble.getInstance().latitude = location.latitude
-                                SpendAssemble.getInstance().longitude = location.longitude
-                            }
                     }
+                    geoChecked.value = it
                 }
             )
         }

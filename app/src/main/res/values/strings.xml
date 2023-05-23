@@ -2,6 +2,11 @@
     <string name="app_name">Spender</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <string name="bottom_bar_balance">Balance</string>
+    <string name="bottom_bar_map">Map</string>
+    <string name="bottom_bar_create">Create</string>
+    <string name="bottom_bar_profile">Profile</string>
+
     <string name="collection_name_users">Users</string>
     <string name="collection_name_trips">Trips</string>
     <string name="collection_name_spends">Spends</string>

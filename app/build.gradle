@@ -10,6 +10,8 @@ plugins {
     id 'dagger.hilt.android.plugin'
 
     id 'kotlin-kapt'
+
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 android {
@@ -73,9 +75,13 @@ dependencies {
     implementation 'androidx.compose.material:material:1.4.2'
     implementation 'androidx.compose.ui:ui-tooling-preview:1.4.2'
     implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     debugImplementation 'androidx.compose.ui:ui-tooling:1.4.2'
     debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.2'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.2'
+
+    // dynamic permissions
+    implementation "com.google.accompanist:accompanist-permissions:0.31.2-alpha"
 
     //Ui
     implementation 'com.google.android.material:material:1.8.0'
@@ -83,7 +89,13 @@ dependencies {
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
 
     //Maps SDk
+    implementation 'com.google.maps.android:maps-compose:2.11.2'
+    // Make sure to also include the latest version of the Maps SDK for Android
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    // Optionally, you can include the Compose utils library for Clustering, etc.
+    implementation 'com.google.maps.android:maps-compose-utils:2.11.2'
+    // Optionally, you can include the widgets library for ScaleBar, etc.
+    implementation 'com.google.maps.android:maps-compose-widgets:2.11.2'
 
     // Navigation Destinations
     implementation 'io.github.raamcosta.compose-destinations:core:1.8.38-beta'
@@ -108,4 +120,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx'
     // Firebase Auth (Email + Password) (Phone)
     implementation 'com.google.firebase:firebase-auth-ktx'
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+
+    implementation "androidx.compose.material:material-icons-extended:1.4.2"
+}
+
+secrets {
+    defaultPropertiesFileName 'local.properties'
 }

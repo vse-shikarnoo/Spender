@@ -1,6 +1,6 @@
 package com.example.spender.ui.navigation.screens.createRideScreens
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,9 +26,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.spender.R
-import com.example.spender.domain.model.user.Friend
-import com.example.spender.ui.navigation.BottomNavGraph
-import com.example.spender.ui.navigation.CreateRideNavGraph
+import com.example.spender.domain.remotemodel.user.Friend
+import com.example.spender.ui.navigation.BottomBar
+import com.example.spender.ui.navigation.BottomBarDestinations
 import com.example.spender.ui.navigation.screens.destinations.BalanceScreenDestination
 import com.example.spender.ui.navigation.screens.firstScreens.EditTextField
 import com.example.spender.ui.navigation.screens.helperfunctions.FriendCard
@@ -39,9 +39,6 @@ import com.example.spender.ui.viewmodel.UserViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@OptIn(ExperimentalMaterial3Api::class)
-@BottomNavGraph
-@CreateRideNavGraph(start = true)
 @Destination
 @Composable
 fun CreateRideScreen(
@@ -51,6 +48,7 @@ fun CreateRideScreen(
 ) {
     Scaffold(
         topBar = { CreateRideTopBar() },
+        bottomBar = { BottomBar(BottomBarDestinations.CreateRide, navigator) },
         content = { CreateRideContent(it, userViewModel, tripViewModel, navigator) }
     )
     LaunchedEffect(
@@ -85,6 +83,18 @@ fun CreateRideContent(
 ) {
     val scrollState = rememberScrollState()
     var tripName by remember { mutableStateOf("") }
+
+    val friends = userViewModel.getUserFriendsDataResult.observeAsState()
+    var friendsList by remember { mutableStateOf(listOf<Friend>()) }
+    viewModelResultHandler(
+        LocalContext.current,
+        friends,
+        onSuccess = {
+            Log.d("CreateTripButton", " friends : $it")
+            friendsList = it
+        }
+    )
+
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -113,10 +123,11 @@ fun CreateRideContent(
                 text = tripName,
                 onTextChanged = { newName -> tripName = newName },
                 label = { Text(text = "Trip title") },
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Text,
+                false,
             )
         }
-        AddFriendsList(userViewModel, tripViewModel, tripName, navigator)
+        AddFriendsList(userViewModel, tripViewModel, tripName, navigator, friendsList)
     }
 }
 
@@ -125,17 +136,18 @@ fun AddFriendsList(
     userViewModel: UserViewModel,
     tripViewModel: TripViewModel,
     tripName: String,
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    friendsList: List<Friend>
 ) {
-    val friends = userViewModel.getUserFriendsDataResult.observeAsState()
-    val addedFriends = mutableListOf<Friend>()
-    var addFriend by remember { mutableStateOf(false) }
-    var friendsLst = emptyList<Friend>()
-    viewModelResultHandler(friends, { friendsLst = it })
+    var addList by if (friendsList.isNotEmpty())
+        remember { mutableStateOf(List(friendsList.size) { false }) }
+    else
+        remember { mutableStateOf(List(0) { false }) }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        if (friendsLst.isNotEmpty()) {
+        if (friendsList.isNotEmpty()) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -166,20 +178,17 @@ fun AddFriendsList(
                     .requiredSizeIn(maxHeight = 280.dp, maxWidth = 400.dp)
             ) {
                 items(
-                    items = friendsLst,
-                ) {
+                    items = friendsList,
+                ) { friend ->
                     FriendCard(
-                        friend = it,
+                        friend = friend,
                         button = {
                             Checkbox(
-                                checked = addFriend,
+                                checked = addList[friendsList.indexOf(friend)],
                                 onCheckedChange = { add ->
-                                    addFriend = add
-                                    if (addFriend) {
-                                        addedFriends.add(it)
-                                    } else {
-                                        addedFriends.remove(it)
-                                    }
+                                    val mutableList = addList.toMutableList()
+                                    mutableList[friendsList.indexOf(friend)] = add
+                                    addList = mutableList.toList()
                                 },
                                 colors = CheckboxDefaults.colors(
                                     uncheckedColor = GreenMain,
@@ -190,7 +199,17 @@ fun AddFriendsList(
                 }
             }
         }
-        CreateTripButton(navigator, tripViewModel, tripName, addedFriends)
+        CreateTripButton(
+            navigator,
+            tripViewModel,
+            tripName,
+            buildList {
+                friendsList.forEachIndexed { index, friend ->
+                    if (addList[index])
+                        add(friend)
+                }
+            }
+        )
     }
 }
 
@@ -199,17 +218,18 @@ fun CreateTripButton(
     navigator: DestinationsNavigator,
     tripViewModel: TripViewModel,
     tripName: String,
-    friends: List<Friend>
+    addFriendList: List<Friend>
 ) {
-    val context = LocalContext.current
-    var error by remember { mutableStateOf("") }
-    var success by remember { mutableStateOf(false) }
     val createTripResult = tripViewModel.createTripDataResult.observeAsState()
+    val createTripMsgShow = tripViewModel.createTripMsgShow.observeAsState()
+    Log.d("CreateTripButton", "add friends : $addFriendList")
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {
-                tripViewModel.createTrip(tripName, friends)
-                success = true
+                tripViewModel.createTrip(
+                    tripName,
+                    addFriendList
+                )
             },
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp
@@ -223,18 +243,16 @@ fun CreateTripButton(
         }
     }
     viewModelResultHandler(
+        LocalContext.current,
         createTripResult,
         onSuccess = {
-            if (success) {
+            if (createTripMsgShow.value == true) {
                 navigator.navigate(BalanceScreenDestination)
             }
-            success = false
         },
-        onError = { newError ->
-            if (error != newError) {
-                Toast.makeText(context, "Error: $newError", Toast.LENGTH_LONG).show()
-            }
-            error = newError
-        }
+        restMsgShowState = {
+            tripViewModel.doNotShowCreateTripMsg()
+        },
+        msgShow = createTripMsgShow.value ?: false
     )
 }

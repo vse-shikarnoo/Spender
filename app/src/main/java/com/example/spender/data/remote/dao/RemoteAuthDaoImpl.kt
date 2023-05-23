@@ -1,13 +1,10 @@
 package com.example.spender.data.remote.dao
 
 import android.app.Application
-import android.util.Log
 import com.example.spender.R
 import com.example.spender.data.DataErrorHandler
 import com.example.spender.data.DataResult
 import com.example.spender.data.messages.FirebaseSuccessMessages
-import com.example.spender.data.messages.exceptions.FirebaseNicknameException
-import com.example.spender.data.messages.exceptions.FirebaseNicknameLengthException
 import com.example.spender.data.messages.exceptions.FirebaseNoUserSignedInException
 import com.example.spender.data.remote.RemoteDataSourceImpl
 import com.example.spender.domain.remotedao.RemoteAuthDao
@@ -21,6 +18,8 @@ class RemoteAuthDaoImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSourceImpl,
     private val appContext: Application
 ) : RemoteAuthDao {
+    private val sharedFunctions = SharedFunctions(remoteDataSource, appContext)
+
     override suspend fun signIn(email: String, password: String): DataResult<String> {
         return try {
             remoteDataSource.auth.signInWithEmailAndPassword(email, password).await()
@@ -35,42 +34,25 @@ class RemoteAuthDaoImpl @Inject constructor(
         password: String,
         nickname: String
     ): DataResult<FirebaseUser> {
-        return when (val checkNickname = checkNickname(nickname)) {
-            is DataResult.Success -> {
-                if (checkNickname.data) {
-                    val user = try {
-                        remoteDataSource.auth.createUserWithEmailAndPassword(
-                            email,
-                            password
-                        ).await()
-                    } catch (e: Exception) {
-                        Log.d("ABOBA", "error auth - ${e.message ?: "error auth"}")
-                        return DataErrorHandler.handle(e)
-                    }
-                    return try {
-                        user.user!!.let {
-                            remoteDataSource.db.collection(
-                                appContext.getString(R.string.collection_name_users)
-                            )
-                                .document(it.uid)
-                                .set(signUpMap(nickname)).await()
-                            DataResult.Success(it)
-                        }
-                    } catch (e: Exception) {
-                        user.user?.delete()?.await()
-                        Log.d("ABOBA", "Firestore error")
-                        DataErrorHandler.handle(e)
-                    }
-                } else {
-                    Log.d("ABOBA", "check nickname = false ${FirebaseNicknameException().message}")
-                    DataErrorHandler.handle(FirebaseNicknameException())
-                }
-            }
+        val checkNickname = checkNickname(nickname)
+        if (checkNickname is DataResult.Error) {
+            return checkNickname
+        }
 
-            is DataResult.Error -> {
-                Log.d("ABOBA", "check nickname - ${checkNickname.exception}")
-                checkNickname
-            }
+        val user = try {
+            remoteDataSource.auth.createUserWithEmailAndPassword(email, password).await()
+        } catch (e: Exception) {
+            return DataErrorHandler.handle(e)
+        }
+
+        return try {
+            remoteDataSource.db.collection(
+                appContext.getString(R.string.collection_name_users)
+            ).document(user.user!!.uid).set(signUpMap(nickname)).await()
+            DataResult.Success(user.user!!)
+        } catch (e: Exception) {
+            user.user?.delete()?.await()
+            DataErrorHandler.handle(e)
         }
     }
 
@@ -150,20 +132,6 @@ class RemoteAuthDaoImpl @Inject constructor(
     override suspend fun checkNickname(
         nickname: String
     ): DataResult<Boolean> {
-        if (nickname.length < 6) {
-            return DataErrorHandler.handle(FirebaseNicknameLengthException())
-        }
-        return try {
-            val checkNicknameQuerySnapshot =
-                remoteDataSource.db.collection(appContext.getString(R.string.collection_name_users))
-                    .whereEqualTo(
-                        appContext.getString(R.string.collection_users_document_field_nickname),
-                        nickname
-                    )
-                    .get(Source.DEFAULT).await()
-            DataResult.Success(checkNicknameQuerySnapshot.isEmpty)
-        } catch (e: Exception) {
-            DataErrorHandler.handle(e)
-        }
+        return sharedFunctions.checkNickname(nickname, Source.SERVER)
     }
 }

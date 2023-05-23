@@ -1,22 +1,24 @@
 package com.example.spender.domain.repository
 
 import com.example.spender.data.DataResult
-import com.example.spender.domain.model.Trip
-import com.example.spender.domain.model.spend.SpendMember
+import com.example.spender.domain.remotemodel.Trip
+import com.example.spender.domain.remotemodel.spend.GoogleMapsSpend
+import com.example.spender.domain.remotemodel.spend.LocalSpend
+import com.example.spender.domain.remotemodel.spend.RemoteSpend
+import com.example.spender.domain.remotemodel.spend.Spend
+import com.example.spender.domain.remotemodel.spendmember.RemoteSpendMember
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Source
 
 interface SpendRepository {
-    suspend fun createSpend(
-        trip: Trip,
-        name: String,
-        category: String = "No category",
-        splitMode: Int = 0,
-        amount: Double = 0.0,
-        geoPoint: GeoPoint = GeoPoint(0.0, 0.0),
-        members: List<SpendMember>,
+    suspend fun createSpend(trip: Trip, spend: LocalSpend): DataResult<String>
+    suspend fun getSpends(trip: Trip, source: Source): DataResult<List<RemoteSpend>>
+    suspend fun getAllSpends(source: Source): DataResult<List<GoogleMapsSpend>>
+    suspend fun updateSpend(
+        oldRemoteSpend: RemoteSpend,
+        newRemoteSpend: RemoteSpend
     ): DataResult<String>
-
     suspend fun updateSpendName(
         spendDocRef: DocumentReference,
         newName: String
@@ -27,7 +29,7 @@ interface SpendRepository {
     ): DataResult<String>
     suspend fun updateSpendSplitMode(
         spendDocRef: DocumentReference,
-        newSplitMode: Int
+        newSplitMode: String
     ): DataResult<String>
     suspend fun updateSpendAmount(
         spendDocRef: DocumentReference,
@@ -39,11 +41,10 @@ interface SpendRepository {
     ): DataResult<String>
     suspend fun addSpendMembers(
         spendDocRef: DocumentReference,
-        newMembers: List<SpendMember>
+        newMembers: List<RemoteSpendMember>
     ): DataResult<String>
     suspend fun deleteSpendMembers(
-        spendDocRef: DocumentReference,
-        members: List<SpendMember>
+        members: List<RemoteSpendMember>
     ): DataResult<String>
-    suspend fun deleteSpend(trip: Trip): DataResult<String>
+    suspend fun deleteSpend(spend: RemoteSpend): DataResult<String>
 }
